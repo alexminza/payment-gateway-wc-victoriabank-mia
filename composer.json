@@ -1,0 +1,13 @@
+{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../victoriabank-mia-sdk-php"
+        }
+    ],
+    "require": {
+        "alexminza/victoriabank-mia-sdk": "*"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
