@@ -66,7 +66,6 @@ function woocommerce_victoriabank_mia_init()
 
         const MOD_QR_ID            =  self::MOD_PREFIX . 'qr_id';
         const MOD_QR_URL           =  self::MOD_PREFIX . 'qr_url';
-        const MOD_PAY_ID           =  self::MOD_PREFIX . 'pay_id';
         const MOD_CALLBACK         =  self::MOD_PREFIX . 'callback';
 
         const DEFAULT_TIMEOUT  = 15; //seconds
@@ -351,39 +350,33 @@ function woocommerce_victoriabank_mia_init()
          * @param string $redirect_url
          * @param int    $validity_minutes
          */
-        private function victoriabank_mia_pay($client, $token, $order_id, $order_name, $total_amount, $currency, $callback_url, $redirect_url, $validity_minutes)
+        private function victoriabank_mia_pay($client, $token, $order_id, $order_name, $total_amount, $currency, $creditor_account, $company_name, $validity_minutes)
         {
-            $expires_at = (new DateTime())->modify("+{$validity_minutes} minutes")->format('c');
-
             $qr_data = array(
-                'type' => 'Dynamic',
-                'expiresAt' => $expires_at,
-                'amountType' => 'Fixed',
-                'amount' => $total_amount,
-                'currency' => $currency,
-                'description' => $order_name,
-                'orderId' => strval($order_id),
-                'callbackUrl' => $callback_url,
-                'redirectUrl' => $redirect_url
+                'header' => array(
+                    'qrType' => 'DYNM', # Type of QR code: DYNM - Dynamic QR, STAT - Static QR, HYBR - Hybrid QR
+                    'amountType' => 'Fixed', # Specifies the type of amount: Fixed - Dynamic QR, Controlled - Static QR, Free - Hybrid QR
+                    'pmtContext' => 'e' #Payment context: m - mobile payment, e - e-commerce payment, i - invoice payment, 0 - other
+                ),
+                'extension' => array(
+                    'creditorAccount' => array(
+                        'iban' => $creditor_account
+                    ),
+                    'amount' => array(
+                        'sum' => $total_amount,
+                        'currency' => $currency
+                    ),
+                    'dba' => $company_name,
+                    'remittanceInfo4Payer' => $order_name,
+                    'creditorRef' => $order_id,
+                    'ttl' => array(
+                        'length' => $validity_minutes, #The duration for which the QR code is valid.
+                        'units' => 'mm' #The unit of time for the TTL: ss - seconds, mm - minutes
+                    )
+                )
             );
 
-            return $client->createQr($qr_data, $token);
-        }
-
-        /**
-         * @param VictoriabankMiaClient $client
-         * @param string $token
-         * @param string $pay_id
-         * @param string $reason
-         */
-        private function victoriabank_mia_refund($client, $token, $pay_id, $reason)
-        {
-            $refund_data = array(
-                'payId' => $pay_id,
-                'reason' => $reason
-            );
-
-            return $client->paymentRefund($refund_data, $token);
+            return $client->createPayeeQr($qr_data, $token);
         }
         #endregion
 
@@ -533,7 +526,6 @@ function woocommerce_victoriabank_mia_init()
                 $callback_reference_id = strval($callback_data_result['referenceId']);
 
                 $order->add_meta_data(self::MOD_CALLBACK, $callback_body, true);
-                $order->add_meta_data(self::MOD_PAY_ID, $callback_pay_id, true);
                 $order->save();
 
                 $order->payment_complete($callback_reference_id);
@@ -555,7 +547,7 @@ function woocommerce_victoriabank_mia_init()
             }
 
             $order = wc_get_order($order_id);
-            $pay_id = $order->get_meta(self::MOD_PAY_ID, true);
+            $qr_id = $order->get_meta(self::MOD_QR_ID, true);
             $order_total = $order->get_total();
             $order_currency = $order->get_currency();
             $payment_refund_response = null;
@@ -573,7 +565,7 @@ function woocommerce_victoriabank_mia_init()
                 $client = $this->init_victoriabank_mia_client();
                 $token = $this->victoriabank_mia_generate_token($client);
 
-                $payment_refund_response = $this->victoriabank_mia_refund($client, $token, $pay_id, $reason);
+                $payment_refund_response = $client->reverseTransaction($qr_id, $token);
                 $this->log(self::print_var($payment_refund_response));
             } catch (Exception $ex) {
                 $this->log($ex, WC_Log_Levels::ERROR);
