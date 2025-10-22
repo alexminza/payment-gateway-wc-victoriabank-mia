@@ -139,7 +139,7 @@ class VB_MIA_Test
 
         $qr_extension_id = $vb_mia_pay_response['qrExtensionUUID'];
         $qr_url = $vb_mia_pay_response['qrAsText'];
-        $qr_image = $vb_mia_pay_response['qrAsImage'];
+        //$qr_image = $vb_mia_pay_response['qrAsImage'];
         print($qr_extension_id);
         print($qr_url);
     }
