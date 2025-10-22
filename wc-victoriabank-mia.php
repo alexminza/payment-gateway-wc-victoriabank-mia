@@ -74,7 +74,7 @@ function woocommerce_victoriabank_mia_init()
         #endregion
 
         protected $testmode, $debug, $logger, $transaction_type, $order_template, $transaction_validity;
-        protected $victoriabank_mia_base_url, $victoriabank_mia_callback_url, $victoriabank_mia_username, $victoriabank_mia_password, $victoriabank_mia_public_key;
+        protected $victoriabank_mia_base_url, $victoriabank_mia_callback_url, $victoriabank_mia_username, $victoriabank_mia_password, $victoriabank_mia_certificate;
 
         public function __construct()
         {
@@ -104,9 +104,9 @@ function woocommerce_victoriabank_mia_init()
             $this->victoriabank_mia_base_url     = $this->testmode ? VictoriabankMiaClient::TEST_BASE_URL : VictoriabankMiaClient::DEFAULT_BASE_URL;
             $this->victoriabank_mia_callback_url = $this->get_option('victoriabank_mia_callback_url', $this->get_callback_url());
 
-            $this->victoriabank_mia_username   = $this->get_option('victoriabank_mia_username');
-            $this->victoriabank_mia_password   = $this->get_option('victoriabank_mia_password');
-            $this->victoriabank_mia_public_key = $this->get_option('victoriabank_mia_public_key');
+            $this->victoriabank_mia_username    = $this->get_option('victoriabank_mia_username');
+            $this->victoriabank_mia_password    = $this->get_option('victoriabank_mia_password');
+            $this->victoriabank_mia_certificate = $this->get_option('victoriabank_mia_certificate');
 
             $this->init_form_fields();
             $this->init_settings();
@@ -187,9 +187,9 @@ function woocommerce_victoriabank_mia_init()
                     'title'       => __('Password', 'wc-victoriabank-mia'),
                     'type'        => 'password',
                 ),
-                'victoriabank_mia_public_key' => array(
-                    'title'       => __('Signature Key', 'wc-victoriabank-mia'),
-                    'type'        => 'password',
+                'victoriabank_mia_certificate' => array(
+                    'title'       => __('Certificate', 'wc-victoriabank-mia'),
+                    'type'        => 'textarea',
                 ),
 
                 'payment_notification' => array(
@@ -242,7 +242,7 @@ function woocommerce_victoriabank_mia_init()
         {
             return !self::string_empty($this->victoriabank_mia_username)
                 && !self::string_empty($this->victoriabank_mia_password)
-                && !self::string_empty($this->victoriabank_mia_public_key);
+                && !self::string_empty($this->victoriabank_mia_certificate);
         }
 
         protected function validate_settings()
@@ -472,8 +472,7 @@ function woocommerce_victoriabank_mia_init()
                 $callback_body = file_get_contents('php://input');
                 $this->log(sprintf(esc_html__('Payment notification callback: %1$s', 'wc-victoriabank-mia'), self::print_var($callback_body)));
 
-                $callback_data = json_decode($callback_body, true);
-                $validation_result = VictoriabankMiaClient::validateCallbackSignature($callback_data, $this->victoriabank_mia_public_key);
+                $validation_result = VictoriabankMiaClient::decodeValidateCallback($callback_body, $this->victoriabank_mia_certificate);
             } catch (Exception $ex) {
                 $this->log($ex, WC_Log_Levels::ERROR);
                 wp_die(get_status_header_desc(WP_Http::INTERNAL_SERVER_ERROR), WP_Http::INTERNAL_SERVER_ERROR);
