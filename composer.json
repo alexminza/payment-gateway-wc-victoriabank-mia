@@ -1,4 +1,30 @@
 {
+    "name": "alexminza/wc-victoriabank-mia",
+    "description": "Victoriabank MIA Payment Gateway for WooCommerce",
+    "type": "wordpress-plugin",
+    "keywords": [
+        "WooCommerce",
+        "Victoriabank",
+        "MIA",
+        "QR",
+        "bank",
+        "payment",
+        "gateway"
+    ],
+    "homepage": "https://github.com/alexminza/wc-victoriabank-mia",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Alexander Minza",
+            "homepage": "https://www.alexminza.com",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/alexminza/wc-victoriabank-mia/issues",
+        "forum": "https://wordpress.org/support/plugin/wc-victoriabank-mia",
+        "source": "https://github.com/alexminza/wc-victoriabank-mia"
+    },
     "repositories": [
         {
             "type": "path",
