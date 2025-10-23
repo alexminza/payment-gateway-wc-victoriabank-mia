@@ -64,9 +64,11 @@ function woocommerce_victoriabank_mia_init()
         const SUPPORTED_CURRENCIES = ['MDL'];
         const ORDER_TEMPLATE       = 'Order #%1$s';
 
-        const MOD_QR_ID            =  self::MOD_PREFIX . 'qr_id';
-        const MOD_QR_URL           =  self::MOD_PREFIX . 'qr_url';
-        const MOD_CALLBACK         =  self::MOD_PREFIX . 'callback';
+        const MOD_QR_ID             =  self::MOD_PREFIX . 'qr_id';
+        const MOD_QR_EXTENSION_ID   =  self::MOD_PREFIX . 'qr_extension_id';
+        const MOD_QR_URL            =  self::MOD_PREFIX . 'qr_url';
+        const MOD_CALLBACK          =  self::MOD_PREFIX . 'callback';
+        const MOD_PAYMENT_REFERENCE =  self::MOD_PREFIX . 'payment_reference';
 
         const DEFAULT_TIMEOUT  = 15; //seconds
         const DEFAULT_VALIDITY = 15; //minutes
@@ -402,26 +404,29 @@ function woocommerce_victoriabank_mia_init()
             }
 
             if (!empty($create_qr_response)) {
-                    $qr_id = $create_qr_response['qrExtensionUUID'];
-                    $qr_url = $create_qr_response['qrAsText'];
+                $qr_id = $create_qr_response['qrHeaderUUID'];
+                $qr_extension_id = $create_qr_response['qrExtensionUUID'];
+                $qr_url = $create_qr_response['qrAsText'];
+                unset($create_qr_response['qrAsImage']); //remove redundant large image data
 
-                    #region Update order payment transaction metadata
-                    //https://github.com/woocommerce/woocommerce/wiki/High-Performance-Order-Storage-Upgrade-Recipe-Book#apis-for-gettingsetting-posts-and-postmeta
-                    //https://developer.woocommerce.com/docs/hpos-extension-recipe-book/#2-supporting-high-performance-order-storage-in-your-extension
-                    $order->add_meta_data(self::MOD_QR_ID, $qr_id, true);
-                    $order->add_meta_data(self::MOD_QR_URL, $qr_url, true);
-                    $order->save();
-                    #endregion
+                #region Update order payment transaction metadata
+                //https://github.com/woocommerce/woocommerce/wiki/High-Performance-Order-Storage-Upgrade-Recipe-Book#apis-for-gettingsetting-posts-and-postmeta
+                //https://developer.woocommerce.com/docs/hpos-extension-recipe-book/#2-supporting-high-performance-order-storage-in-your-extension
+                $order->add_meta_data(self::MOD_QR_ID, $qr_id, true);
+                $order->add_meta_data(self::MOD_QR_EXTENSION_ID, $qr_extension_id, true);
+                $order->add_meta_data(self::MOD_QR_URL, $qr_url, true);
+                $order->save();
+                #endregion
 
-                    $message = sprintf(esc_html__('Payment initiated via %1$s: %2$s', 'wc-victoriabank-mia'), esc_html($this->method_title), esc_html(self::print_response_object($create_qr_response)));
-                    $message = $this->get_test_message($message);
-                    $this->log($message, WC_Log_Levels::INFO);
-                    $order->add_order_note($message);
+                $message = sprintf(esc_html__('Payment initiated via %1$s: %2$s', 'wc-victoriabank-mia'), esc_html($this->method_title), esc_html(self::print_response_object($create_qr_response)));
+                $message = $this->get_test_message($message);
+                $this->log($message, WC_Log_Levels::INFO);
+                $order->add_order_note($message);
 
-                    return array(
-                        'result'   => 'success',
-                        'redirect' => $qr_url
-                    );
+                return array(
+                    'result'   => 'success',
+                    'redirect' => $qr_url
+                );
             }
 
             $message = sprintf(esc_html__('Payment initiation failed via %1$s: %2$s', 'wc-victoriabank-mia'), esc_html($this->method_title), esc_html(self::print_response_object($create_qr_response)));
@@ -461,14 +466,14 @@ function woocommerce_victoriabank_mia_init()
                 $callback_body = file_get_contents('php://input');
                 $this->log(sprintf(esc_html__('Payment notification callback: %1$s', 'wc-victoriabank-mia'), self::print_var($callback_body)));
 
-                $validation_result = VictoriabankMiaClient::decodeValidateCallback($callback_body, $this->victoriabank_mia_certificate);
+                $callback_data = VictoriabankMiaClient::decodeValidateCallback($callback_body, $this->victoriabank_mia_certificate);
             } catch (Exception $ex) {
                 $this->log($ex, WC_Log_Levels::ERROR);
                 wp_die(get_status_header_desc(WP_Http::INTERNAL_SERVER_ERROR), WP_Http::INTERNAL_SERVER_ERROR);
                 throw $ex;
             }
 
-            if (!$validation_result) {
+            if (!$callback_data) {
                 $message = sprintf(esc_html__('%1$s callback signature validation failed.', 'wc-victoriabank-mia'), esc_html($this->method_title));
                 $this->log($message, WC_Log_Levels::ERROR);
 
@@ -478,12 +483,11 @@ function woocommerce_victoriabank_mia_init()
             #endregion
 
             #region Validate order ID
-            $callback_data_result = $callback_data['result'];
-            $callback_order_id = intval($callback_data_result['orderId']);
-            $order = wc_get_order($callback_order_id);
+            $callback_qr_extension_id = $callback_data['qrExtensionUUID'];
+            $order = self::get_order_by_qr_extension_id($callback_qr_extension_id);
 
             if (!$order) {
-                $message = sprintf(esc_html__('Order not found by Order ID: %1$d received from %2$s.', 'wc-victoriabank-mia'), $callback_order_id, esc_html($this->method_title));
+                $message = sprintf(esc_html__('Order not found by QR Extension ID: %1$d received from %2$s.', 'wc-victoriabank-mia'), $callback_qr_extension_id, esc_html($this->method_title));
                 $this->log($message, WC_Log_Levels::ERROR);
 
                 wp_die('Order not found', WP_Http::UNPROCESSABLE_ENTITY);
@@ -491,11 +495,13 @@ function woocommerce_victoriabank_mia_init()
             }
             #endregion
 
-            $callback_qr_status = strval($callback_data_result['qrStatus']);
-            if (strtolower($callback_qr_status) === 'paid') {
+            $callback_signal_code = strval($callback_data['signalCode']);
+            if (strtolower($callback_signal_code) === 'payment') {
                 #region Check order data
-                $callback_amount = floatval($callback_data_result['amount']);
-                $callback_currency = strval($callback_data_result['currency']);
+                $callback_data_payment = $callback_data['payment'];
+                $callback_data_payment_amount = $callback_data_payment['amount'];
+                $callback_amount = floatval($callback_data_payment_amount['sum']);
+                $callback_currency = strval($callback_data_payment_amount['currency']);
 
                 $order_total = $order->get_total();
                 $order_currency = $order->get_currency();
@@ -509,7 +515,7 @@ function woocommerce_victoriabank_mia_init()
                 }
 
                 if ($order->is_paid()) {
-                    $message = sprintf(esc_html__('Callback order already fully paid: %1$d.', 'wc-victoriabank-mia'), $callback_order_id);
+                    $message = sprintf(esc_html__('Callback order already fully paid: %1$d.', 'wc-victoriabank-mia'), $order->get_id());
                     $this->log($message, WC_Log_Levels::ERROR);
 
                     wp_die('Order already fully paid', WP_Http::OK);
@@ -518,13 +524,14 @@ function woocommerce_victoriabank_mia_init()
                 #endregion
 
                 #region Complete order payment
-                $callback_pay_id = strval($callback_data_result['payId']);
-                $callback_reference_id = strval($callback_data_result['referenceId']);
+                $callback_payment_reference = strval($callback_data_payment['reference']);
+                $callback_payment_rrn = self::get_payment_rrn($callback_payment_reference);
 
                 $order->add_meta_data(self::MOD_CALLBACK, $callback_body, true);
+                $order->add_meta_data(self::MOD_PAYMENT_REFERENCE, $callback_payment_reference, true);
                 $order->save();
 
-                $order->payment_complete($callback_reference_id);
+                $order->payment_complete($callback_payment_rrn);
                 #endregion
 
                 $message = sprintf(esc_html__('Payment completed via %1$s: %2$s', 'wc-victoriabank-mia'), esc_html($this->method_title), esc_html($callback_body));
@@ -543,14 +550,15 @@ function woocommerce_victoriabank_mia_init()
             }
 
             $order = wc_get_order($order_id);
-            $qr_id = $order->get_meta(self::MOD_QR_ID, true);
+            $payment_reference = $order->get_meta(self::MOD_PAYMENT_REFERENCE, true);
+            $transaction_id = self::get_payment_transaction_id($payment_reference);
             $order_total = $order->get_total();
             $order_currency = $order->get_currency();
             $payment_refund_response = null;
 
             #region Validate refund amount
             if (isset($amount) && $amount != $order_total) {
-                $message = esc_html__('Partial refunds are not currently supported by Victoriabank MIA.', 'wc-victoriabank-mia');
+                $message = sprintf(esc_html__('Partial refunds are not currently supported by %1$s.', 'wc-victoriabank-mia'), self::MOD_TITLE);
                 $this->log($message, WC_Log_Levels::ERROR);
 
                 return new WP_Error($this->id . '_error', $message);
@@ -561,42 +569,68 @@ function woocommerce_victoriabank_mia_init()
                 $client = $this->init_victoriabank_mia_client();
                 $token = $this->victoriabank_mia_generate_token($client);
 
-                $payment_refund_response = $client->reverseTransaction($qr_id, $token);
+                $payment_refund_response = $client->reverseTransaction($transaction_id, $token);
                 $this->log(self::print_var($payment_refund_response));
             } catch (Exception $ex) {
                 $this->log($ex, WC_Log_Levels::ERROR);
+
+                $message = sprintf(esc_html__('Refund of %1$s %2$s via %3$s failed: %4$s', 'wc-victoriabank-mia'), esc_html($order_total), esc_html($order_currency), esc_html($this->method_title), esc_html($ex->getMessage()));
+                $message = $this->get_test_message($message);
+                $order->add_order_note($message);
+                $this->log($message, WC_Log_Levels::ERROR);
+
+                $this->logs_admin_notice();
+
                 return new WP_Error($this->id . '_error', $ex->getMessage());
             }
 
-            if (!empty($payment_refund_response)) {
-                $payment_refund_response_ok = $payment_refund_response['ok'];
-                if ($payment_refund_response_ok) {
-                    $payment_refund_response_result = $payment_refund_response['result'];
-
-                    $refund_status = $payment_refund_response_result['status'];
-                    if (strtolower($refund_status) === 'refunded') {
-                        $message = sprintf(esc_html__('Refund of %1$s %2$s via %3$s approved: %4$s', 'wc-victoriabank-mia'), esc_html($order_total), esc_html($order_currency), esc_html($this->method_title), esc_html(self::print_response_object($payment_refund_response)));
-                        $message = $this->get_test_message($message);
-                        $this->log($message, WC_Log_Levels::INFO);
-                        $order->add_order_note($message);
-
-                        return true;
-                    }
-                }
-            }
-
-            $message = sprintf(esc_html__('Refund of %1$s %2$s via %3$s failed: %4$s', 'wc-victoriabank-mia'), esc_html($order_total), esc_html($order_currency), esc_html($this->method_title), esc_html(self::print_response_object($payment_refund_response)));
+            $message = sprintf(esc_html__('Refund of %1$s %2$s via %3$s approved: %4$s', 'wc-victoriabank-mia'), esc_html($order_total), esc_html($order_currency), esc_html($this->method_title), esc_html(self::print_response_object($payment_refund_response)));
             $message = $this->get_test_message($message);
+            $this->log($message, WC_Log_Levels::INFO);
             $order->add_order_note($message);
-            $this->log($message, WC_Log_Levels::ERROR);
 
-            $this->logs_admin_notice();
-
-            return new WP_Error($this->id . '_error', $message);
+            return true;
         }
         #endregion
 
         #region Utility
+        protected static function get_order_by_qr_extension_id($qr_extension_id)
+        {
+            //NOTE: Victoriabank MIA API does not currently support passing Order ID for transactions
+            #https://stackoverflow.com/questions/71438717/extend-wc-get-orders-with-a-custom-meta-key-and-meta-value
+            $args = array(
+                'meta_key'   => self::MOD_QR_EXTENSION_ID,
+                'meta_value' => $qr_extension_id
+            );
+
+            $orders = wc_get_orders($args);
+            if (count($orders) == 1) {
+                return $orders[0];
+            }
+
+            self::static_log(self::print_var($orders));
+            return false;
+        }
+
+        protected static function get_payment_transaction_id($payment_reference)
+        {
+            //NOTE: Victoriabank MIA API provides only a composed reference string that needs to be parsed
+            $transaction_components = explode('|', $payment_reference);
+            $transaction_id = $transaction_components[3];
+
+            return $transaction_id;
+        }
+
+        protected static function get_payment_rrn($payment_reference)
+        {
+            $transaction_id = self::get_payment_transaction_id($payment_reference);
+            $rrn = strlen($transaction_id) < 12
+                ? $transaction_id
+                : substr($transaction_id, -12);
+
+            return $rrn;
+        }
+
         protected function get_order_description($order)
         {
             $description = sprintf($this->order_template, $order->get_id());
