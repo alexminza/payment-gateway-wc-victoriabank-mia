@@ -334,7 +334,7 @@ function woocommerce_victoriabank_mia_init()
         private function victoriabank_mia_generate_token($client)
         {
             $tokenResponse = $client->getToken('password', $this->victoriabank_mia_username, $this->victoriabank_mia_password);
-            $accessToken = $tokenResponse['result']['accessToken'];
+            $accessToken = $tokenResponse['accessToken'];
 
             return $accessToken;
         }
@@ -346,8 +346,8 @@ function woocommerce_victoriabank_mia_init()
          * @param string $order_name
          * @param float  $total_amount
          * @param string $currency
-         * @param string $callback_url
-         * @param string $redirect_url
+         * @param string $creditor_account
+         * @param string $company_name
          * @param int    $validity_minutes
          */
         private function victoriabank_mia_pay($client, $token, $order_id, $order_name, $total_amount, $currency, $creditor_account, $company_name, $validity_minutes)
@@ -402,11 +402,8 @@ function woocommerce_victoriabank_mia_init()
             }
 
             if (!empty($create_qr_response)) {
-                $create_qr_response_ok = $create_qr_response['ok'];
-                if ($create_qr_response_ok) {
-                    $create_qr_response_result = $create_qr_response['result'];
-                    $qr_id = $create_qr_response_result['qrId'];
-                    $qr_url = $create_qr_response_result['url'];
+                    $qr_id = $create_qr_response['qrExtensionUUID'];
+                    $qr_url = $create_qr_response['qrAsText'];
 
                     #region Update order payment transaction metadata
                     //https://github.com/woocommerce/woocommerce/wiki/High-Performance-Order-Storage-Upgrade-Recipe-Book#apis-for-gettingsetting-posts-and-postmeta
@@ -425,7 +422,6 @@ function woocommerce_victoriabank_mia_init()
                         'result'   => 'success',
                         'redirect' => $qr_url
                     );
-                }
             }
 
             $message = sprintf(esc_html__('Payment initiation failed via %1$s: %2$s', 'wc-victoriabank-mia'), esc_html($this->method_title), esc_html(self::print_response_object($create_qr_response)));
