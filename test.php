@@ -143,7 +143,17 @@ class VB_MIA_Test
         print($qr_extension_id);
         print($qr_url);
     }
+
+    public function test_callback()
+    {
+        $victoriabank_mia_certificate = file_get_contents($this->VB_PUBLIC_KEY_PATH);
+        $callback_body = '';
+        $callback_data = VictoriabankMiaClient::decodeValidateCallback($callback_body, $victoriabank_mia_certificate);
+
+        print_r($callback_data);
+    }
 }
 
 $vb_mia_test = new VB_MIA_Test();
-$vb_mia_test->test();
+#$vb_mia_test->test();
+$vb_mia_test->test_callback();

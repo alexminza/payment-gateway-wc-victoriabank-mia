@@ -623,6 +623,7 @@ function woocommerce_victoriabank_mia_init()
 
         protected static function get_payment_rrn($payment_reference)
         {
+            //NOTE: Victoriabank MIA API provides only a composed transaction string that needs to be parsed
             $transaction_id = self::get_payment_transaction_id($payment_reference);
             $rrn = strlen($transaction_id) < 12
                 ? $transaction_id
