@@ -1,4 +1,4 @@
-const vb_mia_settings = window.wc.wcSettings.getSetting('vb_mia_data', {});
+const vb_mia_settings = window.wc.wcSettings.getSetting('victoriabank_mia_data', {});
 const vb_mia_title = window.wp.htmlEntities.decodeEntities(vb_mia_settings.title);
 
 const vb_mia_content = () => {
