@@ -194,15 +194,15 @@ function woocommerce_victoriabank_mia_init()
                     'title'       => __('Certificate', 'wc-victoriabank-mia'),
                     'type'        => 'textarea',
                 ),
+                'victoriabank_mia_company_name' => array(
+                    'title'       => __('Company Name', 'wc-victoriabank-mia'),
+                    'type'        => 'text',
+                ),
                 'victoriabank_mia_creditor_account' => array(
                     'title'       => __('Creditor Account', 'wc-victoriabank-mia'),
                     'type'        => 'text',
                     'description' => __('IBAN', 'wc-victoriabank-mia'),
                     'desc_tip'    => true,
-                ),
-                'victoriabank_mia_company_name' => array(
-                    'title'       => __('Company Name', 'wc-victoriabank-mia'),
-                    'type'        => 'text',
                 ),
 
                 'payment_notification' => array(
@@ -382,7 +382,7 @@ function woocommerce_victoriabank_mia_init()
                     ),
                     'dba' => $company_name,
                     'remittanceInfo4Payer' => $order_name,
-                    'creditorRef' => $order_id,
+                    'creditorRef' => strval($order_id),
                     'ttl' => array(
                         'length' => $validity_minutes, #The duration for which the QR code is valid.
                         'units' => 'mm' #The unit of time for the TTL: ss - seconds, mm - minutes
@@ -415,6 +415,12 @@ function woocommerce_victoriabank_mia_init()
                     $this->victoriabank_mia_company_name,
                     $this->transaction_validity
                 );
+
+                if (!empty($create_qr_response)) {
+                    //NOTE: remove redundant large image data
+                    $create_qr_response['qrAsImage'] = null;
+                }
+
                 $this->log(self::print_var($create_qr_response));
             } catch (Exception $ex) {
                 $this->log($ex, WC_Log_Levels::ERROR);
@@ -424,7 +430,6 @@ function woocommerce_victoriabank_mia_init()
                 $qr_id = $create_qr_response['qrHeaderUUID'];
                 $qr_extension_id = $create_qr_response['qrExtensionUUID'];
                 $qr_url = $create_qr_response['qrAsText'];
-                unset($create_qr_response['qrAsImage']); //remove redundant large image data
 
                 #region Update order payment transaction metadata
                 //https://github.com/woocommerce/woocommerce/wiki/High-Performance-Order-Storage-Upgrade-Recipe-Book#apis-for-gettingsetting-posts-and-postmeta
@@ -446,12 +451,10 @@ function woocommerce_victoriabank_mia_init()
                 );
             }
 
-            $message = sprintf(esc_html__('Payment initiation failed via %1$s: %2$s', 'wc-victoriabank-mia'), esc_html($this->method_title), esc_html(self::print_response_object($create_qr_response)));
+            $message = sprintf(esc_html__('Order #%1$s payment initiation failed via %2$s.', 'wc-victoriabank-mia'), esc_html($order_id), esc_html($this->method_title));
             $message = $this->get_test_message($message);
             $order->add_order_note($message);
             $this->log($message, WC_Log_Levels::ERROR);
-
-            $message = sprintf(esc_html__('Order #%1$s payment initiation failed via %2$s.', 'wc-victoriabank-mia'), esc_html($order_id), esc_html($this->method_title));
 
             //https://github.com/woocommerce/woocommerce/issues/48687#issuecomment-2186475264
             $is_store_api_request = method_exists(WC(), 'is_store_api_request') && WC()->is_store_api_request();
