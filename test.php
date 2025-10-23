@@ -82,8 +82,10 @@ class VB_MIA_Test
      */
     private function vb_mia_generate_token($client)
     {
-        $token = $client->getToken('password', $this->VB_MIA_USERNAME, $this->VB_MIA_PASSWORD);
-        return $token;
+        $tokenResponse = $client->getToken('password', $this->VB_MIA_USERNAME, $this->VB_MIA_PASSWORD);
+        $accessToken = $tokenResponse['accessToken'];
+
+        return $accessToken;
     }
 
     /**
@@ -129,7 +131,7 @@ class VB_MIA_Test
     {
         $client = $this->vb_mia_init_client();
         $authToken = $this->vb_mia_generate_token($client);
-        print($authToken);
+        //print($authToken);
 
         $order_id = '12345';
         $order_name = "Order #$order_id";
@@ -155,5 +157,5 @@ class VB_MIA_Test
 }
 
 $vb_mia_test = new VB_MIA_Test();
-#$vb_mia_test->test();
-$vb_mia_test->test_callback();
+$vb_mia_test->test();
+#$vb_mia_test->test_callback();
