@@ -52,6 +52,7 @@ class VB_MIA_Test
         $this->VB_MIA_PASSWORD = getenv('VB_MIA_PASSWORD');
         $this->VB_PUBLIC_KEY_PATH = getenv('VB_PUBLIC_KEY_PATH');
         $this->VB_COMPANY_NAME = getenv('VB_COMPANY_NAME');
+        $this->VB_COMPANY_IBAN = getenv('VB_COMPANY_IBAN');
     }
 
     private function vb_mia_init_client()
@@ -117,7 +118,7 @@ class VB_MIA_Test
                 'remittanceInfo4Payer' => $order_name,
                 'creditorRef' => $order_id,
                 'ttl' => array(
-                    'length' => $validity_minutes, #The duration for which the QR code is valid
+                    'length' => $validity_minutes, #The duration for which the QR code is valid.
                     'units' => 'mm' #The unit of time for the TTL: ss - seconds, mm - minutes
                 )
             )
@@ -138,12 +139,11 @@ class VB_MIA_Test
         $total_amount = 123.45;
         $currency = 'MDL';
         $vb_mia_pay_response = $this->vb_mia_pay($client, $authToken, $order_id, $order_name, $total_amount, $currency, 10);
+        print_r($vb_mia_pay_response);
 
         $qr_extension_id = $vb_mia_pay_response['qrExtensionUUID'];
         $qr_url = $vb_mia_pay_response['qrAsText'];
         //$qr_image = $vb_mia_pay_response['qrAsImage'];
-        print($qr_extension_id);
-        print($qr_url);
     }
 
     public function test_callback()
@@ -155,6 +155,8 @@ class VB_MIA_Test
         print_r($callback_data);
     }
 }
+
+putenv('DEBUG=1');
 
 $vb_mia_test = new VB_MIA_Test();
 $vb_mia_test->test();

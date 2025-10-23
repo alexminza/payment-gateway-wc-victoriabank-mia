@@ -75,7 +75,7 @@ function woocommerce_victoriabank_mia_init()
         #endregion
 
         protected $testmode, $debug, $logger, $transaction_type, $order_template, $transaction_validity;
-        protected $victoriabank_mia_base_url, $victoriabank_mia_callback_url, $victoriabank_mia_username, $victoriabank_mia_password, $victoriabank_mia_certificate;
+        protected $victoriabank_mia_base_url, $victoriabank_mia_username, $victoriabank_mia_password, $victoriabank_mia_certificate, $victoriabank_mia_creditor_account, $victoriabank_mia_company_name;
 
         public function __construct()
         {
@@ -103,11 +103,13 @@ function woocommerce_victoriabank_mia_init()
 
             #https://github.com/alexminza/victoriabank-mia-sdk-php/blob/v1.0.0/src/VictoriabankMia/VictoriabankMiaClient.php
             $this->victoriabank_mia_base_url     = $this->testmode ? VictoriabankMiaClient::TEST_BASE_URL : VictoriabankMiaClient::DEFAULT_BASE_URL;
-            $this->victoriabank_mia_callback_url = $this->get_option('victoriabank_mia_callback_url', $this->get_callback_url());
 
             $this->victoriabank_mia_username    = $this->get_option('victoriabank_mia_username');
             $this->victoriabank_mia_password    = $this->get_option('victoriabank_mia_password');
             $this->victoriabank_mia_certificate = $this->get_option('victoriabank_mia_certificate');
+
+            $this->victoriabank_mia_creditor_account = $this->get_option('victoriabank_mia_creditor_account');
+            $this->victoriabank_mia_company_name     = $this->get_option('victoriabank_mia_company_name');
 
             $this->init_form_fields();
             $this->init_settings();
@@ -192,16 +194,26 @@ function woocommerce_victoriabank_mia_init()
                     'title'       => __('Certificate', 'wc-victoriabank-mia'),
                     'type'        => 'textarea',
                 ),
+                'victoriabank_mia_creditor_account' => array(
+                    'title'       => __('Creditor Account', 'wc-victoriabank-mia'),
+                    'type'        => 'text',
+                    'description' => __('IBAN', 'wc-victoriabank-mia'),
+                    'desc_tip'    => true,
+                ),
+                'victoriabank_mia_company_name' => array(
+                    'title'       => __('Company Name', 'wc-victoriabank-mia'),
+                    'type'        => 'text',
+                ),
 
                 'payment_notification' => array(
                     'title'       => __('Payment Notification', 'wc-victoriabank-mia'),
+                    'description' => sprintf(
+                        '%1$s<br /><br /><b>%2$s:</b> <code>%3$s</code>',
+                        esc_html__('Provide this URL to the bank to enable online payment notifications.', 'wc-victoriabank-mia'),
+                        esc_html__('Callback URL', 'wc-victoriabank-mia'),
+                        esc_url($this->get_callback_url())
+                    ),
                     'type'        => 'title'
-                ),
-                'victoriabank_mia_callback_url' => array(
-                    'title'       => __('Callback URL', 'wc-victoriabank-mia'),
-                    'type'        => 'text',
-                    'description' => sprintf('<code>%1$s</code>', esc_url($this->get_callback_url())),
-                    'default'     => $this->get_callback_url()
                 ),
             );
         }
@@ -386,18 +398,23 @@ function woocommerce_victoriabank_mia_init()
         public function process_payment($order_id)
         {
             $order = wc_get_order($order_id);
-            $order_total = $order->get_total();
-            $order_currency = $order->get_currency();
-            $order_description = $this->get_order_description($order);
-            $callback_url = $this->victoriabank_mia_callback_url;
-            $redirect_url = $this->get_redirect_url($order);
             $create_qr_response = null;
 
             try {
                 $client = $this->init_victoriabank_mia_client();
                 $token = $this->victoriabank_mia_generate_token($client);
 
-                $create_qr_response = $this->victoriabank_mia_pay($client, $token, $order_id, $order_description, $order_total, $order_currency, $callback_url, $redirect_url, $this->transaction_validity);
+                $create_qr_response = $this->victoriabank_mia_pay(
+                    $client,
+                    $token,
+                    $order_id,
+                    $this->get_order_description($order),
+                    $order->get_total(),
+                    $order->get_currency(),
+                    $this->victoriabank_mia_creditor_account,
+                    $this->victoriabank_mia_company_name,
+                    $this->transaction_validity
+                );
                 $this->log(self::print_var($create_qr_response));
             } catch (Exception $ex) {
                 $this->log($ex, WC_Log_Levels::ERROR);
