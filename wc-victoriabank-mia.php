@@ -491,13 +491,6 @@ function woocommerce_victoriabank_mia_init()
                 $this->log(self::print_var($callback_data));
             } catch (Exception $ex) {
                 $this->log($ex, WC_Log_Levels::ERROR);
-                return self::return_response(WP_Http::INTERNAL_SERVER_ERROR);
-            }
-
-            if (empty($callback_data)) {
-                $message = sprintf(esc_html__('%1$s callback signature validation failed.', 'wc-victoriabank-mia'), esc_html($this->method_title));
-                $this->log($message, WC_Log_Levels::ERROR);
-
                 return self::return_response(WP_Http::UNAUTHORIZED, 'Invalid callback signature');
             }
             #endregion
