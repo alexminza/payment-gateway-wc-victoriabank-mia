@@ -540,13 +540,13 @@ function woocommerce_victoriabank_mia_init()
 
             #region Complete order payment
             $callback_payment_reference = strval($callback_data_payment['reference']);
-            $callback_payment_rrn = self::get_payment_rrn($callback_payment_reference);
+            $callback_payment_transaction_id = self::get_payment_transaction_id($callback_payment_reference);
 
             $order->add_meta_data(self::MOD_CALLBACK, $callback_body, true);
             $order->add_meta_data(self::MOD_PAYMENT_REFERENCE, $callback_payment_reference, true);
             $order->save();
 
-            $order->payment_complete($callback_payment_rrn);
+            $order->payment_complete($callback_payment_transaction_id);
             #endregion
 
             $message = sprintf(esc_html__('Payment completed via %1$s: %2$s', 'wc-victoriabank-mia'), esc_html($this->method_title), esc_html($callback_data));
@@ -585,7 +585,7 @@ function woocommerce_victoriabank_mia_init()
                 $token = $this->victoriabank_mia_generate_token($client);
 
                 $payment_refund_response = $client->reverseTransaction($transaction_id, $token);
-                $this->log(self::print_var($payment_refund_response));
+                //$this->log(self::print_var($payment_refund_response));
             } catch (Exception $ex) {
                 $this->log($ex, WC_Log_Levels::ERROR);
 
@@ -599,7 +599,7 @@ function woocommerce_victoriabank_mia_init()
                 return new WP_Error($this->id . '_error', $ex->getMessage());
             }
 
-            $message = sprintf(esc_html__('Refund of %1$s %2$s via %3$s approved: %4$s', 'wc-victoriabank-mia'), esc_html($order_total), esc_html($order_currency), esc_html($this->method_title), esc_html(self::print_response_object($payment_refund_response)));
+            $message = sprintf(esc_html__('Refund of %1$s %2$s via %3$s approved.', 'wc-victoriabank-mia'), esc_html($order_total), esc_html($order_currency), esc_html($this->method_title), esc_html(self::print_response_object($payment_refund_response)));
             $message = $this->get_test_message($message);
             $this->log($message, WC_Log_Levels::INFO);
             $order->add_order_note($message);
