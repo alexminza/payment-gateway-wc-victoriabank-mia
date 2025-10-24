@@ -63,9 +63,12 @@ class VB_MIA_Test
         ];
 
         if ($this->DEBUG) {
-            $log = new \Monolog\Logger('victoriabank_mia_guzzle_request');
-            $logFileName = 'victoriabank_mia_guzzle.log';
+            $logName = 'victoriabank_mia_guzzle';
+            $logFileName = "$logName.log";
+
+            $log = new \Monolog\Logger($logName);
             $log->pushHandler(new \Monolog\Handler\StreamHandler($logFileName, \Monolog\Logger::DEBUG));
+
             $stack = \GuzzleHttp\HandlerStack::create();
             $stack->push(\GuzzleHttp\Middleware::log($log, new \GuzzleHttp\MessageFormatter(\GuzzleHttp\MessageFormatter::DEBUG)));
 
