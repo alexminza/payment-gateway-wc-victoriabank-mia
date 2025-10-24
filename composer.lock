@@ -12,7 +12,7 @@
             "dist": {
                 "type": "path",
                 "url": "../victoriabank-mia-sdk-php",
-                "reference": "264c6c9cfe5609ca50ce8c79802a0e4e5a3dd6a9"
+                "reference": "9632ff4d52b56cdf308596fa5c0e289736e085ba"
             },
             "require": {
                 "firebase/php-jwt": "^6.0",

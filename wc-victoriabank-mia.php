@@ -540,7 +540,7 @@ function woocommerce_victoriabank_mia_init()
 
             #region Complete order payment
             $callback_payment_reference = strval($callback_data_payment['reference']);
-            $callback_payment_transaction_id = self::get_payment_transaction_id($callback_payment_reference);
+            $callback_payment_transaction_id = VictoriabankMiaClient::getPaymentTransactionId($callback_payment_reference);
 
             $order->add_meta_data(self::MOD_CALLBACK, $callback_body, true);
             $order->add_meta_data(self::MOD_PAYMENT_REFERENCE, $callback_payment_reference, true);
@@ -566,7 +566,7 @@ function woocommerce_victoriabank_mia_init()
 
             $order = wc_get_order($order_id);
             $payment_reference = $order->get_meta(self::MOD_PAYMENT_REFERENCE, true);
-            $transaction_id = self::get_payment_transaction_id($payment_reference);
+            $transaction_id = VictoriabankMiaClient::getPaymentTransactionId($payment_reference);
             $order_total = $order->get_total();
             $order_currency = $order->get_currency();
             $payment_refund_response = null;
@@ -625,26 +625,6 @@ function woocommerce_victoriabank_mia_init()
 
             self::static_log(self::print_var($orders));
             return false;
-        }
-
-        protected static function get_payment_transaction_id($payment_reference)
-        {
-            //NOTE: Victoriabank MIA API provides only a composed reference string that needs to be parsed
-            $transaction_components = explode('|', $payment_reference);
-            $transaction_id = $transaction_components[3];
-
-            return $transaction_id;
-        }
-
-        protected static function get_payment_rrn($payment_reference)
-        {
-            //NOTE: Victoriabank MIA API provides only a composed transaction string that needs to be parsed
-            $transaction_id = self::get_payment_transaction_id($payment_reference);
-            $rrn = strlen($transaction_id) < 12
-                ? $transaction_id
-                : substr($transaction_id, -12);
-
-            return $rrn;
         }
 
         protected function get_order_description($order)
