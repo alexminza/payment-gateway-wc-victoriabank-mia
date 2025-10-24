@@ -482,18 +482,21 @@ function woocommerce_victoriabank_mia_init()
             }
 
             #region Validate callback
+            $callback_data = null;
+
             try {
                 $callback_body = file_get_contents('php://input');
                 $this->log(sprintf(esc_html__('Payment notification callback: %1$s', 'wc-victoriabank-mia'), self::print_var($callback_body)));
 
                 $callback_data = VictoriabankMiaClient::decodeValidateCallback($callback_body, $this->victoriabank_mia_certificate);
+                $this->log(self::print_var($callback_data));
             } catch (Exception $ex) {
                 $this->log($ex, WC_Log_Levels::ERROR);
                 wp_die(get_status_header_desc(WP_Http::INTERNAL_SERVER_ERROR), WP_Http::INTERNAL_SERVER_ERROR);
                 throw $ex;
             }
 
-            if (!$callback_data) {
+            if (empty($callback_data)) {
                 $message = sprintf(esc_html__('%1$s callback signature validation failed.', 'wc-victoriabank-mia'), esc_html($this->method_title));
                 $this->log($message, WC_Log_Levels::ERROR);
 
@@ -502,21 +505,21 @@ function woocommerce_victoriabank_mia_init()
             }
             #endregion
 
-            #region Validate order ID
-            $callback_qr_extension_id = $callback_data['qrExtensionUUID'];
-            $order = self::get_order_by_qr_extension_id($callback_qr_extension_id);
-
-            if (!$order) {
-                $message = sprintf(esc_html__('Order not found by QR Extension ID: %1$d received from %2$s.', 'wc-victoriabank-mia'), $callback_qr_extension_id, esc_html($this->method_title));
-                $this->log($message, WC_Log_Levels::ERROR);
-
-                wp_die('Order not found', WP_Http::UNPROCESSABLE_ENTITY);
-                return false;
-            }
-            #endregion
-
             $callback_signal_code = strval($callback_data['signalCode']);
             if (strtolower($callback_signal_code) === 'payment') {
+                #region Validate order ID
+                $callback_qr_extension_id = $callback_data['qrExtensionUUID'];
+                $order = self::get_order_by_qr_extension_id($callback_qr_extension_id);
+
+                if (!$order) {
+                    $message = sprintf(esc_html__('Order not found by QR Extension ID: %1$d received from %2$s.', 'wc-victoriabank-mia'), $callback_qr_extension_id, esc_html($this->method_title));
+                    $this->log($message, WC_Log_Levels::ERROR);
+
+                    wp_die('Order not found', WP_Http::UNPROCESSABLE_ENTITY);
+                    return false;
+                }
+                #endregion
+
                 #region Check order data
                 $callback_data_payment = $callback_data['payment'];
                 $callback_data_payment_amount = $callback_data_payment['amount'];
