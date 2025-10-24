@@ -355,7 +355,7 @@ function woocommerce_victoriabank_mia_init()
 
         /**
          * @param VictoriabankMiaClient $client
-         * @param string $token
+         * @param string $auth_token
          * @param string $order_id
          * @param string $order_name
          * @param float  $total_amount
@@ -364,7 +364,7 @@ function woocommerce_victoriabank_mia_init()
          * @param string $company_name
          * @param int    $validity_minutes
          */
-        private function victoriabank_mia_pay($client, $token, $order_id, $order_name, $total_amount, $currency, $creditor_account, $company_name, $validity_minutes)
+        private function victoriabank_mia_pay($client, $auth_token, $order_id, $order_name, $total_amount, $currency, $creditor_account, $company_name, $validity_minutes)
         {
             $qr_data = array(
                 'header' => array(
@@ -390,7 +390,7 @@ function woocommerce_victoriabank_mia_init()
                 )
             );
 
-            return $client->createPayeeQr($qr_data, $token);
+            return $client->createPayeeQr($qr_data, $auth_token);
         }
         #endregion
 
@@ -402,11 +402,11 @@ function woocommerce_victoriabank_mia_init()
 
             try {
                 $client = $this->init_victoriabank_mia_client();
-                $token = $this->victoriabank_mia_generate_token($client);
+                $auth_token = $this->victoriabank_mia_generate_token($client);
 
                 $create_qr_response = $this->victoriabank_mia_pay(
                     $client,
-                    $token,
+                    $auth_token,
                     $order_id,
                     $this->get_order_description($order),
                     $order->get_total(),
@@ -582,9 +582,9 @@ function woocommerce_victoriabank_mia_init()
 
             try {
                 $client = $this->init_victoriabank_mia_client();
-                $token = $this->victoriabank_mia_generate_token($client);
+                $auth_token = $this->victoriabank_mia_generate_token($client);
 
-                $payment_refund_response = $client->reverseTransaction($transaction_id, $token);
+                $payment_refund_response = $client->reverseTransaction($transaction_id, $auth_token);
                 //$this->log(self::print_var($payment_refund_response));
             } catch (Exception $ex) {
                 $this->log($ex, WC_Log_Levels::ERROR);
