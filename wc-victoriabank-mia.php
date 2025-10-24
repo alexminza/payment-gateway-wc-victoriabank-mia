@@ -193,6 +193,8 @@ function woocommerce_victoriabank_mia_init()
                 'victoriabank_mia_certificate' => array(
                     'title'       => __('Certificate', 'wc-victoriabank-mia'),
                     'type'        => 'textarea',
+                    'description' => __('Victoriabank Public Key Certificate to validate the authenticity of the payment notifications.', 'wc-victoriabank-mia'),
+                    'desc_tip'    => true,
                 ),
                 'victoriabank_mia_company_name' => array(
                     'title'       => __('Company Name', 'wc-victoriabank-mia'),
@@ -474,10 +476,8 @@ function woocommerce_victoriabank_mia_init()
         public function check_response()
         {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $message = sprintf(esc_html__('This %1$s Callback URL works and should not be called directly.', 'wc-victoriabank-mia'), esc_html($this->method_title));
-                wc_add_notice($message, 'notice');
-
-                return wp_safe_redirect(wc_get_cart_url());
+                $message = sprintf(esc_html__('%1$s Callback URL', 'wc-victoriabank-mia'), esc_html($this->method_title));
+                return self::return_response(WP_Http::OK, $message);
             }
 
             #region Validate callback
