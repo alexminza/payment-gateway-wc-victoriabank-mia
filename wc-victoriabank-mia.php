@@ -515,8 +515,8 @@ function woocommerce_victoriabank_mia_init()
             #endregion
 
             #region Check order data
-            $callback_data_payment = $callback_data['payment'];
-            $callback_data_payment_amount = $callback_data_payment['amount'];
+            $callback_data_payment = (array) $callback_data['payment'];
+            $callback_data_payment_amount = (array) $callback_data_payment['amount'];
             $callback_amount = floatval($callback_data_payment_amount['sum']);
             $callback_currency = strval($callback_data_payment_amount['currency']);
 
@@ -549,7 +549,7 @@ function woocommerce_victoriabank_mia_init()
             $order->payment_complete($callback_payment_rrn);
             #endregion
 
-            $message = sprintf(esc_html__('Payment completed via %1$s: %2$s', 'wc-victoriabank-mia'), esc_html($this->method_title), esc_html($callback_body));
+            $message = sprintf(esc_html__('Payment completed via %1$s: %2$s', 'wc-victoriabank-mia'), esc_html($this->method_title), esc_html($callback_data));
             $message = $this->get_test_message($message);
             $this->log($message, WC_Log_Levels::INFO);
             $order->add_order_note($message);
