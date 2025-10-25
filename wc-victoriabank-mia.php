@@ -726,17 +726,6 @@ function woocommerce_victoriabank_mia_init()
             exit;
         }
         #endregion
-
-        #region Admin
-        public static function plugin_links($links)
-        {
-            $plugin_links = array(
-                sprintf('<a href="%1$s">%2$s</a>', esc_url(self::get_settings_url()), esc_html__('Settings', 'wc-victoriabank-mia'))
-            );
-
-            return array_merge($plugin_links, $links);
-        }
-        #endregion
     }
 
     #region Add gateway to WooCommerce
@@ -751,8 +740,21 @@ function woocommerce_victoriabank_mia_init()
     #endregion
 
     #region Admin init
+    function woocommerce_victoriabank_mia_plugin_links($links)
+    {
+        $plugin_links = array(
+            sprintf(
+                '<a href="%1$s">%2$s</a>',
+                esc_url(WC_Victoriabank_MIA::get_settings_url()),
+                esc_html__('Settings', 'wc-victoriabank-mia')
+            )
+        );
+
+        return array_merge($plugin_links, $links);
+    }
+
     if (is_admin()) {
-        add_filter('plugin_action_links_' . plugin_basename(__FILE__), array(WC_Victoriabank_MIA::class, 'plugin_links'));
+        add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'woocommerce_victoriabank_mia_plugin_links');
     }
     #endregion
 }
