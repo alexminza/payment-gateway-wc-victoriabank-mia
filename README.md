@@ -5,6 +5,8 @@
 [![WordPress Plugin Active Installs](https://img.shields.io/wordpress/plugin/installs/wc-victoriabank-mia?logo=wordpress)](https://wordpress.org/plugins/wc-victoriabank-mia/advanced/)
 [![WordPress Plugin Stars](https://img.shields.io/wordpress/plugin/stars/wc-victoriabank-mia?logo=wordpress)](https://wordpress.org/support/plugin/wc-victoriabank-mia/reviews/)
 
+![Victoriabank MIA](./.wordpress-org/banner-1544x500.png)
+
 _Accept MIA payments directly on your store with the Victoriabank MIA payment gateway for WooCommerce._
 
 WordPress plugin: https://wordpress.org/plugins/wc-victoriabank-mia/
