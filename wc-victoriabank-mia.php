@@ -172,8 +172,7 @@ function woocommerce_victoriabank_mia_init()
                 'transaction_validity'  => array(
                     'title'       => __('Transaction validity', 'wc-victoriabank-mia'),
                     'type'        => 'decimal',
-                    'description' => __('Transaction validity in minutes', 'wc-victoriabank-mia'),
-                    'desc_tip'    => true,
+                    'description' => __('minutes', 'wc-victoriabank-mia'),
                     'default'     => self::DEFAULT_VALIDITY
                 ),
 
@@ -204,7 +203,6 @@ function woocommerce_victoriabank_mia_init()
                     'title'       => __('Creditor Account', 'wc-victoriabank-mia'),
                     'type'        => 'text',
                     'description' => __('IBAN', 'wc-victoriabank-mia'),
-                    'desc_tip'    => true,
                 ),
 
                 'payment_notification' => array(
