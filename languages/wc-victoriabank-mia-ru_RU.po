@@ -2,12 +2,11 @@
 # This file is distributed under the GPLv3 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Victoriabank MIA Payment Gateway for WooCommerce 1.0.0-"
-"dev\n"
+"Project-Id-Version: Victoriabank MIA Payment Gateway for WooCommerce 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wc-victoriabank-"
 "mia\n"
-"POT-Creation-Date: 2025-10-25 16:46+0300\n"
-"PO-Revision-Date: 2025-10-25 16:48+0300\n"
+"POT-Creation-Date: 2025-10-25 18:48+0300\n"
+"PO-Revision-Date: 2025-10-25 18:51+0300\n"
 "Last-Translator: Alexander Minza <alex@alexminza.com>\n"
 "Language-Team: \n"
 "Language: ru_RU\n"
@@ -115,31 +114,31 @@ msgid "Transaction validity"
 msgstr "Действительность транзакции"
 
 #: wc-victoriabank-mia.php:175
-msgid "Transaction validity in minutes"
-msgstr "Действительность транзакции в минутах"
+msgid "minutes"
+msgstr "минут"
 
-#: wc-victoriabank-mia.php:181 wc-victoriabank-mia.php:281
+#: wc-victoriabank-mia.php:180 wc-victoriabank-mia.php:279
 msgid "Connection Settings"
 msgstr "Настройки подключения"
 
-#: wc-victoriabank-mia.php:182
+#: wc-victoriabank-mia.php:181
 msgid "Payment gateway connection credentials are provided by the bank."
 msgstr ""
 "Учетные данные для подключения к платежному шлюзу предоставляются банком."
 
-#: wc-victoriabank-mia.php:186
+#: wc-victoriabank-mia.php:185
 msgid "Username"
 msgstr "Логин"
 
-#: wc-victoriabank-mia.php:190
+#: wc-victoriabank-mia.php:189
 msgid "Password"
 msgstr "Пароль"
 
-#: wc-victoriabank-mia.php:194
+#: wc-victoriabank-mia.php:193
 msgid "Certificate"
 msgstr "Сертификат"
 
-#: wc-victoriabank-mia.php:196
+#: wc-victoriabank-mia.php:195
 msgid ""
 "Victoriabank Public Key Certificate to validate the authenticity of the "
 "payment notifications."
@@ -147,41 +146,41 @@ msgstr ""
 "Сертификат открытого ключа Victoriabank для подтверждения подлинности "
 "уведомлений о платежах."
 
-#: wc-victoriabank-mia.php:200
+#: wc-victoriabank-mia.php:199
 msgid "Company Name"
 msgstr "Название компании"
 
-#: wc-victoriabank-mia.php:204
+#: wc-victoriabank-mia.php:203
 msgid "Creditor Account"
 msgstr "Кредиторский счет"
 
-#: wc-victoriabank-mia.php:206
+#: wc-victoriabank-mia.php:205
 msgid "IBAN"
 msgstr "IBAN"
 
-#: wc-victoriabank-mia.php:211
+#: wc-victoriabank-mia.php:209
 msgid "Payment Notification"
 msgstr "Уведомление об оплате"
 
-#: wc-victoriabank-mia.php:214
+#: wc-victoriabank-mia.php:212
 msgid "Provide this URL to the bank to enable online payment notifications."
 msgstr ""
 "Предоставьте этот URL-адрес банку для получения онлайн уведомлений о "
 "платежах."
 
-#: wc-victoriabank-mia.php:215
+#: wc-victoriabank-mia.php:213
 msgid "Callback URL"
 msgstr "URL обратного вызова (Callback URL)"
 
-#: wc-victoriabank-mia.php:270
+#: wc-victoriabank-mia.php:268
 msgid "Unsupported store currency"
 msgstr "Валюта магазина не поддерживается"
 
-#: wc-victoriabank-mia.php:272
+#: wc-victoriabank-mia.php:270
 msgid "Supported currencies"
 msgstr "Поддерживаемые валюты"
 
-#: wc-victoriabank-mia.php:280
+#: wc-victoriabank-mia.php:278
 #, php-format
 msgid ""
 "See plugin documentation for <a href=\"%1$s\" target=\"_blank\">installation "
@@ -190,11 +189,11 @@ msgstr ""
 "Перейдите на страницу документации плагина для <a href=\"%1$s\" "
 "target=\"_blank\">инструкций по установке</a>."
 
-#: wc-victoriabank-mia.php:281
+#: wc-victoriabank-mia.php:279
 msgid "Not configured"
 msgstr "Не настроено"
 
-#: wc-victoriabank-mia.php:310
+#: wc-victoriabank-mia.php:308
 #, php-format
 msgid ""
 "%1$s is not properly configured. Verify plugin <a href=\"%2$s\">Connection "
@@ -203,7 +202,7 @@ msgstr ""
 "%1$s настроен неправильно. Проверьте <a href=\"%2$s\">Настройки подключения</"
 "a> плагина."
 
-#: wc-victoriabank-mia.php:316
+#: wc-victoriabank-mia.php:314
 #, php-format
 msgid ""
 "See <a href=\"%2$s\">%1$s settings</a> page for log details and setup "
@@ -212,66 +211,66 @@ msgstr ""
 "Перейдите на страницу <a href=\"%2$s\">настроек %1$s</a> для просмотра "
 "сведений журнала и инструкций по установке."
 
-#: wc-victoriabank-mia.php:445
+#: wc-victoriabank-mia.php:442
 #, php-format
 msgid "Payment initiated via %1$s: %2$s"
 msgstr "Платеж инициирован через %1$s: %2$s"
 
-#: wc-victoriabank-mia.php:456
+#: wc-victoriabank-mia.php:453
 #, php-format
 msgid "Order #%1$s payment initiation failed via %2$s."
 msgstr "Ошибка инициирования оплаты заказа #%1$s через %2$s."
 
-#: wc-victoriabank-mia.php:479
+#: wc-victoriabank-mia.php:476
 #, php-format
 msgid "%1$s Callback URL"
 msgstr "%1$s Callback URL"
 
-#: wc-victoriabank-mia.php:488
+#: wc-victoriabank-mia.php:485
 #, php-format
 msgid "Payment notification callback: %1$s"
 msgstr "Уведомление об оплате: %1$s"
 
-#: wc-victoriabank-mia.php:510
+#: wc-victoriabank-mia.php:507
 #, php-format
 msgid "Order not found by QR Extension ID: %1$s received from %2$s."
 msgstr "Заказ не найден по QR Extension ID: %1$s полученному от %2$s."
 
-#: wc-victoriabank-mia.php:527
+#: wc-victoriabank-mia.php:524
 #, php-format
 msgid "Order amount mismatch: Callback: %1$f %2$s, Order: %3$f %4$s."
 msgstr "Несоответствие суммы заказа: Уведомление: %1$f %2$s, Заказ: %3$f %4$s."
 
-#: wc-victoriabank-mia.php:534
+#: wc-victoriabank-mia.php:531
 #, php-format
 msgid "Callback order already fully paid: %1$d."
 msgstr "Заказ уже полностью оплачен: %1$d."
 
-#: wc-victoriabank-mia.php:552
+#: wc-victoriabank-mia.php:549
 #, php-format
 msgid "Payment completed via %1$s: %2$s"
 msgstr "Платеж проведен через %1$s: %2$s"
 
-#: wc-victoriabank-mia.php:576
+#: wc-victoriabank-mia.php:573
 #, php-format
 msgid "Partial refunds are not currently supported by %1$s."
 msgstr "Частичный возврат средств в настоящее время не поддерживается %1$s."
 
-#: wc-victoriabank-mia.php:592
+#: wc-victoriabank-mia.php:589
 #, php-format
 msgid "Refund of %1$s %2$s via %3$s failed: %4$s"
 msgstr "Ошибка возврата %1$s %2$s через %3$s: %4$s"
 
-#: wc-victoriabank-mia.php:602
+#: wc-victoriabank-mia.php:599
 #, php-format
 msgid "Refund of %1$s %2$s via %3$s approved."
 msgstr "Возврат %1$s %2$s через %3$s подтвержден."
 
-#: wc-victoriabank-mia.php:639
+#: wc-victoriabank-mia.php:636
 #, php-format
 msgid "TEST: %1$s"
 msgstr "ТЕСТ: %1$s"
 
-#: wc-victoriabank-mia.php:737
+#: wc-victoriabank-mia.php:749
 msgid "Settings"
 msgstr "Настройки"
