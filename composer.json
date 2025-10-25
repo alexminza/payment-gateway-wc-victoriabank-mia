@@ -25,12 +25,6 @@
         "forum": "https://wordpress.org/support/plugin/wc-victoriabank-mia",
         "source": "https://github.com/alexminza/wc-victoriabank-mia"
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../victoriabank-mia-sdk-php"
-        }
-    ],
     "require": {
         "php": ">=7.2.5",
         "alexminza/victoriabank-mia-sdk": "*",
@@ -41,6 +35,5 @@
             "php": "7.2.5"
         }
     },
-    "minimum-stability": "dev",
     "prefer-stable": true
 }

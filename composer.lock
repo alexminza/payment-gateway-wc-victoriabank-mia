@@ -4,15 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ae4e1d37a51320c310f74904d7e5a8bc",
+    "content-hash": "8b0f88a54d4fe2f32e9c05c9a5218261",
     "packages": [
         {
             "name": "alexminza/victoriabank-mia-sdk",
-            "version": "1.0.0.x-dev",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/alexminza/victoriabank-mia-sdk-php.git",
+                "reference": "6c4a61aead2fc640ffef133be82386faebdbbbe4"
+            },
             "dist": {
-                "type": "path",
-                "url": "../victoriabank-mia-sdk-php",
-                "reference": "9632ff4d52b56cdf308596fa5c0e289736e085ba"
+                "type": "zip",
+                "url": "https://api.github.com/repos/alexminza/victoriabank-mia-sdk-php/zipball/6c4a61aead2fc640ffef133be82386faebdbbbe4",
+                "reference": "6c4a61aead2fc640ffef133be82386faebdbbbe4",
+                "shasum": ""
             },
             "require": {
                 "firebase/php-jwt": "^6.0",
@@ -26,6 +32,7 @@
                     "Victoriabank\\": "src/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "GPL-3.0-or-later"
             ],
@@ -39,9 +46,9 @@
             "description": "PHP SDK for Victoriabank MIA API",
             "homepage": "https://github.com/alexminza/victoriabank-mia-sdk-php",
             "keywords": [
+                "Moldova",
                 "api",
                 "mia",
-                "moldova",
                 "payments",
                 "php",
                 "qr",
@@ -49,13 +56,11 @@
                 "victoriabank"
             ],
             "support": {
-                "issues": "https://github.com/alexminza/victoriabank-mia-sdk-php/issues",
                 "forum": "https://github.com/alexminza/victoriabank-mia-sdk-php/discussions",
+                "issues": "https://github.com/alexminza/victoriabank-mia-sdk-php/issues",
                 "source": "https://github.com/alexminza/victoriabank-mia-sdk-php"
             },
-            "transport-options": {
-                "relative": true
-            }
+            "time": "2025-10-24T15:03:26+00:00"
         },
         {
             "name": "firebase/php-jwt",
@@ -1211,7 +1216,7 @@
     ],
     "packages-dev": [],
     "aliases": [],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
