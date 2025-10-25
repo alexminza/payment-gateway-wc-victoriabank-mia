@@ -4,7 +4,7 @@
  * Plugin Name: Victoriabank MIA Payment Gateway for WooCommerce
  * Description: Accept MIA payments directly on your store with the Victoriabank MIA payment gateway for WooCommerce.
  * Plugin URI: https://github.com/alexminza/wc-victoriabank-mia
- * Version: 1.0.0-dev
+ * Version: 1.0.0
  * Author: Alexander Minza
  * Author URI: https://profiles.wordpress.org/alexminza
  * Developer: Alexander Minza
@@ -17,7 +17,7 @@
  * Requires at least: 4.8
  * Tested up to: 6.8
  * WC requires at least: 3.3
- * WC tested up to: 10.2.2
+ * WC tested up to: 10.3.3
  * Requires Plugins: woocommerce
  */
 
@@ -38,7 +38,7 @@ function woocommerce_victoriabank_mia_plugins_loaded()
 {
     load_plugin_textdomain('wc-victoriabank-mia', false, dirname(plugin_basename(__FILE__)) . '/languages');
 
-    //https://docs.woocommerce.com/document/query-whether-woocommerce-is-activated/
+    //https://woocommerce.com/document/query-whether-woocommerce-is-activated/
     if (!class_exists('WooCommerce')) {
         add_action('admin_notices', 'woocommerce_victoriabank_mia_missing_wc_notice');
         return;
@@ -101,7 +101,7 @@ function woocommerce_victoriabank_mia_init()
             $this->order_template       = $this->get_option('order_template', self::ORDER_TEMPLATE);
             $this->transaction_validity = intval($this->get_option('transaction_validity', self::DEFAULT_VALIDITY));
 
-            #https://github.com/alexminza/victoriabank-mia-sdk-php/blob/v1.0.0/src/VictoriabankMia/VictoriabankMiaClient.php
+            #https://github.com/alexminza/victoriabank-mia-sdk-php/blob/main/src/VictoriabankMia/VictoriabankMiaClient.php
             $this->victoriabank_mia_base_url     = $this->testmode ? VictoriabankMiaClient::TEST_BASE_URL : VictoriabankMiaClient::DEFAULT_BASE_URL;
 
             $this->victoriabank_mia_username    = $this->get_option('victoriabank_mia_username');
@@ -432,8 +432,7 @@ function woocommerce_victoriabank_mia_init()
                 $qr_url = $create_qr_response['qrAsText'];
 
                 #region Update order payment transaction metadata
-                //https://github.com/woocommerce/woocommerce/wiki/High-Performance-Order-Storage-Upgrade-Recipe-Book#apis-for-gettingsetting-posts-and-postmeta
-                //https://developer.woocommerce.com/docs/hpos-extension-recipe-book/#2-supporting-high-performance-order-storage-in-your-extension
+                //https://developer.woocommerce.com/docs/features/high-performance-order-storage/recipe-book/#apis-for-gettingsetting-posts-and-postmeta
                 $order->add_meta_data(self::MOD_QR_ID, $qr_id, true);
                 $order->add_meta_data(self::MOD_QR_EXTENSION_ID, $qr_extension_id, true);
                 $order->add_meta_data(self::MOD_QR_URL, $qr_url, true);
@@ -647,7 +646,7 @@ function woocommerce_victoriabank_mia_init()
 
         protected function get_callback_url()
         {
-            //https://developer.woo.com/docs/woocommerce-plugin-api-callbacks/
+            //https://developer.woocommerce.com/docs/extensions/core-concepts/woocommerce-plugin-api-callback/
             $callbackUrl = WC()->api_request_url("wc_{$this->id}");
             return apply_filters(self::MOD_ID . '_callback_url', $callbackUrl);
         }
@@ -678,7 +677,7 @@ function woocommerce_victoriabank_mia_init()
 
         protected function log($message, $level = WC_Log_Levels::DEBUG)
         {
-            //https://developer.woo.com/docs/logging-in-woocommerce/
+            //https://developer.woocommerce.com/docs/best-practices/data-management/logging/
             //https://stackoverflow.com/questions/1423157/print-php-call-stack
             $log_context = array('source' => self::MOD_ID);
             $this->logger->log($level, $message, $log_context);
@@ -762,7 +761,7 @@ function woocommerce_victoriabank_mia_init()
 add_action('before_woocommerce_init', function () {
     if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
         //WooCommerce HPOS compatibility
-        //https://github.com/woocommerce/woocommerce/wiki/High-Performance-Order-Storage-Upgrade-Recipe-Book#declaring-extension-incompatibility
+        //https://developer.woocommerce.com/docs/features/high-performance-order-storage/recipe-book/#declaring-extension-incompatibility
         \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
 
         //WooCommerce Cart Checkout Blocks compatibility
