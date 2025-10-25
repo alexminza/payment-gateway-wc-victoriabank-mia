@@ -2,7 +2,7 @@
 
 /**
  * Plugin Name: Victoriabank MIA Payment Gateway for WooCommerce
- * Description: Accept MIA payments directly on your store with the Victoriabank MIA Payment Gateway for WooCommerce.
+ * Description: Accept MIA payments directly on your store with the Victoriabank MIA payment gateway for WooCommerce.
  * Plugin URI: https://github.com/alexminza/wc-victoriabank-mia
  * Version: 1.0.0-dev
  * Author: Alexander Minza
@@ -49,7 +49,7 @@ function woocommerce_victoriabank_mia_plugins_loaded()
 
 function woocommerce_victoriabank_mia_missing_wc_notice()
 {
-    echo sprintf('<div class="notice notice-error is-dismissible"><p>%1$s</p></div>', esc_html__('Victoriabank MIA Payment Gateway requires WooCommerce to be installed and active.', 'wc-victoriabank-mia'));
+    echo sprintf('<div class="notice notice-error is-dismissible"><p>%1$s</p></div>', esc_html__('Victoriabank MIA payment gateway requires WooCommerce to be installed and active.', 'wc-victoriabank-mia'));
 }
 
 function woocommerce_victoriabank_mia_init()
@@ -507,7 +507,7 @@ function woocommerce_victoriabank_mia_init()
             $order = self::get_order_by_qr_extension_id($callback_qr_extension_id);
 
             if (!$order) {
-                $message = sprintf(esc_html__('Order not found by QR Extension ID: %1$d received from %2$s.', 'wc-victoriabank-mia'), $callback_qr_extension_id, esc_html($this->method_title));
+                $message = sprintf(esc_html__('Order not found by QR Extension ID: %1$s received from %2$s.', 'wc-victoriabank-mia'), $callback_qr_extension_id, esc_html($this->method_title));
                 $this->log($message, WC_Log_Levels::ERROR);
 
                 return self::return_response(WP_Http::UNPROCESSABLE_ENTITY, 'Order not found');
