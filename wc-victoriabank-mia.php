@@ -444,7 +444,7 @@ function woocommerce_victoriabank_mia_init()
                 $order->save();
                 #endregion
 
-                $message = sprintf(esc_html__('Payment initiated via %1$s: %2$s', 'wc-victoriabank-mia'), esc_html($this->method_title), esc_html(self::print_response_object($create_qr_response)));
+                $message = esc_html(sprintf(__('Payment initiated via %1$s: %2$s', 'wc-victoriabank-mia'), $this->method_title, self::print_response_object($create_qr_response)));
                 $message = $this->get_test_message($message);
                 $this->log($message, WC_Log_Levels::INFO);
                 $order->add_order_note($message);
@@ -455,7 +455,7 @@ function woocommerce_victoriabank_mia_init()
                 );
             }
 
-            $message = sprintf(esc_html__('Order #%1$s payment initiation failed via %2$s.', 'wc-victoriabank-mia'), esc_html($order_id), esc_html($this->method_title));
+            $message = esc_html(sprintf(__('Order #%1$s payment initiation failed via %2$s.', 'wc-victoriabank-mia'), $order_id, $this->method_title));
             $message = $this->get_test_message($message);
             $order->add_order_note($message);
             $this->log($message, WC_Log_Levels::ERROR);
@@ -463,7 +463,7 @@ function woocommerce_victoriabank_mia_init()
             //https://github.com/woocommerce/woocommerce/issues/48687#issuecomment-2186475264
             $is_store_api_request = method_exists(WC(), 'is_store_api_request') && WC()->is_store_api_request();
             if ($is_store_api_request) {
-                throw new Exception($message);
+                throw new Exception(esc_html($message));
             }
 
             wc_add_notice($message, 'error');
@@ -477,8 +477,8 @@ function woocommerce_victoriabank_mia_init()
 
         public function check_response()
         {
-            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $message = sprintf(esc_html__('%1$s Callback URL', 'wc-victoriabank-mia'), esc_html($this->method_title));
+            if (($_SERVER['REQUEST_METHOD'] ?? '') === 'GET') {
+                $message = sprintf(__('%1$s Callback URL', 'wc-victoriabank-mia'), $this->method_title);
                 return self::return_response(WP_Http::OK, $message);
             }
 
@@ -487,7 +487,7 @@ function woocommerce_victoriabank_mia_init()
 
             try {
                 $callback_body = file_get_contents('php://input');
-                $this->log(sprintf(esc_html__('Payment notification callback: %1$s', 'wc-victoriabank-mia'), self::print_var($callback_body)));
+                $this->log(sprintf(__('Payment notification callback: %1$s', 'wc-victoriabank-mia'), self::print_var($callback_body)));
 
                 $callback_data = (array) VictoriabankMiaClient::decodeValidateCallback($callback_body, $this->victoriabank_mia_certificate);
                 $this->log(self::print_var($callback_data));
@@ -509,7 +509,7 @@ function woocommerce_victoriabank_mia_init()
             $order = $this->get_order_by_qr_extension_id($callback_qr_extension_id);
 
             if (!$order) {
-                $message = sprintf(esc_html__('Order not found by QR Extension ID: %1$s received from %2$s.', 'wc-victoriabank-mia'), $callback_qr_extension_id, esc_html($this->method_title));
+                $message = sprintf(__('Order not found by QR Extension ID: %1$s received from %2$s.', 'wc-victoriabank-mia'), $callback_qr_extension_id, $this->method_title);
                 $this->log($message, WC_Log_Levels::ERROR);
 
                 return self::return_response(WP_Http::UNPROCESSABLE_ENTITY, 'Order not found');
@@ -526,14 +526,14 @@ function woocommerce_victoriabank_mia_init()
             $order_currency = $order->get_currency();
 
             if ($order_total != $callback_amount || strtoupper($order_currency) !== strtoupper($callback_currency)) {
-                $message = sprintf(esc_html__('Order amount mismatch: Callback: %1$f %2$s, Order: %3$f %4$s.', 'wc-victoriabank-mia'), $callback_amount, $callback_currency, $order_total, $order_currency);
+                $message = sprintf(__('Order amount mismatch: Callback: %1$f %2$s, Order: %3$f %4$s.', 'wc-victoriabank-mia'), $callback_amount, $callback_currency, $order_total, $order_currency);
                 $this->log($message, WC_Log_Levels::ERROR);
 
                 return self::return_response(WP_Http::UNPROCESSABLE_ENTITY, 'Order data mismatch');
             }
 
             if ($order->is_paid()) {
-                $message = sprintf(esc_html__('Callback order already fully paid: %1$d.', 'wc-victoriabank-mia'), $order->get_id());
+                $message = sprintf(__('Callback order already fully paid: %1$d.', 'wc-victoriabank-mia'), $order->get_id());
                 $this->log($message, WC_Log_Levels::ERROR);
 
                 return self::return_response(WP_Http::OK, 'Order already fully paid');
@@ -551,7 +551,7 @@ function woocommerce_victoriabank_mia_init()
             $order->payment_complete($callback_payment_transaction_id);
             #endregion
 
-            $message = sprintf(esc_html__('Payment completed via %1$s: %2$s', 'wc-victoriabank-mia'), esc_html($this->method_title), esc_html($callback_data));
+            $message = esc_html(sprintf(__('Payment completed via %1$s: %2$s', 'wc-victoriabank-mia'), $this->method_title, $callback_data));
             $message = $this->get_test_message($message);
             $this->log($message, WC_Log_Levels::INFO);
             $order->add_order_note($message);
@@ -575,7 +575,7 @@ function woocommerce_victoriabank_mia_init()
 
             #region Validate refund amount
             if (isset($amount) && $amount != $order_total) {
-                $message = sprintf(esc_html__('Partial refunds are not currently supported by %1$s.', 'wc-victoriabank-mia'), self::MOD_TITLE);
+                $message = esc_html(sprintf(__('Partial refunds are not currently supported by %1$s.', 'wc-victoriabank-mia'), self::MOD_TITLE));
                 $this->log($message, WC_Log_Levels::ERROR);
 
                 return new WP_Error($this->id . '_error', $message);
@@ -591,7 +591,7 @@ function woocommerce_victoriabank_mia_init()
             } catch (Exception $ex) {
                 $this->log($ex, WC_Log_Levels::ERROR);
 
-                $message = sprintf(esc_html__('Refund of %1$s %2$s via %3$s failed: %4$s', 'wc-victoriabank-mia'), esc_html($order_total), esc_html($order_currency), esc_html($this->method_title), esc_html($ex->getMessage()));
+                $message = esc_html(sprintf(__('Refund of %1$s %2$s via %3$s failed: %4$s', 'wc-victoriabank-mia'), $order_total, $order_currency, $this->method_title, $ex->getMessage()));
                 $message = $this->get_test_message($message);
                 $order->add_order_note($message);
                 $this->log($message, WC_Log_Levels::ERROR);
@@ -601,7 +601,7 @@ function woocommerce_victoriabank_mia_init()
                 return new WP_Error($this->id . '_error', $ex->getMessage());
             }
 
-            $message = sprintf(esc_html__('Refund of %1$s %2$s via %3$s approved.', 'wc-victoriabank-mia'), esc_html($order_total), esc_html($order_currency), esc_html($this->method_title), esc_html(self::print_response_object($payment_refund_response)));
+            $message = esc_html(sprintf(__('Refund of %1$s %2$s via %3$s approved.', 'wc-victoriabank-mia'), $order_total, $order_currency, $this->method_title, self::print_response_object($payment_refund_response)));
             $message = $this->get_test_message($message);
             $this->log($message, WC_Log_Levels::INFO);
             $order->add_order_note($message);
@@ -647,7 +647,7 @@ function woocommerce_victoriabank_mia_init()
         protected function get_test_message($message)
         {
             if ($this->testmode)
-                $message = sprintf(esc_html__('TEST: %1$s', 'wc-victoriabank-mia'), esc_html($message));
+                $message = esc_html(sprintf(__('TEST: %1$s', 'wc-victoriabank-mia'), $message));
 
             return $message;
         }
@@ -751,7 +751,7 @@ function woocommerce_victoriabank_mia_init()
                 $response_text = get_status_header_desc($status_code);
 
             http_response_code($status_code);
-            echo $response_text;
+            echo esc_html($response_text);
             exit;
         }
 
