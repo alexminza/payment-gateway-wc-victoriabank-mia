@@ -6,7 +6,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wc-victoriabank-"
 "mia\n"
 "POT-Creation-Date: 2025-10-25 18:48+0300\n"
-"PO-Revision-Date: 2025-10-25 18:50+0300\n"
+"PO-Revision-Date: 2025-10-26 14:14+0200\n"
 "Last-Translator: Alexander Minza <alex@alexminza.com>\n"
 "Language-Team: \n"
 "Language: ro_RO\n"
@@ -21,7 +21,7 @@ msgid ""
 "Accept MIA payments directly on your store with the Victoriabank MIA payment "
 "gateway for WooCommerce."
 msgstr ""
-"Acceptă plăți MIA direct în magazin cu gateway-ul de plată Victoriabank "
+"Acceptă plăți MIA direct în magazin cu gateway-ul de plată Victoriabank MIA "
 "pentru WooCommerce."
 
 #: wc-victoriabank-mia.php:52
@@ -242,7 +242,7 @@ msgstr "Sumă comandă incorectă: Notificare: %1$f %2$s, Comandă: %3$f %4$s."
 #: wc-victoriabank-mia.php:531
 #, php-format
 msgid "Callback order already fully paid: %1$d."
-msgstr "Comandă deja plătită integral: %1$d."
+msgstr "Comanda este deja plătită integral: %1$d."
 
 #: wc-victoriabank-mia.php:549
 #, php-format
