@@ -347,10 +347,10 @@ function woocommerce_victoriabank_mia_init()
          */
         private function victoriabank_mia_generate_token($client)
         {
-            $tokenResponse = $client->getToken('password', $this->victoriabank_mia_username, $this->victoriabank_mia_password);
-            $accessToken = $tokenResponse['accessToken'];
+            $get_token_response = $client->getToken('password', $this->victoriabank_mia_username, $this->victoriabank_mia_password);
+            $access_token = $get_token_response['accessToken'];
 
-            return $accessToken;
+            return $access_token;
         }
 
         /**
