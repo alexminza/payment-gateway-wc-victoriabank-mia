@@ -397,6 +397,11 @@ function woocommerce_victoriabank_mia_init()
         #region Payment
         public function process_payment($order_id)
         {
+            //TODO: REMOVE
+            if ($this->debug) {
+                self::get_egress_ip();
+            }
+
             $order = wc_get_order($order_id);
             $create_qr_response = null;
 
@@ -501,7 +506,7 @@ function woocommerce_victoriabank_mia_init()
 
             #region Validate order ID
             $callback_qr_extension_id = $callback_data['qrExtensionUUID'];
-            $order = self::get_order_by_qr_extension_id($callback_qr_extension_id);
+            $order = $this->get_order_by_qr_extension_id($callback_qr_extension_id);
 
             if (!$order) {
                 $message = sprintf(esc_html__('Order not found by QR Extension ID: %1$s received from %2$s.', 'wc-victoriabank-mia'), $callback_qr_extension_id, esc_html($this->method_title));
@@ -606,7 +611,10 @@ function woocommerce_victoriabank_mia_init()
         #endregion
 
         #region Utility
-        protected static function get_order_by_qr_extension_id($qr_extension_id)
+        /**
+         * @param string $qr_extension_id
+         */
+        protected function get_order_by_qr_extension_id($qr_extension_id)
         {
             //NOTE: Victoriabank MIA API does not currently support passing Order ID for transactions
             #https://stackoverflow.com/questions/71438717/extend-wc-get-orders-with-a-custom-meta-key-and-meta-value
@@ -620,16 +628,22 @@ function woocommerce_victoriabank_mia_init()
                 return $orders[0];
             }
 
-            self::static_log(self::print_var($orders));
+            $this->log(self::print_var($orders));
             return false;
         }
 
+        /**
+         * @param \WC_Order $order
+         */
         protected function get_order_description($order)
         {
             $description = sprintf($this->order_template, $order->get_id());
             return apply_filters(self::MOD_ID . '_order_description', $description, $order);
         }
 
+        /**
+         * @param string $message
+         */
         protected function get_test_message($message)
         {
             if ($this->testmode)
@@ -638,6 +652,9 @@ function woocommerce_victoriabank_mia_init()
             return $message;
         }
 
+        /**
+         * @param \WC_Order $order
+         */
         protected function get_redirect_url($order)
         {
             $redirectUrl = $this->get_return_url($order);
@@ -675,6 +692,10 @@ function woocommerce_victoriabank_mia_init()
             );
         }
 
+        /**
+         * @param string $message
+         * @param string $level
+         */
         protected function log($message, $level = WC_Log_Levels::DEBUG)
         {
             //https://developer.woocommerce.com/docs/best-practices/data-management/logging/
@@ -683,10 +704,18 @@ function woocommerce_victoriabank_mia_init()
             $this->logger->log($level, $message, $log_context);
         }
 
-        protected static function static_log($message, $level = WC_Log_Levels::DEBUG)
+        /**
+         * @param string $message
+         * @param string $level
+         * @param array  $additional_context
+         */
+        protected static function static_log($message, $level = WC_Log_Levels::DEBUG, $additional_context = null)
         {
-            $logger = wc_get_logger();
             $log_context = array('source' => self::MOD_ID);
+            if ($additional_context)
+                $log_context = array_merge($log_context, $additional_context);
+
+            $logger = wc_get_logger();
             $logger->log($level, $message, $log_context);
         }
 
@@ -724,6 +753,18 @@ function woocommerce_victoriabank_mia_init()
             http_response_code($status_code);
             echo $response_text;
             exit;
+        }
+
+        protected static function get_egress_ip()
+        {
+            //https://developers.cloudflare.com/cloudflare-one/traffic-policies/egress-policies/dedicated-egress-ips/#verify-egress-ips
+            $response = wp_remote_get('https://ipv4.icanhazip.com/');
+            $responseBody = wp_remote_retrieve_body($response);
+
+            $log_context = [
+                'response' => $response
+            ];
+            self::static_log($responseBody, WC_Log_Levels::DEBUG, $log_context);
         }
         #endregion
     }
