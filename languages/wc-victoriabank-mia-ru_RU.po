@@ -5,8 +5,8 @@ msgstr ""
 "Project-Id-Version: Victoriabank MIA Payment Gateway for WooCommerce 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wc-victoriabank-"
 "mia\n"
-"POT-Creation-Date: 2025-10-25 18:48+0300\n"
-"PO-Revision-Date: 2025-10-25 18:51+0300\n"
+"POT-Creation-Date: 2025-10-28 17:36+0200\n"
+"PO-Revision-Date: 2025-10-28 17:37+0200\n"
 "Last-Translator: Alexander Minza <alex@alexminza.com>\n"
 "Language-Team: \n"
 "Language: ru_RU\n"
@@ -231,46 +231,46 @@ msgstr "%1$s Callback URL"
 msgid "Payment notification callback: %1$s"
 msgstr "Уведомление об оплате: %1$s"
 
-#: wc-victoriabank-mia.php:507
+#: wc-victoriabank-mia.php:508
 #, php-format
 msgid "Order not found by QR Extension ID: %1$s received from %2$s."
 msgstr "Заказ не найден по QR Extension ID: %1$s полученному от %2$s."
 
-#: wc-victoriabank-mia.php:524
+#: wc-victoriabank-mia.php:525
 #, php-format
 msgid "Order amount mismatch: Callback: %1$f %2$s, Order: %3$f %4$s."
 msgstr "Несоответствие суммы заказа: Уведомление: %1$f %2$s, Заказ: %3$f %4$s."
 
-#: wc-victoriabank-mia.php:531
+#: wc-victoriabank-mia.php:532
 #, php-format
 msgid "Callback order already fully paid: %1$d."
 msgstr "Заказ уже полностью оплачен: %1$d."
 
-#: wc-victoriabank-mia.php:549
+#: wc-victoriabank-mia.php:550
 #, php-format
 msgid "Payment completed via %1$s: %2$s"
 msgstr "Платеж проведен через %1$s: %2$s"
 
-#: wc-victoriabank-mia.php:573
+#: wc-victoriabank-mia.php:574
 #, php-format
 msgid "Partial refunds are not currently supported by %1$s."
 msgstr "Частичный возврат средств в настоящее время не поддерживается %1$s."
 
-#: wc-victoriabank-mia.php:589
+#: wc-victoriabank-mia.php:590
 #, php-format
 msgid "Refund of %1$s %2$s via %3$s failed: %4$s"
 msgstr "Ошибка возврата %1$s %2$s через %3$s: %4$s"
 
-#: wc-victoriabank-mia.php:599
+#: wc-victoriabank-mia.php:600
 #, php-format
 msgid "Refund of %1$s %2$s via %3$s approved."
 msgstr "Возврат %1$s %2$s через %3$s подтвержден."
 
-#: wc-victoriabank-mia.php:636
+#: wc-victoriabank-mia.php:646
 #, php-format
 msgid "TEST: %1$s"
 msgstr "ТЕСТ: %1$s"
 
-#: wc-victoriabank-mia.php:749
+#: wc-victoriabank-mia.php:786
 msgid "Settings"
 msgstr "Настройки"
