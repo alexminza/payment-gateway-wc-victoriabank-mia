@@ -489,6 +489,7 @@ function woocommerce_victoriabank_mia_init()
                 $callback_body = file_get_contents('php://input');
                 $this->log(sprintf(__('Payment notification callback: %1$s', 'wc-victoriabank-mia'), self::print_var($callback_body)));
 
+                $callback_body = trim($callback_body,'"');
                 $callback_data = (array) VictoriabankMiaClient::decodeValidateCallback($callback_body, $this->victoriabank_mia_certificate);
                 $this->log(self::print_var($callback_data));
             } catch (Exception $ex) {
@@ -551,7 +552,7 @@ function woocommerce_victoriabank_mia_init()
             $order->payment_complete($callback_payment_transaction_id);
             #endregion
 
-            $message = esc_html(sprintf(__('Payment completed via %1$s: %2$s', 'wc-victoriabank-mia'), $this->method_title, $callback_data));
+            $message = esc_html(sprintf(__('Payment completed via %1$s: %2$s', 'wc-victoriabank-mia'), $this->method_title, self::print_var($callback_data)));
             $message = $this->get_test_message($message);
             $this->log($message, WC_Log_Levels::INFO);
             $order->add_order_note($message);
