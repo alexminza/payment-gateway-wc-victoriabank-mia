@@ -397,11 +397,6 @@ function woocommerce_victoriabank_mia_init()
         #region Payment
         public function process_payment($order_id)
         {
-            //TODO: REMOVE
-            if ($this->debug) {
-                self::get_egress_ip();
-            }
-
             $order = wc_get_order($order_id);
             $create_qr_response = null;
 
