@@ -70,11 +70,11 @@ function woocommerce_victoriabank_mia_init()
         const MOD_CALLBACK          =  self::MOD_PREFIX . 'callback';
         const MOD_PAYMENT_REFERENCE =  self::MOD_PREFIX . 'payment_reference';
 
-        const DEFAULT_TIMEOUT  = 15; //seconds
+        const DEFAULT_TIMEOUT  = 30; //seconds
         const DEFAULT_VALIDITY = 15; //minutes
         #endregion
 
-        protected $testmode, $debug, $logger, $transaction_type, $order_template, $transaction_validity;
+        protected $testmode, $debug, $logger, $order_template, $transaction_validity;
         protected $victoriabank_mia_base_url, $victoriabank_mia_username, $victoriabank_mia_password, $victoriabank_mia_certificate, $victoriabank_mia_creditor_account, $victoriabank_mia_company_name;
 
         public function __construct()
@@ -348,7 +348,7 @@ function woocommerce_victoriabank_mia_init()
         private function victoriabank_mia_generate_token($client)
         {
             $get_token_response = $client->getToken('password', $this->victoriabank_mia_username, $this->victoriabank_mia_password);
-            $access_token = $get_token_response['accessToken'];
+            $access_token = strval($get_token_response['accessToken']);
 
             return $access_token;
         }
@@ -363,6 +363,7 @@ function woocommerce_victoriabank_mia_init()
          * @param string $creditor_account
          * @param string $company_name
          * @param int    $validity_minutes
+         * @return GuzzleHttp\Command\Result
          */
         private function victoriabank_mia_pay($client, $auth_token, $order_id, $order_name, $total_amount, $currency, $creditor_account, $company_name, $validity_minutes)
         {
@@ -427,9 +428,9 @@ function woocommerce_victoriabank_mia_init()
             }
 
             if (!empty($create_qr_response)) {
-                $qr_id = $create_qr_response['qrHeaderUUID'];
-                $qr_extension_id = $create_qr_response['qrExtensionUUID'];
-                $qr_url = $create_qr_response['qrAsText'];
+                $qr_id = strval($create_qr_response['qrHeaderUUID']);
+                $qr_extension_id = strval($create_qr_response['qrExtensionUUID']);
+                $qr_url = strval($create_qr_response['qrAsText']);
 
                 #region Update order payment transaction metadata
                 //https://developer.woocommerce.com/docs/features/high-performance-order-storage/recipe-book/#apis-for-gettingsetting-posts-and-postmeta
@@ -501,7 +502,7 @@ function woocommerce_victoriabank_mia_init()
             #endregion
 
             #region Validate order ID
-            $callback_qr_extension_id = $callback_data['qrExtensionUUID'];
+            $callback_qr_extension_id = strval($callback_data['qrExtensionUUID']);
             $order = $this->get_order_by_qr_extension_id($callback_qr_extension_id);
 
             if (empty($order)) {
