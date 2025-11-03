@@ -83,7 +83,7 @@ function woocommerce_victoriabank_mia_init()
             $this->method_title       = self::MOD_TITLE;
             $this->method_description = 'Victoriabank MIA Payment Gateway for WooCommerce';
             $this->has_fields         = false;
-            $this->supports           = array('products', 'refunds');
+            $this->supports           = ['products', 'refunds'];
 
             #region Initialize user set variables
             $this->enabled            = $this->get_option('enabled', 'no');
@@ -367,29 +367,29 @@ function woocommerce_victoriabank_mia_init()
          */
         private function victoriabank_mia_pay($client, $auth_token, $order_id, $order_name, $total_amount, $currency, $creditor_account, $company_name, $validity_minutes)
         {
-            $qr_data = array(
-                'header' => array(
+            $qr_data = [
+                'header' => [
                     'qrType' => 'DYNM', # Type of QR code: DYNM - Dynamic QR, STAT - Static QR, HYBR - Hybrid QR
                     'amountType' => 'Fixed', # Specifies the type of amount: Fixed - Dynamic QR, Controlled - Static QR, Free - Hybrid QR
                     'pmtContext' => 'e' #Payment context: m - mobile payment, e - e-commerce payment, i - invoice payment, 0 - other
-                ),
-                'extension' => array(
-                    'creditorAccount' => array(
+                ],
+                'extension' => [
+                    'creditorAccount' => [
                         'iban' => $creditor_account
-                    ),
-                    'amount' => array(
+                    ],
+                    'amount' => [
                         'sum' => $total_amount,
                         'currency' => $currency
-                    ),
+                    ],
                     'dba' => $company_name,
                     'remittanceInfo4Payer' => $order_name,
                     'creditorRef' => strval($order_id),
-                    'ttl' => array(
+                    'ttl' => [
                         'length' => $validity_minutes, #The duration for which the QR code is valid.
                         'units' => 'mm' #The unit of time for the TTL: ss - seconds, mm - minutes
-                    )
-                )
-            );
+                    ]
+                ]
+            ];
 
             return $client->createPayeeQr($qr_data, $auth_token);
         }
