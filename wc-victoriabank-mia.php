@@ -253,9 +253,9 @@ function woocommerce_victoriabank_mia_init()
 
         protected function check_settings()
         {
-            return !self::string_empty($this->victoriabank_mia_username)
-                && !self::string_empty($this->victoriabank_mia_password)
-                && !self::string_empty($this->victoriabank_mia_certificate);
+            return !empty($this->victoriabank_mia_username)
+                && !empty($this->victoriabank_mia_password)
+                && !empty($this->victoriabank_mia_certificate);
         }
 
         protected function validate_settings()
@@ -730,11 +730,6 @@ function woocommerce_victoriabank_mia_init()
                 return json_encode($response->toArray());
 
             return '';
-        }
-
-        protected static function string_empty($string)
-        {
-            return is_null($string) || strlen($string) === 0;
         }
 
         /**
