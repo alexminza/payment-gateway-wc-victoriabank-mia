@@ -484,7 +484,7 @@ function woocommerce_victoriabank_mia_init()
                 $callback_body = file_get_contents('php://input');
                 $this->log(sprintf(__('Payment notification callback: %1$s', 'wc-victoriabank-mia'), self::print_var($callback_body)));
 
-                $callback_body = trim($callback_body,'"');
+                $callback_body = trim($callback_body, '"');
                 $callback_data = (array) VictoriabankMiaClient::decodeValidateCallback($callback_body, $this->victoriabank_mia_certificate);
                 $this->log(self::print_var($callback_data));
             } catch (Exception $ex) {
@@ -504,7 +504,7 @@ function woocommerce_victoriabank_mia_init()
             $callback_qr_extension_id = $callback_data['qrExtensionUUID'];
             $order = $this->get_order_by_qr_extension_id($callback_qr_extension_id);
 
-            if (!$order) {
+            if (empty($order)) {
                 $message = sprintf(__('Order not found by QR Extension ID: %1$s received from %2$s.', 'wc-victoriabank-mia'), $callback_qr_extension_id, $this->method_title);
                 $this->log($message, WC_Log_Levels::ERROR);
 
@@ -708,7 +708,7 @@ function woocommerce_victoriabank_mia_init()
         protected static function static_log($message, $level = WC_Log_Levels::DEBUG, $additional_context = null)
         {
             $log_context = array('source' => self::MOD_ID);
-            if ($additional_context)
+            if (!empty($additional_context))
                 $log_context = array_merge($log_context, $additional_context);
 
             $logger = wc_get_logger();
@@ -726,7 +726,7 @@ function woocommerce_victoriabank_mia_init()
          */
         protected static function print_response_object($response)
         {
-            if ($response)
+            if (!empty($response))
                 return json_encode($response->toArray());
 
             return '';
