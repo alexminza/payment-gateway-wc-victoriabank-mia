@@ -559,7 +559,7 @@ function woocommerce_victoriabank_mia_init()
         {
             if (!$this->check_settings()) {
                 $message = $this->get_settings_admin_message();
-                return new WP_Error($this->id . '_error', $message);
+                return new WP_Error("{$this->id}_error", $message);
             }
 
             $order = wc_get_order($order_id);
@@ -574,7 +574,7 @@ function woocommerce_victoriabank_mia_init()
                 $message = esc_html(sprintf(__('Partial refunds are not currently supported by %1$s.', 'wc-victoriabank-mia'), self::MOD_TITLE));
                 $this->log($message, WC_Log_Levels::ERROR);
 
-                return new WP_Error($this->id . '_error', $message);
+                return new WP_Error("{$this->id}_error", $message);
             }
             #endregion
 
@@ -594,7 +594,7 @@ function woocommerce_victoriabank_mia_init()
 
                 $this->logs_admin_notice();
 
-                return new WP_Error($this->id . '_error', $ex->getMessage());
+                return new WP_Error("{$this->id}_error", $ex->getMessage());
             }
 
             $message = esc_html(sprintf(__('Refund of %1$s %2$s via %3$s approved.', 'wc-victoriabank-mia'), $order_total, $order_currency, $this->method_title, self::print_response_object($payment_refund_response)));
