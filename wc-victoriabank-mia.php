@@ -615,17 +615,18 @@ function woocommerce_victoriabank_mia_init()
         {
             //NOTE: Victoriabank MIA API does not currently support passing Order ID for transactions
             #https://stackoverflow.com/questions/71438717/extend-wc-get-orders-with-a-custom-meta-key-and-meta-value
-            $args = array(
+            $args = [
                 'meta_key'   => self::MOD_QR_EXTENSION_ID,
                 'meta_value' => $qr_extension_id
-            );
+            ];
 
             $orders = wc_get_orders($args);
             if (count($orders) == 1) {
                 return $orders[0];
             }
 
-            $this->log(self::print_var($orders));
+            $log_context = ['orders' => $orders];
+            $this->log(sprintf('Duplicate order meta %1$s: %2$s', self::MOD_QR_EXTENSION_ID, $qr_extension_id), WC_Log_Levels::ERROR, $log_context);
             return false;
         }
 
@@ -692,12 +693,16 @@ function woocommerce_victoriabank_mia_init()
         /**
          * @param string $message
          * @param string $level
+         * @param array  $additional_context
          */
-        protected function log($message, $level = WC_Log_Levels::DEBUG)
+        protected function log($message, $level = WC_Log_Levels::DEBUG, $additional_context = null)
         {
             //https://developer.woocommerce.com/docs/best-practices/data-management/logging/
             //https://stackoverflow.com/questions/1423157/print-php-call-stack
-            $log_context = array('source' => self::MOD_ID);
+            $log_context = ['source' => self::MOD_ID];
+            if (!empty($additional_context))
+                $log_context = array_merge($log_context, $additional_context);
+
             $this->logger->log($level, $message, $log_context);
         }
 
@@ -708,7 +713,7 @@ function woocommerce_victoriabank_mia_init()
          */
         protected static function static_log($message, $level = WC_Log_Levels::DEBUG, $additional_context = null)
         {
-            $log_context = array('source' => self::MOD_ID);
+            $log_context = ['source' => self::MOD_ID];
             if (!empty($additional_context))
                 $log_context = array_merge($log_context, $additional_context);
 
