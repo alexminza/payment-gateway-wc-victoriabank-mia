@@ -89,7 +89,7 @@ function woocommerce_victoriabank_mia_init()
             $this->enabled            = $this->get_option('enabled', 'no');
             $this->title              = $this->get_option('title', $this->method_title);
             $this->description        = $this->get_option('description');
-            $this->icon               = apply_filters('woocommerce_victoriabank_mia_icon', plugin_dir_url(__FILE__) . 'assets/img/mia.svg');
+            $this->icon               = apply_filters("woocommerce_{$this->id}_icon", plugin_dir_url(__FILE__) . 'assets/img/mia.svg');
 
             $this->testmode           = wc_string_to_bool($this->get_option('testmode', 'no'));
             $this->debug              = wc_string_to_bool($this->get_option('debug', 'no'));
@@ -294,13 +294,13 @@ function woocommerce_victoriabank_mia_init()
         protected function logs_admin_notice()
         {
             $message = $this->get_logs_admin_message();
-            WC_Admin_Notices::add_custom_notice(self::MOD_ID . '_logs_admin_notice', $message);
+            WC_Admin_Notices::add_custom_notice("{$this->id}_logs_admin_notice", $message);
         }
 
         protected function settings_admin_notice()
         {
             $message = $this->get_settings_admin_message();
-            WC_Admin_Notices::add_custom_notice(self::MOD_ID . '_settings_admin_notice', $message);
+            WC_Admin_Notices::add_custom_notice("{$this->id}_settings_admin_notice", $message);
         }
 
         protected function get_settings_admin_message()
@@ -324,7 +324,7 @@ function woocommerce_victoriabank_mia_init()
             ];
 
             if ($this->debug) {
-                $logName = self::MOD_ID . '_guzzle';
+                $logName = "{$this->id}_guzzle";
                 $logFileName = WC_Log_Handler_File::get_log_file_path($logName);
 
                 $log = new \Monolog\Logger($logName);
@@ -634,7 +634,7 @@ function woocommerce_victoriabank_mia_init()
         protected function get_order_description($order)
         {
             $description = sprintf($this->order_template, $order->get_id());
-            return apply_filters(self::MOD_ID . '_order_description', $description, $order);
+            return apply_filters("{$this->id}_order_description", $description, $order);
         }
 
         /**
@@ -654,14 +654,14 @@ function woocommerce_victoriabank_mia_init()
         protected function get_redirect_url($order)
         {
             $redirectUrl = $this->get_return_url($order);
-            return apply_filters(self::MOD_ID . '_redirect_url', $redirectUrl);
+            return apply_filters("{$this->id}_redirect_url", $redirectUrl);
         }
 
         protected function get_callback_url()
         {
             //https://developer.woocommerce.com/docs/extensions/core-concepts/woocommerce-plugin-api-callback/
             $callbackUrl = WC()->api_request_url("wc_{$this->id}");
-            return apply_filters(self::MOD_ID . '_callback_url', $callbackUrl);
+            return apply_filters("{$this->id}_callback_url", $callbackUrl);
         }
 
         protected static function get_logs_url()
