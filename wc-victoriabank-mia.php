@@ -440,7 +440,7 @@ function woocommerce_victoriabank_mia_init()
                 $order->save();
                 #endregion
 
-                $message = esc_html(sprintf(__('Payment initiated via %1$s: %2$s', 'wc-victoriabank-mia'), $this->method_title, self::print_response_object($create_qr_response)));
+                $message = esc_html(sprintf(__('Order #%1$s payment initiated via %2$s: %3$s', 'wc-victoriabank-mia'), $order_id, $this->method_title, self::print_response_object($create_qr_response)));
                 $message = $this->get_test_message($message);
                 $this->log($message, WC_Log_Levels::INFO);
                 $order->add_order_note($message);
@@ -530,7 +530,7 @@ function woocommerce_victoriabank_mia_init()
             }
 
             if ($order->is_paid()) {
-                $message = sprintf(__('Callback order already fully paid: %1$d.', 'wc-victoriabank-mia'), $order->get_id());
+                $message = sprintf(__('Callback order already fully paid: %1$s.', 'wc-victoriabank-mia'), $order->get_id());
                 $this->log($message, WC_Log_Levels::ERROR);
 
                 return self::return_response(WP_Http::OK, 'Order already fully paid');
@@ -588,7 +588,7 @@ function woocommerce_victoriabank_mia_init()
             } catch (Exception $ex) {
                 $this->log($ex, WC_Log_Levels::ERROR);
 
-                $message = esc_html(sprintf(__('Refund of %1$s %2$s via %3$s failed: %4$s', 'wc-victoriabank-mia'), $order_total, $order_currency, $this->method_title, $ex->getMessage()));
+                $message = esc_html(sprintf(__('Order #%1$s refund of %2$f %3$s via %4$s failed: %5$s', 'wc-victoriabank-mia'), $order_id, $order_total, $order_currency, $this->method_title, $ex->getMessage()));
                 $message = $this->get_test_message($message);
                 $order->add_order_note($message);
                 $this->log($message, WC_Log_Levels::ERROR);
@@ -598,7 +598,7 @@ function woocommerce_victoriabank_mia_init()
                 return new WP_Error("{$this->id}_error", $ex->getMessage());
             }
 
-            $message = esc_html(sprintf(__('Refund of %1$s %2$s via %3$s approved.', 'wc-victoriabank-mia'), $order_total, $order_currency, $this->method_title, self::print_response_object($payment_refund_response)));
+            $message = esc_html(sprintf(__('Order #%1$s refund of %2$f %3$s via %4$s approved.', 'wc-victoriabank-mia'), $order_id, $order_total, $order_currency, $this->method_title));
             $message = $this->get_test_message($message);
             $this->log($message, WC_Log_Levels::INFO);
             $order->add_order_note($message);
