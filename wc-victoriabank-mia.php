@@ -568,7 +568,6 @@ function woocommerce_victoriabank_mia_init()
             $transaction_id = VictoriabankMiaClient::getPaymentTransactionId($payment_reference);
             $order_total = $order->get_total();
             $order_currency = $order->get_currency();
-            $payment_refund_response = null;
 
             #region Validate refund amount
             if (isset($amount) && $amount != $order_total) {
@@ -583,7 +582,7 @@ function woocommerce_victoriabank_mia_init()
                 $client = $this->init_victoriabank_mia_client();
                 $auth_token = $this->victoriabank_mia_generate_token($client);
 
-                $payment_refund_response = $client->reverseTransaction($transaction_id, $auth_token);
+                $client->reverseTransaction($transaction_id, $auth_token);
                 //$this->log(self::print_var($payment_refund_response));
             } catch (Exception $ex) {
                 $this->log($ex, WC_Log_Levels::ERROR);
