@@ -699,7 +699,7 @@ function woocommerce_victoriabank_mia_init()
         {
             //https://developer.woocommerce.com/docs/best-practices/data-management/logging/
             //https://stackoverflow.com/questions/1423157/print-php-call-stack
-            $log_context = ['source' => self::MOD_ID];
+            $log_context = ['source' => $this->id];
             if (!empty($additional_context))
                 $log_context = array_merge($log_context, $additional_context);
 
