@@ -625,34 +625,32 @@ function woocommerce_victoriabank_mia_init()
             $qr_code_js_div_id = "{$qr_code_div_id}-js";
 
             echo <<<HTML
-            <section class="woocommerce-notice woocommerce-notice--success woocommerce-thankyou-order-received">
-                <div class="woocommerce-notice woocommerce-notice--info woocommerce-info">
+            <div class="woocommerce-info woocommerce-message">
+                Această comandă are o plată în așteptare. Soldul va fi actualizat în momentul primirii plății.
+            </div>
+            <fieldset>
+                <legend>$this->method_title</legend>
+                <div style="text-align: center;">
+                    <img src="{$this->icon}" alt="{$this->method_title}" class="aligncenter" style="max-width: 250px; height: auto;">
+                    <div id="{$qr_code_js_div_id}" class="aligncenter" style="display: flex; justify-content: center;"></div>
                     <p>
-                        <strong>$this->method_title</strong>
+                        <strong>Scanează & Plătește</strong><br />
+                        scanează acest QR cod cu camera telefonului sau din aplicația ta financiară și finalizează plata
                     </p>
-                    <p>
-                        Scaneaza codul QR cu aplicația mobilă a băncii sau cu camera telefonului.
-                    </p>
-                </div>
-                <div class="wc-payment-method-header aligncenter">
-                    <img src="{$this->icon}" alt="{$this->method_title}" class="aligncenter size-full" style="max-width: 250px; height: auto;">
-                </div>
-                <div id="{$qr_code_js_div_id}" class="wc-payment-qr-code aligncenter" style="display: inline-block;"></div>
-                <div class="form-row place-order aligncenter">
                     <a href="{$qr_url}" target="_blank" class="woocommerce-button button pay order-actions-button">Lista băncilor</a>
                 </div>
-            </section>
+            </fieldset>
 
             <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
             <script>
-                var qrcode = new QRCode(document.getElementById("{$qr_code_js_div_id}"), {
+                var qrcode = new QRCode("{$qr_code_js_div_id}", {
                     text: "{$qr_url}",
                     width: 300,
                     height: 300,
-                    colorDark: "#000000",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.H,
-                    useSVG: true
+                    //colorDark: "#000000",
+                    //colorLight: "#ffffff",
+                    //correctLevel: QRCode.CorrectLevel.H,
+                    //useSVG: true
                 });
             </script>
 HTML;
