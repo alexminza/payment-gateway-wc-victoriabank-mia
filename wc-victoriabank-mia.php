@@ -630,9 +630,9 @@ function woocommerce_victoriabank_mia_init()
             </div>
             <fieldset>
                 <legend>$this->method_title</legend>
-                <div style="text-align: center;">
+                <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
                     <img src="{$this->icon}" alt="{$this->method_title}" class="aligncenter" style="max-width: 250px; height: auto;">
-                    <div id="{$qr_code_js_div_id}" class="aligncenter" style="display: flex; justify-content: center;"></div>
+                    <div id="{$qr_code_js_div_id}" class="aligncenter"></div>
                     <p>
                         <strong>Scanează & Plătește</strong><br />
                         scanează acest QR cod cu camera telefonului sau din aplicația ta financiară și finalizează plata
