@@ -459,8 +459,7 @@ function woocommerce_victoriabank_mia_init()
             $this->log($message, WC_Log_Levels::ERROR);
 
             //https://github.com/woocommerce/woocommerce/issues/48687#issuecomment-2186475264
-            $is_store_api_request = method_exists(WC(), 'is_store_api_request') && WC()->is_store_api_request();
-            if ($is_store_api_request) {
+            if (WC()->is_store_api_request()) {
                 throw new Exception(esc_html($message));
             }
 
