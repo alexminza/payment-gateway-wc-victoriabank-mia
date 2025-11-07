@@ -119,6 +119,7 @@ function woocommerce_victoriabank_mia_init()
                 add_action("woocommerce_update_options_payment_gateways_{$this->id}", array($this, 'process_admin_options'));
 
             add_action("woocommerce_api_wc_{$this->id}", array($this, 'check_response'));
+            add_action("woocommerce_thankyou_{$this->id}", array($this, 'thankyou_page'), 10, 1);
         }
 
         public function init_form_fields()
@@ -445,9 +446,10 @@ function woocommerce_victoriabank_mia_init()
                 $this->log($message, WC_Log_Levels::INFO);
                 $order->add_order_note($message);
 
+                $redirect_url = wp_is_mobile() ? $qr_url : $this->get_redirect_url($order);
                 return array(
                     'result'   => 'success',
-                    'redirect' => $qr_url
+                    'redirect' => $redirect_url
                 );
             }
 
@@ -606,6 +608,46 @@ function woocommerce_victoriabank_mia_init()
         }
         #endregion
 
+        #region QR
+        /**
+         * @param int $order_id
+         */
+        public function thankyou_page($order_id)
+        {
+            $order = wc_get_order($order_id);
+            $qr_url = $order->get_meta(self::MOD_QR_URL, true);
+
+            if (empty($qr_url)) {
+                $this->log("Order $order_id missing meta " . self::MOD_QR_URL, WC_Log_Levels::ERROR);
+                return;
+            }
+
+            $qr_code_div_id = "{$this->id}-order-qrcode";
+            $qr_code_js_div_id = "{$qr_code_div_id}-js";
+
+            echo <<<HTML
+            <div class="{$qr_code_div_id}">
+                <h2>$this->method_title</h2>
+                <div id="{$qr_code_js_div_id}" style="display: inline-block;"></div>
+                <p><a href="{$qr_url}" target="_blank">$qr_url</a></p>
+            </div>
+
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+            <script>
+                var qrcode = new QRCode(document.getElementById("{$qr_code_js_div_id}"), {
+                    text: "{$qr_url}",
+                    width: 300,
+                    height: 300,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H,
+                    useSVG: true
+                });
+            </script>
+HTML;
+        }
+        #endregion
+
         #region Utility
         /**
          * @param string $qr_extension_id
@@ -654,15 +696,15 @@ function woocommerce_victoriabank_mia_init()
          */
         protected function get_redirect_url($order)
         {
-            $redirectUrl = $this->get_return_url($order);
-            return apply_filters("{$this->id}_redirect_url", $redirectUrl);
+            $redirect_url = $this->get_return_url($order);
+            return apply_filters("{$this->id}_redirect_url", $redirect_url);
         }
 
         protected function get_callback_url()
         {
             //https://developer.woocommerce.com/docs/extensions/core-concepts/woocommerce-plugin-api-callback/
-            $callbackUrl = WC()->api_request_url("wc_{$this->id}");
-            return apply_filters("{$this->id}_callback_url", $callbackUrl);
+            $callback_url = WC()->api_request_url("wc_{$this->id}");
+            return apply_filters("{$this->id}_callback_url", $callback_url);
         }
 
         protected static function get_logs_url()
