@@ -625,11 +625,23 @@ function woocommerce_victoriabank_mia_init()
             $qr_code_js_div_id = "{$qr_code_div_id}-js";
 
             echo <<<HTML
-            <div class="{$qr_code_div_id}">
-                <h2>$this->method_title</h2>
-                <div id="{$qr_code_js_div_id}" style="display: inline-block;"></div>
-                <p><a href="{$qr_url}" target="_blank">$qr_url</a></p>
-            </div>
+            <section class="woocommerce-notice woocommerce-notice--success woocommerce-thankyou-order-received">
+                <div class="woocommerce-notice woocommerce-notice--info woocommerce-info">
+                    <p>
+                        <strong>$this->method_title</strong>
+                    </p>
+                    <p>
+                        Scaneaza codul QR cu aplicația mobilă a băncii sau cu camera telefonului.
+                    </p>
+                </div>
+                <div class="wc-payment-method-header aligncenter">
+                    <img src="{$this->icon}" alt="{$this->method_title}" class="aligncenter size-full" style="max-width: 250px; height: auto;">
+                </div>
+                <div id="{$qr_code_js_div_id}" class="wc-payment-qr-code aligncenter" style="display: inline-block;"></div>
+                <div class="form-row place-order aligncenter">
+                    <a href="{$qr_url}" target="_blank" class="woocommerce-button button pay order-actions-button">Lista băncilor</a>
+                </div>
+            </section>
 
             <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
             <script>
