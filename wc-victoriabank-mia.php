@@ -616,8 +616,8 @@ function woocommerce_victoriabank_mia_init()
         public function thankyou_order_received_text($thank_you_title, $order)
         {
             //https://rudrastyh.com/woocommerce/thank-you-page.html
-            if ($order->get_payment_method() === self::MOD_ID) {
-                $thank_you_title .= '<br />' . __('Această comandă are o plată în așteptare. Urmează instrucțiunile de plată de mai jos.', 'wc-victoriabank-mia');
+            if (!$order->is_paid() && $order->get_payment_method() === self::MOD_ID) {
+                $thank_you_title .= '<br />' . __('Această comandă are o plată în așteptare. Urmează instrucțiunile de mai jos.', 'wc-victoriabank-mia');
             }
 
             return wp_kses_post($thank_you_title);
@@ -629,8 +629,23 @@ function woocommerce_victoriabank_mia_init()
         public function thankyou_page($order_id)
         {
             $order = wc_get_order($order_id);
-            $qr_url = $order->get_meta(self::MOD_QR_URL, true);
+            if ($order->is_paid()) {
+                $qr_order_paid = esc_html__('Comanda este platită integral.', 'wc-victoriabank-mia');
 
+                echo <<<HTML
+                <fieldset>
+                    <legend>$this->method_title</legend>
+                    <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                        <p>$qr_order_paid</p>
+                    </div>
+                </fieldset>
+HTML;
+
+                return;
+            }
+
+
+            $qr_url = $order->get_meta(self::MOD_QR_URL, true);
             if (empty($qr_url)) {
                 $this->log("Order $order_id missing meta " . self::MOD_QR_URL, WC_Log_Levels::ERROR);
                 return;
