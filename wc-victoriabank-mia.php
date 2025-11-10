@@ -646,17 +646,19 @@ HTML;
                 return;
             }
 
-
             $qr_url = $order->get_meta(self::MOD_QR_URL, true);
             if (empty($qr_url)) {
-                $this->log("Order $order_id missing meta " . self::MOD_QR_URL, WC_Log_Levels::ERROR);
+                $message = esc_html(sprintf(__('Order #%1$s missing meta %2$s.', 'wc-victoriabank-mia'), $order_id, self::MOD_QR_URL));
+                $this->log($message, WC_Log_Levels::ERROR);
                 return;
             }
 
             $qr_code_div_id = "{$this->id}-order-qrcode";
             $qr_code_js_div_id = "{$qr_code_div_id}-js";
-            $qr_code_title = esc_html__('Scanează & Plătește', 'wc-victoriabank-mia');
-            $qr_code_text = esc_html__('Scanează acest QR cod cu camera telefonului sau din aplicația ta financiară și finalizează plata.', 'wc-victoriabank-mia');
+
+            $is_mobile = wp_is_mobile();
+            $qr_code_title = $is_mobile ? esc_html__('Continuă spre plată', 'wc-victoriabank-mia') : esc_html__('Scanează & Plătește', 'wc-victoriabank-mia');
+            $qr_code_text = $is_mobile ? esc_html__('Selecteaza aplicația financiară din listă apăsând butonul de mai jos.', 'wc-victoriabank-mia') : esc_html__('Scanează acest QR cod cu camera telefonului sau din aplicația ta financiară și finalizează plata.', 'wc-victoriabank-mia');
             $qr_code_url_text = esc_html__('Lista băncilor', 'wc-victoriabank-mia');
 
             echo <<<HTML
@@ -670,16 +672,20 @@ HTML;
                     <a href="{$qr_url}" target="_blank" class="woocommerce-button button pay order-actions-button">$qr_code_url_text</a>
                 </div>
             </fieldset>
-
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-            <script>
-                var qrcode = new QRCode("{$qr_code_js_div_id}", {
-                    text: "{$qr_url}",
-                    width: 200,
-                    height: 200
-                });
-            </script>
 HTML;
+
+            if (!$is_mobile) {
+                echo <<<HTML
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                <script>
+                    var qrcode = new QRCode("{$qr_code_js_div_id}", {
+                        text: "{$qr_url}",
+                        width: 200,
+                        height: 200
+                    });
+                </script>
+HTML;
+            }
         }
         #endregion
 
