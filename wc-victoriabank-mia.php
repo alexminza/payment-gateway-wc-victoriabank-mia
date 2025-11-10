@@ -636,7 +636,7 @@ function woocommerce_victoriabank_mia_init()
 
                 echo <<<HTML
                 <fieldset>
-                    <legend>$this->method_title</legend>
+                    <legend>$this->title</legend>
                     <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
                         <p>$qr_order_paid</p>
                     </div>
@@ -663,9 +663,9 @@ HTML;
 
             echo <<<HTML
             <fieldset>
-                <legend>$this->method_title</legend>
+                <legend>$this->title</legend>
                 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                    <img src="{$this->icon}" alt="{$this->method_title}" class="aligncenter" style="max-width: 200px; height: auto;">
+                    <img src="{$this->icon}" alt="{$this->title}" class="aligncenter" style="max-width: 200px; height: auto;">
                     <div id="{$qr_code_js_div_id}" class="aligncenter"></div>
                     <h2>$qr_code_title</h2>
                     <p>$qr_code_text</p>
