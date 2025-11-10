@@ -801,18 +801,6 @@ HTML;
             echo esc_html($response_text);
             exit;
         }
-
-        protected static function get_egress_ip()
-        {
-            //https://developers.cloudflare.com/cloudflare-one/traffic-policies/egress-policies/dedicated-egress-ips/#verify-egress-ips
-            $response = wp_remote_get('https://ipv4.icanhazip.com/');
-            $responseBody = wp_remote_retrieve_body($response);
-
-            $log_context = [
-                'response' => $response
-            ];
-            self::static_log($responseBody, WC_Log_Levels::DEBUG, $log_context);
-        }
         #endregion
     }
 

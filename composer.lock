@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "alexminza/victoriabank-mia-sdk",
-            "version": "v1.0.0",
+            "version": "v1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/alexminza/victoriabank-mia-sdk-php.git",
-                "reference": "6c4a61aead2fc640ffef133be82386faebdbbbe4"
+                "reference": "3001ee84844b81ad26aa23889a7741f32e19c32e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alexminza/victoriabank-mia-sdk-php/zipball/6c4a61aead2fc640ffef133be82386faebdbbbe4",
-                "reference": "6c4a61aead2fc640ffef133be82386faebdbbbe4",
+                "url": "https://api.github.com/repos/alexminza/victoriabank-mia-sdk-php/zipball/3001ee84844b81ad26aa23889a7741f32e19c32e",
+                "reference": "3001ee84844b81ad26aa23889a7741f32e19c32e",
                 "shasum": ""
             },
             "require": {
@@ -60,7 +60,7 @@
                 "issues": "https://github.com/alexminza/victoriabank-mia-sdk-php/issues",
                 "source": "https://github.com/alexminza/victoriabank-mia-sdk-php"
             },
-            "time": "2025-10-24T15:03:26+00:00"
+            "time": "2025-11-07T12:23:17+00:00"
         },
         {
             "name": "firebase/php-jwt",
