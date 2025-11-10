@@ -616,8 +616,10 @@ function woocommerce_victoriabank_mia_init()
         public function thankyou_order_received_text($thank_you_title, $order)
         {
             //https://rudrastyh.com/woocommerce/thank-you-page.html
-            if (!$order->is_paid() && $order->get_payment_method() === self::MOD_ID) {
-                $thank_you_title .= '<br />' . __('Această comandă are o plată în așteptare. Urmează instrucțiunile de mai jos.', 'wc-victoriabank-mia');
+            if (!empty($order)) {
+                if (!$order->is_paid() && $order->get_payment_method() === self::MOD_ID) {
+                    $thank_you_title .= '<br />' . __('Această comandă are o plată în așteptare. Urmează instrucțiunile de mai jos.', 'wc-victoriabank-mia');
+                }
             }
 
             return wp_kses_post($thank_you_title);
@@ -661,7 +663,7 @@ HTML;
             <fieldset>
                 <legend>$this->method_title</legend>
                 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                    <img src="{$this->icon}" alt="{$this->method_title}" class="aligncenter" style="max-width: 250px; height: auto;">
+                    <img src="{$this->icon}" alt="{$this->method_title}" class="aligncenter" style="max-width: 200px; height: auto;">
                     <div id="{$qr_code_js_div_id}" class="aligncenter"></div>
                     <h2>$qr_code_title</h2>
                     <p>$qr_code_text</p>
