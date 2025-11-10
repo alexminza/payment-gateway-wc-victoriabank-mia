@@ -120,6 +120,7 @@ function woocommerce_victoriabank_mia_init()
 
             add_action("woocommerce_api_wc_{$this->id}", array($this, 'check_response'));
             add_action("woocommerce_thankyou_{$this->id}", array($this, 'thankyou_page'), 10, 1);
+            add_filter('woocommerce_thankyou_order_received_text', array($this, 'thankyou_order_received_text'), 20, 2);
         }
 
         public function init_form_fields()
@@ -609,6 +610,20 @@ function woocommerce_victoriabank_mia_init()
 
         #region QR
         /**
+         * @param string $thank_you_title
+         * @param \WC_Order $order
+         */
+        public function thankyou_order_received_text($thank_you_title, $order)
+        {
+            //https://rudrastyh.com/woocommerce/thank-you-page.html
+            if ($order->get_payment_method() === self::MOD_ID) {
+                $thank_you_title .= '<br />' . __('Această comandă are o plată în așteptare. Urmează instrucțiunile de plată de mai jos.', 'wc-victoriabank-mia');
+            }
+
+            return wp_kses_post($thank_you_title);
+        }
+
+        /**
          * @param int $order_id
          */
         public function thankyou_page($order_id)
@@ -623,21 +638,19 @@ function woocommerce_victoriabank_mia_init()
 
             $qr_code_div_id = "{$this->id}-order-qrcode";
             $qr_code_js_div_id = "{$qr_code_div_id}-js";
+            $qr_code_title = esc_html__('Scanează & Plătește', 'wc-victoriabank-mia');
+            $qr_code_text = esc_html__('Scanează acest QR cod cu camera telefonului sau din aplicația ta financiară și finalizează plata.', 'wc-victoriabank-mia');
+            $qr_code_url_text = esc_html__('Lista băncilor', 'wc-victoriabank-mia');
 
             echo <<<HTML
-            <div class="woocommerce-info woocommerce-message">
-                Această comandă are o plată în așteptare. Soldul va fi actualizat în momentul primirii plății.
-            </div>
             <fieldset>
                 <legend>$this->method_title</legend>
                 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
                     <img src="{$this->icon}" alt="{$this->method_title}" class="aligncenter" style="max-width: 250px; height: auto;">
                     <div id="{$qr_code_js_div_id}" class="aligncenter"></div>
-                    <p>
-                        <strong>Scanează & Plătește</strong><br />
-                        scanează acest QR cod cu camera telefonului sau din aplicația ta financiară și finalizează plata
-                    </p>
-                    <a href="{$qr_url}" target="_blank" class="woocommerce-button button pay order-actions-button">Lista băncilor</a>
+                    <h2>$qr_code_title</h2>
+                    <p>$qr_code_text</p>
+                    <a href="{$qr_url}" target="_blank" class="woocommerce-button button pay order-actions-button">$qr_code_url_text</a>
                 </div>
             </fieldset>
 
@@ -645,8 +658,8 @@ function woocommerce_victoriabank_mia_init()
             <script>
                 var qrcode = new QRCode("{$qr_code_js_div_id}", {
                     text: "{$qr_url}",
-                    width: 300,
-                    height: 300
+                    width: 200,
+                    height: 200
                 });
             </script>
 HTML;
