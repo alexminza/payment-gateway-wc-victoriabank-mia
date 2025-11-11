@@ -121,6 +121,9 @@ function woocommerce_victoriabank_mia_init()
             add_action("woocommerce_api_wc_{$this->id}", array($this, 'check_response'));
             add_action("woocommerce_thankyou_{$this->id}", array($this, 'thankyou_page'), 10, 1);
             add_filter('woocommerce_thankyou_order_received_text', array($this, 'thankyou_order_received_text'), 20, 2);
+
+            add_action("wp_ajax_{$this->id}_check_status", array($this, 'ajax_check_status'));
+            add_action("wp_ajax_nopriv_{$this->id}_check_status", array($this, 'ajax_check_status'));
         }
 
         public function init_form_fields()
@@ -686,6 +689,36 @@ HTML;
                 </script>
 HTML;
             }
+        }
+
+        public function ajax_check_status()
+        {
+            $order_id = intval($_POST['order_id'] ?? 0);
+            $nonce = sanitize_text_field($_POST['nonce'] ?? '');
+
+            $expected_nonce = self::MOD_PREFIX . $order_id;
+            if (empty($order_id) || !wp_verify_nonce($nonce, $expected_nonce)) {
+                $response = [
+                    'success' => false,
+                    'message' => __('Invalid request', 'wc-victoriabank-mia')
+                ];
+                wp_send_json_error($response, WP_Http::UNPROCESSABLE_ENTITY);
+            }
+
+            $order = wc_get_order($order_id);
+            if (empty($order)) {
+                $response = [
+                    'success' => false,
+                    'message' => __('Order not found', 'wc-victoriabank-mia')
+                ];
+                wp_send_json_error($response, WP_Http::UNPROCESSABLE_ENTITY);
+            }
+
+            $response = [
+                'success' => true,
+                'paid' => $order->is_paid(),
+            ];
+            wp_send_json($response);
         }
         #endregion
 
