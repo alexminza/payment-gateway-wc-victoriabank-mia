@@ -657,8 +657,8 @@ HTML;
             $qr_code_js_div_id = "{$qr_code_div_id}-js";
 
             $is_mobile = wp_is_mobile();
-            $qr_code_title = $is_mobile ? esc_html__('Continuă spre plată', 'wc-victoriabank-mia') : esc_html__('Scanează & Plătește', 'wc-victoriabank-mia');
-            $qr_code_text = $is_mobile ? esc_html__('Selecteaza aplicația financiară din listă apăsând butonul de mai jos.', 'wc-victoriabank-mia') : esc_html__('Scanează acest QR cod cu camera telefonului sau din aplicația ta financiară și finalizează plata.', 'wc-victoriabank-mia');
+            $qr_code_title = $is_mobile ? esc_html__('Selectează & Plătește', 'wc-victoriabank-mia') : esc_html__('Scanează & Plătește', 'wc-victoriabank-mia');
+            $qr_code_text = $is_mobile ? esc_html__('Selectează aplicația financiară din listă apăsând butonul de mai jos.', 'wc-victoriabank-mia') : esc_html__('Scanează acest QR cod cu camera telefonului sau din aplicația ta financiară și finalizează plata.', 'wc-victoriabank-mia');
             $qr_code_url_text = esc_html__('Lista băncilor', 'wc-victoriabank-mia');
 
             echo <<<HTML
