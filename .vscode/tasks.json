@@ -61,7 +61,12 @@
                 "./*",
                 "-x",
                 "\"*.DS_Store*\"",
-                "composer.phar"
+                "\".*\"",
+                "\"*/.*\"",
+                "\"*/.*/*\"",
+                "composer.phar",
+                "\"test/*\"",
+                "\"test/\""
             ],
             "problemMatcher": []
         },
