@@ -429,7 +429,14 @@ function woocommerce_victoriabank_mia_init()
 
                 $this->log(self::print_var($create_qr_response));
             } catch (Exception $ex) {
-                $this->log($ex, WC_Log_Levels::ERROR);
+                $this->log(
+                    $ex->getMessage(),
+                    WC_Log_Levels::ERROR,
+                    [
+                        'order_id' => $order_id,
+                        'exception' => $ex
+                    ]
+                );
             }
 
             if (!empty($create_qr_response)) {
@@ -494,7 +501,12 @@ function woocommerce_victoriabank_mia_init()
                 $callback_data = (array) VictoriabankMiaClient::decodeValidateCallback($callback_body, $this->victoriabank_mia_certificate);
                 $this->log(self::print_var($callback_data));
             } catch (Exception $ex) {
-                $this->log($ex, WC_Log_Levels::ERROR);
+                $this->log(
+                    $ex->getMessage(),
+                    WC_Log_Levels::ERROR,
+                    ['exception' => $ex]
+                );
+
                 return self::return_response(WP_Http::UNAUTHORIZED, 'Invalid callback signature');
             }
             #endregion
@@ -590,7 +602,16 @@ function woocommerce_victoriabank_mia_init()
                 $client->reverseTransaction($transaction_id, $auth_token);
                 //$this->log(self::print_var($payment_refund_response));
             } catch (Exception $ex) {
-                $this->log($ex, WC_Log_Levels::ERROR);
+                $this->log(
+                    $ex->getMessage(),
+                    WC_Log_Levels::ERROR,
+                    [
+                        'order_id' => $order_id,
+                        'amount' => $amount,
+                        'reason' => $reason,
+                        'exception' => $ex
+                    ]
+                );
 
                 $message = esc_html(sprintf(__('Order #%1$s refund of %2$f %3$s via %4$s failed: %5$s', 'wc-victoriabank-mia'), $order_id, $order_total, $order_currency, $this->method_title, $ex->getMessage()));
                 $message = $this->get_test_message($message);
