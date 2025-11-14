@@ -376,7 +376,7 @@ function woocommerce_victoriabank_mia_init()
                 'header' => [
                     'qrType' => 'DYNM', # Type of QR code: DYNM - Dynamic QR, STAT - Static QR, HYBR - Hybrid QR
                     'amountType' => 'Fixed', # Specifies the type of amount: Fixed - Dynamic QR, Controlled - Static QR, Free - Hybrid QR
-                    'pmtContext' => 'e' #Payment context: m - mobile payment, e - e-commerce payment, i - invoice payment, 0 - other
+                    'pmtContext' => 'e' #Payment context: m - mobile payment, e - e-commerce payment, i - invoice payment, o - other
                 ],
                 'extension' => [
                     'creditorAccount' => [
