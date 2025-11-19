@@ -89,7 +89,7 @@ function woocommerce_victoriabank_mia_init()
             $this->enabled            = $this->get_option('enabled', 'no');
             $this->title              = $this->get_option('title', $this->method_title);
             $this->description        = $this->get_option('description');
-            $this->icon               = apply_filters("woocommerce_{$this->id}_icon", plugin_dir_url(__FILE__) . 'assets/img/mia.svg');
+            $this->icon               = apply_filters("woocommerce_{$this->id}_icon", plugins_url('/assets/img/mia.svg', __FILE__));
 
             $this->testmode           = wc_string_to_bool($this->get_option('testmode', 'no'));
             $this->debug              = wc_string_to_bool($this->get_option('debug', 'no'));
@@ -679,8 +679,9 @@ HTML;
                 return;
             }
 
-            $qr_code_div_id = "{$this->id}-order-qrcode";
-            $qr_code_js_div_id = "{$qr_code_div_id}-js";
+            $qr_code_div_id_base = "{$this->id}-order-qrcode";
+            $qr_code_div_id = esc_attr($qr_code_div_id_base);
+            $qr_code_js_div_id = esc_attr("{$qr_code_div_id_base}-js");
 
             $is_mobile = wp_is_mobile();
             $gateway_icon = esc_url($this->icon);
@@ -689,7 +690,7 @@ HTML;
             $qr_code_url_text = esc_html__('Lista băncilor', 'wc-victoriabank-mia');
 
             echo <<<HTML
-            <fieldset>
+            <fieldset id="{$qr_code_div_id}">
                 <legend>$gateway_title</legend>
                 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
                     <img src="{$gateway_icon}" alt="{$gateway_title}" class="aligncenter" style="max-width: 200px; height: auto;">
@@ -702,16 +703,21 @@ HTML;
 HTML;
 
             if (!$is_mobile) {
-                echo <<<HTML
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-                <script>
-                    var qrcode = new QRCode("{$qr_code_js_div_id}", {
-                        text: "{$qr_url}",
+                //https://cdnjs.com/libraries/qrcodejs
+                //<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+                $js_div_id = wp_json_encode($qr_code_js_div_id);
+                $js_text = wp_json_encode($qr_url);
+
+                wp_enqueue_script('qrcodejs', plugins_url('/assets/js/qrcodejs/qrcode.min.js', __FILE__), array(), null, true);
+                wp_add_inline_script(
+                    'qrcodejs',
+                    "var qrcode = new QRCode({$js_div_id}, {
+                        text: {$js_text},
                         width: 200,
                         height: 200
-                    });
-                </script>
-HTML;
+                    });"
+                );
             }
         }
 
