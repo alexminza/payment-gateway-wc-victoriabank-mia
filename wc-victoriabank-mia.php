@@ -654,13 +654,15 @@ function woocommerce_victoriabank_mia_init()
          */
         public function thankyou_page($order_id)
         {
+            $gateway_title = esc_html($this->title);
+
             $order = wc_get_order($order_id);
             if ($order->is_paid()) {
                 $qr_order_paid = esc_html__('Comanda este platită integral.', 'wc-victoriabank-mia');
 
                 echo <<<HTML
                 <fieldset>
-                    <legend>$this->title</legend>
+                    <legend>$gateway_title</legend>
                     <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
                         <p>$qr_order_paid</p>
                     </div>
@@ -670,7 +672,7 @@ HTML;
                 return;
             }
 
-            $qr_url = $order->get_meta(self::MOD_QR_URL, true);
+            $qr_url = esc_url($order->get_meta(self::MOD_QR_URL, true));
             if (empty($qr_url)) {
                 $message = esc_html(sprintf(__('Order #%1$s missing meta %2$s.', 'wc-victoriabank-mia'), $order_id, self::MOD_QR_URL));
                 $this->log($message, WC_Log_Levels::ERROR);
@@ -681,15 +683,16 @@ HTML;
             $qr_code_js_div_id = "{$qr_code_div_id}-js";
 
             $is_mobile = wp_is_mobile();
+            $gateway_icon = esc_url($this->icon);
             $qr_code_title = $is_mobile ? esc_html__('Selectează & Plătește', 'wc-victoriabank-mia') : esc_html__('Scanează & Plătește', 'wc-victoriabank-mia');
-            $qr_code_text = $is_mobile ? esc_html__('Selectează aplicația financiară din listă apăsând butonul de mai jos.', 'wc-victoriabank-mia') : esc_html__('Scanează acest QR cod cu camera telefonului sau din aplicația ta financiară și finalizează plata.', 'wc-victoriabank-mia');
+            $qr_code_text = $is_mobile ? esc_html__('Alege aplicația financiară din listă apăsând butonul de mai jos.', 'wc-victoriabank-mia') : esc_html__('Scanează acest QR cod cu camera telefonului sau din aplicația ta financiară și finalizează plata.', 'wc-victoriabank-mia');
             $qr_code_url_text = esc_html__('Lista băncilor', 'wc-victoriabank-mia');
 
             echo <<<HTML
             <fieldset>
-                <legend>$this->title</legend>
+                <legend>$gateway_title</legend>
                 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                    <img src="{$this->icon}" alt="{$this->title}" class="aligncenter" style="max-width: 200px; height: auto;">
+                    <img src="{$gateway_icon}" alt="{$gateway_title}" class="aligncenter" style="max-width: 200px; height: auto;">
                     <div id="{$qr_code_js_div_id}" class="aligncenter"></div>
                     <h2>$qr_code_title</h2>
                     <p>$qr_code_text</p>
