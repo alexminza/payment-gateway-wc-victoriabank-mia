@@ -539,8 +539,11 @@ function woocommerce_victoriabank_mia_init()
             $order_total = $order->get_total();
             $order_currency = $order->get_currency();
 
-            if ($order_total != $callback_amount || strtoupper($order_currency) !== strtoupper($callback_currency)) {
-                $message = sprintf(__('Order amount mismatch: Callback: %1$f %2$s, Order: %3$f %4$s.', 'wc-victoriabank-mia'), $callback_amount, $callback_currency, $order_total, $order_currency);
+            $order_price = $this->format_price($order_total, $order_currency);
+            $callback_price = $this->format_price($callback_amount, $callback_currency);
+
+            if ($order_price !== $callback_price) {
+                $message = sprintf(__('Order amount mismatch: Callback: %1$s, Order: %2$s.', 'wc-victoriabank-mia'), $callback_price, $order_price);
                 $this->log($message, WC_Log_Levels::ERROR);
 
                 return self::return_response(WP_Http::UNPROCESSABLE_ENTITY, 'Order data mismatch');
@@ -587,7 +590,7 @@ function woocommerce_victoriabank_mia_init()
             $order_currency = $order->get_currency();
 
             #region Validate refund amount
-            if (isset($amount) && $amount != $order_total) {
+            if (isset($amount) && $amount !== $order_total) {
                 $message = esc_html(sprintf(__('Partial refunds are not currently supported by %1$s.', 'wc-victoriabank-mia'), self::MOD_TITLE));
                 $this->log($message, WC_Log_Levels::ERROR);
 
@@ -613,7 +616,7 @@ function woocommerce_victoriabank_mia_init()
                     ]
                 );
 
-                $message = esc_html(sprintf(__('Order #%1$s refund of %2$f %3$s via %4$s failed: %5$s', 'wc-victoriabank-mia'), $order_id, $order_total, $order_currency, $this->method_title, $ex->getMessage()));
+                $message = esc_html(sprintf(__('Order #%1$s refund of %2$s via %3$s failed: %4$s', 'wc-victoriabank-mia'), $order_id, $this->format_price($order_total, $order_currency), $this->method_title, $ex->getMessage()));
                 $message = $this->get_test_message($message);
                 $order->add_order_note($message);
                 $this->log($message, WC_Log_Levels::ERROR);
@@ -623,7 +626,7 @@ function woocommerce_victoriabank_mia_init()
                 return new WP_Error('process_refund', $ex->getMessage());
             }
 
-            $message = esc_html(sprintf(__('Order #%1$s refund of %2$f %3$s via %4$s approved.', 'wc-victoriabank-mia'), $order_id, $order_total, $order_currency, $this->method_title));
+            $message = esc_html(sprintf(__('Order #%1$s refund of %2$s via %3$s approved.', 'wc-victoriabank-mia'), $order_id, $this->format_price($order_total, $order_currency), $this->method_title));
             $message = $this->get_test_message($message);
             $this->log($message, WC_Log_Levels::INFO);
             $order->add_order_note($message);
@@ -766,13 +769,27 @@ HTML;
             ];
 
             $orders = wc_get_orders($args);
-            if (count($orders) == 1) {
+            if (count($orders) === 1) {
                 return $orders[0];
             }
 
             $log_context = ['orders' => $orders];
             $this->log(sprintf('Duplicate order meta %1$s: %2$s', self::MOD_QR_EXTENSION_ID, $qr_extension_id), WC_Log_Levels::ERROR, $log_context);
             return false;
+        }
+
+        /**
+         * @param float  $price
+         * @param string $currency
+         */
+        protected function format_price($price, $currency)
+        {
+            $args = [
+                'currency' => $currency,
+                'in_span' => false
+            ];
+
+            return wc_price($price, $args);
         }
 
         /**
