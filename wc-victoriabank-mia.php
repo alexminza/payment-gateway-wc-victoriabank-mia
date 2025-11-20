@@ -651,53 +651,48 @@ function woocommerce_victoriabank_mia_init()
          */
         public function thankyou_page($order_id)
         {
-            $gateway_title = esc_html($this->title);
-
             $order = wc_get_order($order_id);
             if ($order->is_paid()) {
-                $qr_order_paid = esc_html__('Comanda este platită integral.', 'wc-victoriabank-mia');
-
-                echo <<<HTML
+                ?>
                 <fieldset>
-                    <legend>$gateway_title</legend>
+                    <legend><?php echo esc_html($this->title); ?></legend>
                     <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                        <p>$qr_order_paid</p>
+                        <p><?php esc_html_e('Comanda este platită integral.', 'wc-victoriabank-mia'); ?></p>
                     </div>
                 </fieldset>
-HTML;
-
+                <?php
                 return;
             }
 
-            $qr_url = esc_url($order->get_meta(self::MOD_QR_URL, true));
+            $qr_url = $order->get_meta(self::MOD_QR_URL, true);
             if (empty($qr_url)) {
-                $message = esc_html(sprintf(__('Order #%1$s missing meta %2$s.', 'wc-victoriabank-mia'), $order_id, self::MOD_QR_URL));
+                $message = sprintf(__('Order #%1$s missing meta %2$s.', 'wc-victoriabank-mia'), $order_id, self::MOD_QR_URL);
                 $this->log($message, WC_Log_Levels::ERROR);
                 return;
             }
 
-            $qr_code_div_id_base = "{$this->id}-order-qrcode";
-            $qr_code_div_id = esc_attr($qr_code_div_id_base);
-            $qr_code_js_div_id = esc_attr("{$qr_code_div_id_base}-js");
+            $qr_code_div_id = "{$this->id}-order-qrcode";
+            $qr_code_js_div_id = "{$qr_code_div_id}-js";
 
             $is_mobile = wp_is_mobile();
-            $gateway_icon = esc_url($this->icon);
-            $qr_code_title = $is_mobile ? esc_html__('Selectează & Plătește', 'wc-victoriabank-mia') : esc_html__('Scanează & Plătește', 'wc-victoriabank-mia');
-            $qr_code_text = $is_mobile ? esc_html__('Alege aplicația financiară din listă apăsând butonul de mai jos.', 'wc-victoriabank-mia') : esc_html__('Scanează acest QR cod cu camera telefonului sau din aplicația ta financiară și finalizează plata.', 'wc-victoriabank-mia');
-            $qr_code_url_text = esc_html__('Lista băncilor', 'wc-victoriabank-mia');
+            $gateway_icon = $this->icon;
 
-            echo <<<HTML
-            <fieldset id="{$qr_code_div_id}">
-                <legend>$gateway_title</legend>
+            $qr_code_title = $is_mobile ? __('Selectează & Plătește', 'wc-victoriabank-mia') : __('Scanează & Plătește', 'wc-victoriabank-mia');
+            $qr_code_text = $is_mobile ? __('Alege aplicația financiară din listă apăsând butonul de mai jos.', 'wc-victoriabank-mia') : __('Scanează acest QR cod cu camera telefonului sau din aplicația ta financiară și finalizează plata.', 'wc-victoriabank-mia');
+            $qr_code_url_text = __('Lista băncilor', 'wc-victoriabank-mia');
+
+            ?>
+            <fieldset id="<?php echo esc_attr($qr_code_div_id); ?>">
+                <legend><?php echo esc_html($this->title); ?></legend>
                 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                    <img src="{$gateway_icon}" alt="{$gateway_title}" class="aligncenter" style="max-width: 200px; height: auto;">
-                    <div id="{$qr_code_js_div_id}" class="aligncenter"></div>
-                    <h2>$qr_code_title</h2>
-                    <p>$qr_code_text</p>
-                    <a href="{$qr_url}" target="_blank" class="woocommerce-button button pay order-actions-button">$qr_code_url_text</a>
+                    <img src="<?php echo esc_url($gateway_icon); ?>" alt="<?php echo esc_attr($this->title); ?>" class="aligncenter" style="max-width: 200px; height: auto;">
+                    <div id="<?php echo esc_attr($qr_code_js_div_id); ?>" class="aligncenter"></div>
+                    <h2><?php echo esc_html($qr_code_title); ?></h2>
+                    <p><?php echo esc_html($qr_code_text); ?></p>
+                    <a href="<?php echo esc_url($qr_url); ?>" target="_blank" class="woocommerce-button button pay order-actions-button"><?php echo esc_html($qr_code_url_text); ?></a>
                 </div>
             </fieldset>
-HTML;
+            <?php
 
             if (!$is_mobile) {
                 //https://cdnjs.com/libraries/qrcodejs
@@ -706,7 +701,7 @@ HTML;
                 $js_div_id = wp_json_encode($qr_code_js_div_id);
                 $js_text = wp_json_encode($qr_url);
 
-                wp_enqueue_script('qrcodejs', plugins_url('/assets/js/qrcodejs/qrcode.min.js', __FILE__), array(), null, true);
+                wp_enqueue_script('qrcodejs', plugins_url('/assets/js/qrcodejs/qrcode.min.js', __FILE__), array(), '1.0.0', true);
                 wp_add_inline_script(
                     'qrcodejs',
                     "var qrcode = new QRCode({$js_div_id}, {
