@@ -651,10 +651,13 @@ function woocommerce_victoriabank_mia_init()
          */
         public function thankyou_page($order_id)
         {
+            $qr_code_div_id = "{$this->id}-order-qrcode";
+            $qr_code_js_div_id = "{$qr_code_div_id}-js";
+
             $order = wc_get_order($order_id);
             if ($order->is_paid()) {
                 ?>
-                <fieldset>
+                <fieldset id="<?php echo esc_attr($qr_code_div_id); ?>">
                     <legend><?php echo esc_html($this->title); ?></legend>
                     <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
                         <p><?php esc_html_e('Comanda este platită integral.', 'wc-victoriabank-mia'); ?></p>
@@ -671,12 +674,7 @@ function woocommerce_victoriabank_mia_init()
                 return;
             }
 
-            $qr_code_div_id = "{$this->id}-order-qrcode";
-            $qr_code_js_div_id = "{$qr_code_div_id}-js";
-
             $is_mobile = wp_is_mobile();
-            $gateway_icon = $this->icon;
-
             $qr_code_title = $is_mobile ? __('Selectează & Plătește', 'wc-victoriabank-mia') : __('Scanează & Plătește', 'wc-victoriabank-mia');
             $qr_code_text = $is_mobile ? __('Alege aplicația financiară din listă apăsând butonul de mai jos.', 'wc-victoriabank-mia') : __('Scanează acest QR cod cu camera telefonului sau din aplicația ta financiară și finalizează plata.', 'wc-victoriabank-mia');
             $qr_code_url_text = __('Lista băncilor', 'wc-victoriabank-mia');
@@ -685,7 +683,7 @@ function woocommerce_victoriabank_mia_init()
             <fieldset id="<?php echo esc_attr($qr_code_div_id); ?>">
                 <legend><?php echo esc_html($this->title); ?></legend>
                 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                    <img src="<?php echo esc_url($gateway_icon); ?>" alt="<?php echo esc_attr($this->title); ?>" class="aligncenter" style="max-width: 200px; height: auto;">
+                    <img src="<?php echo esc_url($this->icon); ?>" alt="<?php echo esc_attr($this->title); ?>" class="aligncenter" style="max-width: 200px; height: auto;">
                     <div id="<?php echo esc_attr($qr_code_js_div_id); ?>" class="aligncenter"></div>
                     <h2><?php echo esc_html($qr_code_title); ?></h2>
                     <p><?php echo esc_html($qr_code_text); ?></p>
