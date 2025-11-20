@@ -40,16 +40,10 @@ function woocommerce_victoriabank_mia_plugins_loaded()
 
     //https://woocommerce.com/document/query-whether-woocommerce-is-activated/
     if (!class_exists('WooCommerce')) {
-        add_action('admin_notices', 'woocommerce_victoriabank_mia_missing_wc_notice');
         return;
     }
 
     woocommerce_victoriabank_mia_init();
-}
-
-function woocommerce_victoriabank_mia_missing_wc_notice()
-{
-    echo sprintf('<div class="notice notice-error is-dismissible"><p>%1$s</p></div>', esc_html__('Victoriabank MIA payment gateway requires WooCommerce to be installed and active.', 'wc-victoriabank-mia'));
 }
 
 function woocommerce_victoriabank_mia_init()
