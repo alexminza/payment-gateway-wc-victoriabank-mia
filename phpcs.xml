@@ -42,6 +42,7 @@
 		<exclude name="PEAR.Functions.FunctionCallSignature.SpaceBeforeCloseBracket" />
 
 		<exclude name="Squiz.Commenting.InlineComment.InvalidEndChar" />
+		<exclude name="Squiz.Commenting.InlineComment.NoSpaceBefore" />
 		<exclude name="Squiz.Commenting.FileComment.MissingPackageTag" />
 		<exclude name="Squiz.Commenting.FileComment.SpacingAfterOpen" />
 		<exclude name="Squiz.Commenting.ClassComment.Missing" />
