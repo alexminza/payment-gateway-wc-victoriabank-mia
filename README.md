@@ -1,4 +1,4 @@
-# Victoriabank MIA Payment Gateway for WooCommerce
+# Payment Gateway for Victoriabank MIA for WooCommerce
 
 [![WordPress Plugin Version](https://img.shields.io/wordpress/plugin/v/wc-victoriabank-mia?logo=wordpress)](https://wordpress.org/plugins/wc-victoriabank-mia/)
 [![WordPress Plugin Downloads](https://img.shields.io/wordpress/plugin/dt/wc-victoriabank-mia?logo=wordpress)](https://wordpress.org/plugins/wc-victoriabank-mia/advanced/)
@@ -7,7 +7,7 @@
 
 ![Victoriabank MIA](./.wordpress-org/banner-1544x500.png)
 
-_Accept MIA payments directly on your store with the Victoriabank MIA payment gateway for WooCommerce._
+_Accept MIA payments directly on your store with the Payment Gateway for Victoriabank MIA for WooCommerce._
 
 WordPress plugin: https://wordpress.org/plugins/wc-victoriabank-mia/
 

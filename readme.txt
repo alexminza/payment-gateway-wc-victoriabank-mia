@@ -1,4 +1,4 @@
-=== Victoriabank MIA Payment Gateway for WooCommerce ===
+=== Payment Gateway for Victoriabank MIA for WooCommerce ===
 Contributors: alexminza
 Tags: WooCommerce, Moldova, Victoriabank, MIA, QR, payment gateway
 Requires at least: 4.8
@@ -12,7 +12,7 @@ Accept MIA payments directly on your store with the Victoriabank MIA payment gat
 
 == Description ==
 
-Accept MIA payments directly on your store with the Victoriabank MIA payment gateway for WooCommerce.
+Accept MIA payments directly on your store with the Payment Gateway for Victoriabank MIA for WooCommerce.
 
 = Features =
 
