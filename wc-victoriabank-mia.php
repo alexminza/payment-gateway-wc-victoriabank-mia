@@ -21,8 +21,8 @@
  * Requires Plugins: woocommerce
  */
 
-//Looking to contribute code to this plugin? Go ahead and fork the repository over at GitHub https://github.com/alexminza/wc-victoriabank-mia
-//This plugin is based on PHP SDK for Victoriabank MIA API https://github.com/alexminza/victoriabank-mia-sdk-php (https://packagist.org/packages/alexminza/victoriabank-mia-sdk)
+// Looking to contribute code to this plugin? Go ahead and fork the repository over at GitHub https://github.com/alexminza/wc-victoriabank-mia
+// This plugin is based on PHP SDK for Victoriabank MIA API https://github.com/alexminza/victoriabank-mia-sdk-php (https://packagist.org/packages/alexminza/victoriabank-mia-sdk)
 
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
@@ -36,9 +36,9 @@ add_action('plugins_loaded', 'woocommerce_victoriabank_mia_plugins_loaded', 0);
 
 function woocommerce_victoriabank_mia_plugins_loaded()
 {
-    //load_plugin_textdomain('wc-victoriabank-mia', false, dirname(plugin_basename(__FILE__)) . '/languages');
+    // load_plugin_textdomain('wc-victoriabank-mia', false, dirname(plugin_basename(__FILE__)) . '/languages');
 
-    //https://woocommerce.com/document/query-whether-woocommerce-is-activated/
+    // https://woocommerce.com/document/query-whether-woocommerce-is-activated/
     if (!class_exists('WooCommerce')) {
         return;
     }
@@ -50,12 +50,12 @@ function woocommerce_victoriabank_mia_init()
 {
     class WC_Victoriabank_MIA extends WC_Payment_Gateway
     {
-        #region Constants
+        //region Constants
         const MOD_ID             = 'victoriabank_mia';
         const MOD_TITLE          = 'Victoriabank MIA';
         const MOD_PREFIX         = 'victoriabank_mia_';
 
-        const SUPPORTED_CURRENCIES = ['MDL'];
+        const SUPPORTED_CURRENCIES = array('MDL');
         const ORDER_TEMPLATE       = 'Order #%1$s';
 
         const MOD_QR_ID             =  self::MOD_PREFIX . 'qr_id';
@@ -64,9 +64,9 @@ function woocommerce_victoriabank_mia_init()
         const MOD_CALLBACK          =  self::MOD_PREFIX . 'callback';
         const MOD_PAYMENT_REFERENCE =  self::MOD_PREFIX . 'payment_reference';
 
-        const DEFAULT_TIMEOUT  = 30; //seconds
-        const DEFAULT_VALIDITY = 15; //minutes
-        #endregion
+        const DEFAULT_TIMEOUT  = 30; // seconds
+        const DEFAULT_VALIDITY = 15; // minutes
+        //endregion
 
         protected $testmode, $debug, $logger, $order_template, $transaction_validity;
         protected $victoriabank_mia_base_url, $victoriabank_mia_username, $victoriabank_mia_password, $victoriabank_mia_certificate, $victoriabank_mia_creditor_account, $victoriabank_mia_company_name;
@@ -77,9 +77,9 @@ function woocommerce_victoriabank_mia_init()
             $this->method_title       = self::MOD_TITLE;
             $this->method_description = 'Payment Gateway for Victoriabank MIA for WooCommerce';
             $this->has_fields         = false;
-            $this->supports           = ['products', 'refunds'];
+            $this->supports           = array('products', 'refunds');
 
-            #region Initialize user set variables
+            //region Initialize user set variables
             $this->enabled            = $this->get_option('enabled', 'no');
             $this->title              = $this->get_option('title', $this->method_title);
             $this->description        = $this->get_option('description');
@@ -89,13 +89,14 @@ function woocommerce_victoriabank_mia_init()
             $this->debug              = wc_string_to_bool($this->get_option('debug', 'no'));
             $this->logger             = new WC_Logger(null, $this->debug ? WC_Log_Levels::DEBUG : WC_Log_Levels::INFO);
 
-            if ($this->testmode)
+            if ($this->testmode) {
                 $this->description = $this->get_test_message($this->description);
+            }
 
             $this->order_template       = $this->get_option('order_template', self::ORDER_TEMPLATE);
             $this->transaction_validity = intval($this->get_option('transaction_validity', self::DEFAULT_VALIDITY));
 
-            #https://github.com/alexminza/victoriabank-mia-sdk-php/blob/main/src/VictoriabankMia/VictoriabankMiaClient.php
+            // https://github.com/alexminza/victoriabank-mia-sdk-php/blob/main/src/VictoriabankMia/VictoriabankMiaClient.php
             $this->victoriabank_mia_base_url     = $this->testmode ? VictoriabankMiaClient::TEST_BASE_URL : VictoriabankMiaClient::DEFAULT_BASE_URL;
 
             $this->victoriabank_mia_username    = $this->get_option('victoriabank_mia_username');
@@ -107,10 +108,11 @@ function woocommerce_victoriabank_mia_init()
 
             $this->init_form_fields();
             $this->init_settings();
-            #endregion
+            //endregion
 
-            if (is_admin())
+            if (is_admin()) {
                 add_action("woocommerce_update_options_payment_gateways_{$this->id}", array($this, 'process_admin_options'));
+            }
 
             add_action("woocommerce_api_wc_{$this->id}", array($this, 'check_response'));
             add_action("woocommerce_thankyou_{$this->id}", array($this, 'thankyou_page'), 10, 1);
@@ -127,21 +129,21 @@ function woocommerce_victoriabank_mia_init()
                     'title'       => __('Enable/Disable', 'wc-victoriabank-mia'),
                     'type'        => 'checkbox',
                     'label'       => __('Enable this gateway', 'wc-victoriabank-mia'),
-                    'default'     => 'yes'
+                    'default'     => 'yes',
                 ),
                 'title'           => array(
                     'title'       => __('Title', 'wc-victoriabank-mia'),
                     'type'        => 'text',
                     'description' => __('Payment method title that the customer will see during checkout.', 'wc-victoriabank-mia'),
                     'desc_tip'    => true,
-                    'default'     => self::MOD_TITLE
+                    'default'     => self::MOD_TITLE,
                 ),
                 'description'     => array(
                     'title'       => __('Description', 'wc-victoriabank-mia'),
                     'type'        => 'textarea',
                     'description' => __('Payment method description that the customer will see during checkout.', 'wc-victoriabank-mia'),
                     'desc_tip'    => true,
-                    'default'     => ''
+                    'default'     => '',
                 ),
 
                 'testmode'        => array(
@@ -150,7 +152,7 @@ function woocommerce_victoriabank_mia_init()
                     'label'       => __('Enabled', 'wc-victoriabank-mia'),
                     'description' => __('Use Test or Live bank gateway to process the payments. Disable when ready to accept live payments.', 'wc-victoriabank-mia'),
                     'desc_tip'    => true,
-                    'default'     => 'no'
+                    'default'     => 'no',
                 ),
                 'debug'           => array(
                     'title'       => __('Debug mode', 'wc-victoriabank-mia'),
@@ -158,7 +160,7 @@ function woocommerce_victoriabank_mia_init()
                     'label'       => __('Enable logging', 'wc-victoriabank-mia'),
                     'default'     => 'no',
                     'description' => sprintf('<a href="%2$s">%1$s</a>', esc_html__('View logs', 'wc-victoriabank-mia'), esc_url(self::get_logs_url())),
-                    'desc_tip'    => __('Save debug messages to the WooCommerce System Status logs. Note: this may log personal information. Use this for debugging purposes only and delete the logs when finished.', 'wc-victoriabank-mia')
+                    'desc_tip'    => __('Save debug messages to the WooCommerce System Status logs. Note: this may log personal information. Use this for debugging purposes only and delete the logs when finished.', 'wc-victoriabank-mia'),
                 ),
 
                 'order_template'  => array(
@@ -166,19 +168,19 @@ function woocommerce_victoriabank_mia_init()
                     'type'        => 'text',
                     'description' => __('Format: <code>%1$s</code> - Order ID', 'wc-victoriabank-mia'),
                     'desc_tip'    => __('Order description that the customer will see on the bank payment page.', 'wc-victoriabank-mia'),
-                    'default'     => self::ORDER_TEMPLATE
+                    'default'     => self::ORDER_TEMPLATE,
                 ),
                 'transaction_validity'  => array(
                     'title'       => __('Transaction validity', 'wc-victoriabank-mia'),
                     'type'        => 'decimal',
                     'description' => __('minutes', 'wc-victoriabank-mia'),
-                    'default'     => self::DEFAULT_VALIDITY
+                    'default'     => self::DEFAULT_VALIDITY,
                 ),
 
                 'connection_settings' => array(
                     'title'       => __('Connection Settings', 'wc-victoriabank-mia'),
                     'description' => __('Payment gateway connection credentials are provided by the bank.', 'wc-victoriabank-mia'),
-                    'type'        => 'title'
+                    'type'        => 'title',
                 ),
                 'victoriabank_mia_username' => array(
                     'title'       => __('Username', 'wc-victoriabank-mia'),
@@ -212,7 +214,7 @@ function woocommerce_victoriabank_mia_init()
                         esc_html__('Callback URL', 'wc-victoriabank-mia'),
                         esc_url($this->get_callback_url())
                     ),
-                    'type'        => 'title'
+                    'type'        => 'title',
                 ),
             );
         }
@@ -228,11 +230,13 @@ function woocommerce_victoriabank_mia_init()
 
         public function is_available()
         {
-            if (!$this->is_valid_for_use())
+            if (!$this->is_valid_for_use()) {
                 return false;
+            }
 
-            if (!$this->check_settings())
+            if (!$this->check_settings()) {
                 return false;
+            }
 
             return parent::is_available();
         }
@@ -262,18 +266,21 @@ function woocommerce_victoriabank_mia_init()
             $validate_result = true;
 
             if (!$this->is_valid_for_use()) {
-                $this->add_error(sprintf(
-                    '<strong>%1$s: %2$s</strong>. %3$s: %4$s',
-                    esc_html__('Unsupported store currency', 'wc-victoriabank-mia'),
-                    esc_html(get_woocommerce_currency()),
-                    esc_html__('Supported currencies', 'wc-victoriabank-mia'),
-                    esc_html(join(', ', self::SUPPORTED_CURRENCIES))
-                ));
+                $this->add_error(
+                    sprintf(
+                        '<strong>%1$s: %2$s</strong>. %3$s: %4$s',
+                        esc_html__('Unsupported store currency', 'wc-victoriabank-mia'),
+                        esc_html(get_woocommerce_currency()),
+                        esc_html__('Supported currencies', 'wc-victoriabank-mia'),
+                        esc_html(join(', ', self::SUPPORTED_CURRENCIES))
+                    )
+                );
 
                 $validate_result = false;
             }
 
             if (!$this->check_settings()) {
+                /* translators: 1: Plugin installation instructions URL */
                 $message_instructions = sprintf(__('See plugin documentation for <a href="%1$s" target="_blank">installation instructions</a>.', 'wc-victoriabank-mia'), 'https://wordpress.org/plugins/wc-victoriabank-mia/#installation');
                 $this->add_error(sprintf('<strong>%1$s</strong>: %2$s. %3$s', esc_html__('Connection Settings', 'wc-victoriabank-mia'), esc_html__('Not configured', 'wc-victoriabank-mia'), wp_kses_post($message_instructions)));
                 $validate_result = false;
@@ -304,30 +311,32 @@ function woocommerce_victoriabank_mia_init()
 
         protected function get_settings_admin_message()
         {
+            /* translators: 1: Payment method title 2: Plugin settings URL */
             $message = sprintf(wp_kses_post(__('%1$s is not properly configured. Verify plugin <a href="%2$s">Connection Settings</a>.', 'wc-victoriabank-mia')), esc_html($this->method_title), esc_url(self::get_settings_url()));
             return $message;
         }
 
         protected function get_logs_admin_message()
         {
+            /* translators: 1: Payment method title 2: Plugin settings URL */
             $message = sprintf(wp_kses_post(__('See <a href="%2$s">%1$s settings</a> page for log details and setup instructions.', 'wc-victoriabank-mia')), esc_html($this->method_title), esc_url(self::get_settings_url()));
             return $message;
         }
 
-        #region Victoriabank MIA
+        //region Victoriabank MIA
         protected function init_victoriabank_mia_client()
         {
-            $options = [
+            $options = array(
                 'base_uri' => $this->victoriabank_mia_base_url,
-                'timeout' => self::DEFAULT_TIMEOUT
-            ];
+                'timeout' => self::DEFAULT_TIMEOUT,
+            );
 
             if ($this->debug) {
-                $logName = "{$this->id}_guzzle";
-                $logFileName = WC_Log_Handler_File::get_log_file_path($logName);
+                $log_name = "{$this->id}_guzzle";
+                $log_file_name = WC_Log_Handler_File::get_log_file_path($log_name);
 
-                $log = new \Monolog\Logger($logName);
-                $log->pushHandler(new \Monolog\Handler\StreamHandler($logFileName, \Monolog\Logger::DEBUG));
+                $log = new \Monolog\Logger($log_name);
+                $log->pushHandler(new \Monolog\Handler\StreamHandler($log_file_name, \Monolog\Logger::DEBUG));
 
                 $stack = \GuzzleHttp\HandlerStack::create();
                 $stack->push(\GuzzleHttp\Middleware::log($log, new \GuzzleHttp\MessageFormatter(\GuzzleHttp\MessageFormatter::DEBUG)));
@@ -335,8 +344,8 @@ function woocommerce_victoriabank_mia_init()
                 $options['handler'] = $stack;
             }
 
-            $guzzleClient = new \GuzzleHttp\Client($options);
-            $client = new VictoriabankMiaClient($guzzleClient);
+            $guzzle_client = new \GuzzleHttp\Client($options);
+            $client = new VictoriabankMiaClient($guzzle_client);
 
             return $client;
         }
@@ -392,9 +401,9 @@ function woocommerce_victoriabank_mia_init()
 
             return $client->createPayeeQr($qr_data, $auth_token);
         }
-        #endregion
+        //endregion
 
-        #region Payment
+        //region Payment
         public function process_payment($order_id)
         {
             $order = wc_get_order($order_id);
@@ -438,13 +447,13 @@ function woocommerce_victoriabank_mia_init()
                 $qr_extension_id = strval($create_qr_response['qrExtensionUUID']);
                 $qr_url = strval($create_qr_response['qrAsText']);
 
-                #region Update order payment transaction metadata
-                //https://developer.woocommerce.com/docs/features/high-performance-order-storage/recipe-book/#apis-for-gettingsetting-posts-and-postmeta
+                //region Update order payment transaction metadata
+                // https://developer.woocommerce.com/docs/features/high-performance-order-storage/recipe-book/#apis-for-gettingsetting-posts-and-postmeta
                 $order->add_meta_data(self::MOD_QR_ID, $qr_id, true);
                 $order->add_meta_data(self::MOD_QR_EXTENSION_ID, $qr_extension_id, true);
                 $order->add_meta_data(self::MOD_QR_URL, $qr_url, true);
                 $order->save();
-                #endregion
+                //endregion
 
                 $message = esc_html(sprintf(__('Order #%1$s payment initiated via %2$s: %3$s', 'wc-victoriabank-mia'), $order_id, $this->method_title, self::print_response_object($create_qr_response)));
                 $message = $this->get_test_message($message);
@@ -463,7 +472,7 @@ function woocommerce_victoriabank_mia_init()
             $order->add_order_note($message);
             $this->log($message, WC_Log_Levels::ERROR);
 
-            //https://github.com/woocommerce/woocommerce/issues/48687#issuecomment-2186475264
+            // https://github.com/woocommerce/woocommerce/issues/48687#issuecomment-2186475264
             if (WC()->is_store_api_request()) {
                 throw new Exception(esc_html($message));
             }
@@ -484,7 +493,7 @@ function woocommerce_victoriabank_mia_init()
                 return self::return_response(WP_Http::OK, $message);
             }
 
-            #region Validate callback
+            //region Validate callback
             $callback_data = null;
 
             try {
@@ -503,16 +512,16 @@ function woocommerce_victoriabank_mia_init()
 
                 return self::return_response(WP_Http::UNAUTHORIZED, 'Invalid callback signature');
             }
-            #endregion
+            //endregion
 
-            #region Validate signal code
+            //region Validate signal code
             $callback_signal_code = strval($callback_data['signalCode']);
             if (strtolower($callback_signal_code) !== 'payment') {
                 return self::return_response(WP_Http::ACCEPTED);
             }
-            #endregion
+            //endregion
 
-            #region Validate order ID
+            //region Validate order ID
             $callback_qr_extension_id = strval($callback_data['qrExtensionUUID']);
             $order = $this->get_order_by_qr_extension_id($callback_qr_extension_id);
 
@@ -522,9 +531,9 @@ function woocommerce_victoriabank_mia_init()
 
                 return self::return_response(WP_Http::UNPROCESSABLE_ENTITY, 'Order not found');
             }
-            #endregion
+            //endregion
 
-            #region Check order data
+            //region Check order data
             $callback_data_payment = (array) $callback_data['payment'];
             $callback_data_payment_amount = (array) $callback_data_payment['amount'];
             $callback_amount = floatval($callback_data_payment_amount['sum']);
@@ -549,9 +558,9 @@ function woocommerce_victoriabank_mia_init()
 
                 return self::return_response(WP_Http::OK, 'Order already fully paid');
             }
-            #endregion
+            //endregion
 
-            #region Complete order payment
+            //region Complete order payment
             $callback_payment_reference = strval($callback_data_payment['reference']);
             $callback_payment_transaction_id = VictoriabankMiaClient::getPaymentTransactionId($callback_payment_reference);
 
@@ -560,7 +569,7 @@ function woocommerce_victoriabank_mia_init()
             $order->save();
 
             $order->payment_complete($callback_payment_transaction_id);
-            #endregion
+            //endregion
 
             $message = esc_html(sprintf(__('Payment completed via %1$s: %2$s', 'wc-victoriabank-mia'), $this->method_title, json_encode($callback_data)));
             $message = $this->get_test_message($message);
@@ -583,21 +592,21 @@ function woocommerce_victoriabank_mia_init()
             $order_total = $order->get_total();
             $order_currency = $order->get_currency();
 
-            #region Validate refund amount
+            //region Validate refund amount
             if (isset($amount) && $amount !== $order_total) {
                 $message = esc_html(sprintf(__('Partial refunds are not currently supported by %1$s.', 'wc-victoriabank-mia'), self::MOD_TITLE));
                 $this->log($message, WC_Log_Levels::ERROR);
 
                 return new WP_Error('partial_refund', $message);
             }
-            #endregion
+            //endregion
 
             try {
                 $client = $this->init_victoriabank_mia_client();
                 $auth_token = $this->victoriabank_mia_generate_token($client);
 
                 $client->reverseTransaction($transaction_id, $auth_token);
-                //$this->log(self::print_var($payment_refund_response));
+                // $this->log(self::print_var($payment_refund_response));
             } catch (Exception $ex) {
                 $this->log(
                     $ex->getMessage(),
@@ -627,9 +636,9 @@ function woocommerce_victoriabank_mia_init()
 
             return true;
         }
-        #endregion
+        //endregion
 
-        #region QR
+        //region QR
         /**
          * @param string $thank_you_title
          * @param \WC_Order $order
@@ -740,9 +749,9 @@ function woocommerce_victoriabank_mia_init()
             ];
             wp_send_json($response);
         }
-        #endregion
+        //endregion
 
-        #region Utility
+        //region Utility
         /**
          * @param string $qr_extension_id
          */
@@ -900,11 +909,11 @@ function woocommerce_victoriabank_mia_init()
             echo esc_html($response_text);
             exit;
         }
-        #endregion
+        //endregion
     }
 
-    #region Add gateway to WooCommerce
-    //https://developer.woocommerce.com/docs/features/payments/payment-gateway-plugin-base/
+    //region Add gateway to WooCommerce
+    // https://developer.woocommerce.com/docs/features/payments/payment-gateway-plugin-base/
     function woocommerce_victoriabank_mia_add_gateway($methods)
     {
         $methods[] = WC_Victoriabank_MIA::class;
@@ -912,9 +921,9 @@ function woocommerce_victoriabank_mia_init()
     }
 
     add_filter('woocommerce_payment_gateways', 'woocommerce_victoriabank_mia_add_gateway');
-    #endregion
+    //endregion
 
-    #region Admin init
+    //region Admin init
     function woocommerce_victoriabank_mia_plugin_links($links)
     {
         $plugin_links = array(
@@ -931,24 +940,24 @@ function woocommerce_victoriabank_mia_init()
     if (is_admin()) {
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'woocommerce_victoriabank_mia_plugin_links');
     }
-    #endregion
+    //endregion
 }
 
-#region Declare WooCommerce compatibility
+//region Declare WooCommerce compatibility
 add_action('before_woocommerce_init', function () {
     if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
-        //WooCommerce HPOS compatibility
-        //https://developer.woocommerce.com/docs/features/high-performance-order-storage/recipe-book/#declaring-extension-incompatibility
+        // WooCommerce HPOS compatibility
+        // https://developer.woocommerce.com/docs/features/high-performance-order-storage/recipe-book/#declaring-extension-incompatibility
         \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
 
-        //WooCommerce Cart Checkout Blocks compatibility
-        //https://github.com/woocommerce/woocommerce/pull/36426
+        // WooCommerce Cart Checkout Blocks compatibility
+        // https://github.com/woocommerce/woocommerce/pull/36426
         \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks', __FILE__, true);
     }
 });
-#endregion
+//endregion
 
-#region Register WooCommerce Blocks payment method type
+//region Register WooCommerce Blocks payment method type
 add_action('woocommerce_blocks_loaded', function () {
     if (class_exists(\Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType::class)) {
         require_once plugin_dir_path(__FILE__) . 'wc-victoriabank-mia-wbc.php';
@@ -961,4 +970,4 @@ add_action('woocommerce_blocks_loaded', function () {
         );
     }
 });
-#endregion
+//endregion
