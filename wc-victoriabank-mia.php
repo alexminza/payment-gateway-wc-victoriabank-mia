@@ -639,7 +639,7 @@ function woocommerce_victoriabank_mia_init()
             //https://rudrastyh.com/woocommerce/thank-you-page.html
             if (!empty($order)) {
                 if (!$order->is_paid() && $order->get_payment_method() === self::MOD_ID) {
-                    $thank_you_title .= '<br />' . __('Această comandă are o plată în așteptare. Urmează instrucțiunile de mai jos.', 'wc-victoriabank-mia');
+                    $thank_you_title .= '<br />' . __('This order has a pending payment. Follow the instructions below.', 'wc-victoriabank-mia');
                 }
             }
 
@@ -660,7 +660,7 @@ function woocommerce_victoriabank_mia_init()
                 <fieldset id="<?php echo esc_attr($qr_code_div_id); ?>">
                     <legend><?php echo esc_html($this->title); ?></legend>
                     <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                        <p><?php esc_html_e('Comanda este platită integral.', 'wc-victoriabank-mia'); ?></p>
+                        <p><?php esc_html_e('This order is fully paid.', 'wc-victoriabank-mia'); ?></p>
                     </div>
                 </fieldset>
                 <?php
@@ -675,9 +675,9 @@ function woocommerce_victoriabank_mia_init()
             }
 
             $is_mobile = wp_is_mobile();
-            $qr_code_title = $is_mobile ? __('Selectează & Plătește', 'wc-victoriabank-mia') : __('Scanează & Plătește', 'wc-victoriabank-mia');
-            $qr_code_text = $is_mobile ? __('Alege aplicația financiară din listă apăsând butonul de mai jos.', 'wc-victoriabank-mia') : __('Scanează acest QR cod cu camera telefonului sau din aplicația ta financiară și finalizează plata.', 'wc-victoriabank-mia');
-            $qr_code_url_text = __('Lista băncilor', 'wc-victoriabank-mia');
+            $qr_code_title = $is_mobile ? __('Select & Pay', 'wc-victoriabank-mia') : __('Scan & Pay', 'wc-victoriabank-mia');
+            $qr_code_text = $is_mobile ? __('Choose the financial app from the list by pressing the button below.', 'wc-victoriabank-mia') : __('Scan this QR code with your phone camera or from your financial app and complete the payment.', 'wc-victoriabank-mia');
+            $qr_code_url_text = __('Banks list', 'wc-victoriabank-mia');
 
             ?>
             <fieldset id="<?php echo esc_attr($qr_code_div_id); ?>">
