@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Plugin Name: Victoriabank MIA Payment Gateway for WooCommerce
- * Description: Accept MIA payments directly on your store with the Victoriabank MIA payment gateway for WooCommerce.
+ * Plugin Name: Payment Gateway for Victoriabank MIA for WooCommerce
+ * Description: Accept MIA payments directly on your store with the Payment Gateway for Victoriabank MIA for WooCommerce.
  * Plugin URI: https://github.com/alexminza/wc-victoriabank-mia
  * Version: 1.0.0
  * Author: Alexander Minza
@@ -17,7 +17,7 @@
  * Requires at least: 4.8
  * Tested up to: 6.8
  * WC requires at least: 3.3
- * WC tested up to: 10.3.3
+ * WC tested up to: 10.3.5
  * Requires Plugins: woocommerce
  */
 
@@ -81,7 +81,7 @@ function woocommerce_victoriabank_mia_init()
         {
             $this->id                 = self::MOD_ID;
             $this->method_title       = self::MOD_TITLE;
-            $this->method_description = 'Victoriabank MIA Payment Gateway for WooCommerce';
+            $this->method_description = 'Payment Gateway for Victoriabank MIA for WooCommerce';
             $this->has_fields         = false;
             $this->supports           = array('products', 'refunds');
 

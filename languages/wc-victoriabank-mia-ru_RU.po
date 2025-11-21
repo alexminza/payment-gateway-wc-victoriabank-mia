@@ -2,11 +2,12 @@
 # This file is distributed under the GPLv3 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Victoriabank MIA Payment Gateway for WooCommerce 1.0.0\n"
+"Project-Id-Version: Payment Gateway for Victoriabank MIA for WooCommerce "
+"1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wc-victoriabank-"
 "mia\n"
-"POT-Creation-Date: 2025-10-28 17:36+0200\n"
-"PO-Revision-Date: 2025-10-28 17:37+0200\n"
+"POT-Creation-Date: 2025-11-21 09:59+0200\n"
+"PO-Revision-Date: 2025-11-21 10:00+0200\n"
 "Last-Translator: Alexander Minza <alex@alexminza.com>\n"
 "Language-Team: \n"
 "Language: ru_RU\n"
@@ -18,8 +19,8 @@ msgstr ""
 #. Description of the plugin
 #: wc-victoriabank-mia.php
 msgid ""
-"Accept MIA payments directly on your store with the Victoriabank MIA payment "
-"gateway for WooCommerce."
+"Accept MIA payments directly on your store with the Payment Gateway for "
+"Victoriabank MIA for WooCommerce."
 msgstr ""
 "Принимайте оплату MIA прямо в своем магазине с помощью платежного шлюза "
 "Victoriabank MIA для WooCommerce."
@@ -271,6 +272,6 @@ msgstr "Возврат %1$s %2$s через %3$s подтвержден."
 msgid "TEST: %1$s"
 msgstr "ТЕСТ: %1$s"
 
-#: wc-victoriabank-mia.php:786
+#: wc-victoriabank-mia.php:774
 msgid "Settings"
 msgstr "Настройки"
