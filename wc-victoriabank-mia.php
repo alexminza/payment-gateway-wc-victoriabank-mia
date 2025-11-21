@@ -164,6 +164,7 @@ function woocommerce_victoriabank_mia_init()
                 'order_template'  => array(
                     'title'       => __('Order description', 'wc-victoriabank-mia'),
                     'type'        => 'text',
+                    /* translators: 1: Example placeholder shown to user, represents Order ID */
                     'description' => __('Format: <code>%1$s</code> - Order ID', 'wc-victoriabank-mia'),
                     'desc_tip'    => __('Order description that the customer will see on the bank payment page.', 'wc-victoriabank-mia'),
                     'default'     => self::ORDER_TEMPLATE,
@@ -309,14 +310,14 @@ function woocommerce_victoriabank_mia_init()
 
         protected function get_settings_admin_message()
         {
-            /* translators: 1: Payment method title 2: Plugin settings URL */
+            /* translators: 1: Payment method title, 2: Plugin settings URL */
             $message = sprintf(wp_kses_post(__('%1$s is not properly configured. Verify plugin <a href="%2$s">Connection Settings</a>.', 'wc-victoriabank-mia')), esc_html($this->method_title), esc_url(self::get_settings_url()));
             return $message;
         }
 
         protected function get_logs_admin_message()
         {
-            /* translators: 1: Payment method title 2: Plugin settings URL */
+            /* translators: 1: Payment method title, 2: Plugin settings URL */
             $message = sprintf(wp_kses_post(__('See <a href="%2$s">%1$s settings</a> page for log details and setup instructions.', 'wc-victoriabank-mia')), esc_html($this->method_title), esc_url(self::get_settings_url()));
             return $message;
         }
@@ -453,6 +454,7 @@ function woocommerce_victoriabank_mia_init()
                 $order->save();
                 //endregion
 
+                /* translators: 1: Order ID, 2: Payment method title, 3: API response details */
                 $message = esc_html(sprintf(__('Order #%1$s payment initiated via %2$s: %3$s', 'wc-victoriabank-mia'), $order_id, $this->method_title, self::print_response_object($create_qr_response)));
                 $message = $this->get_test_message($message);
                 $this->log($message, WC_Log_Levels::INFO);
@@ -465,6 +467,7 @@ function woocommerce_victoriabank_mia_init()
                 );
             }
 
+            /* translators: 1: Order ID, 2: Payment method title */
             $message = esc_html(sprintf(__('Order #%1$s payment initiation failed via %2$s.', 'wc-victoriabank-mia'), $order_id, $this->method_title));
             $message = $this->get_test_message($message);
             $order->add_order_note($message);
@@ -488,6 +491,7 @@ function woocommerce_victoriabank_mia_init()
         {
             $request_method = isset($_SERVER['REQUEST_METHOD']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_METHOD'])) : '';
             if (strtoupper($request_method) === 'GET') {
+                /* translators: 1: Payment method title */
                 $message = sprintf(__('%1$s Callback URL', 'wc-victoriabank-mia'), $this->method_title);
                 return self::return_response(WP_Http::OK, $message);
             }
@@ -497,6 +501,7 @@ function woocommerce_victoriabank_mia_init()
 
             try {
                 $callback_body = file_get_contents('php://input');
+                /* translators: 1: Payment notification callback body */
                 $this->log(sprintf(__('Payment notification callback: %1$s', 'wc-victoriabank-mia'), self::print_var($callback_body)));
 
                 $callback_body = trim($callback_body, '"');
@@ -525,6 +530,7 @@ function woocommerce_victoriabank_mia_init()
             $order = $this->get_order_by_qr_extension_id($callback_qr_extension_id);
 
             if (empty($order)) {
+                /* translators: 1: QR Extension ID, 2: Payment method title */
                 $message = sprintf(__('Order not found by QR Extension ID: %1$s received from %2$s.', 'wc-victoriabank-mia'), $callback_qr_extension_id, $this->method_title);
                 $this->log($message, WC_Log_Levels::ERROR);
 
@@ -545,6 +551,7 @@ function woocommerce_victoriabank_mia_init()
             $callback_price = $this->format_price($callback_amount, $callback_currency);
 
             if ($order_price !== $callback_price) {
+                /* translators: 1: Callback notification price, 2: Order total price */
                 $message = sprintf(__('Order amount mismatch: Callback: %1$s, Order: %2$s.', 'wc-victoriabank-mia'), $callback_price, $order_price);
                 $this->log($message, WC_Log_Levels::ERROR);
 
@@ -552,6 +559,7 @@ function woocommerce_victoriabank_mia_init()
             }
 
             if ($order->is_paid()) {
+                /* translators: 1: Order ID */
                 $message = sprintf(__('Callback order already fully paid: %1$s.', 'wc-victoriabank-mia'), $order->get_id());
                 $this->log($message, WC_Log_Levels::ERROR);
 
@@ -570,6 +578,7 @@ function woocommerce_victoriabank_mia_init()
             $order->payment_complete($callback_payment_transaction_id);
             //endregion
 
+            /* translators: 1: Payment method title, 2: Payment notification callback data */
             $message = esc_html(sprintf(__('Payment completed via %1$s: %2$s', 'wc-victoriabank-mia'), $this->method_title, wp_json_encode($callback_data)));
             $message = $this->get_test_message($message);
             $this->log($message, WC_Log_Levels::INFO);
@@ -593,7 +602,8 @@ function woocommerce_victoriabank_mia_init()
 
             //region Validate refund amount
             if (isset($amount) && $amount !== $order_total) {
-                $message = esc_html(sprintf(__('Partial refunds are not currently supported by %1$s.', 'wc-victoriabank-mia'), self::MOD_TITLE));
+                /* translators: 1: Payment method title */
+                $message = esc_html(sprintf(__('Partial refunds are not currently supported by %1$s.', 'wc-victoriabank-mia'), $this->method_title));
                 $this->log($message, WC_Log_Levels::ERROR);
 
                 return new WP_Error('partial_refund', $message);
@@ -618,6 +628,7 @@ function woocommerce_victoriabank_mia_init()
                     )
                 );
 
+                /* translators: 1: Order ID, 2: Refund amount, 3: Payment method title, 4: Error message */
                 $message = esc_html(sprintf(__('Order #%1$s refund of %2$s via %3$s failed: %4$s', 'wc-victoriabank-mia'), $order_id, $this->format_price($order_total, $order_currency), $this->method_title, $ex->getMessage()));
                 $message = $this->get_test_message($message);
                 $order->add_order_note($message);
@@ -628,6 +639,7 @@ function woocommerce_victoriabank_mia_init()
                 return new WP_Error('process_refund', $ex->getMessage());
             }
 
+            /* translators: 1: Order ID, 2: Refund amount, 3: Payment method title */
             $message = esc_html(sprintf(__('Order #%1$s refund of %2$s via %3$s approved.', 'wc-victoriabank-mia'), $order_id, $this->format_price($order_total, $order_currency), $this->method_title));
             $message = $this->get_test_message($message);
             $this->log($message, WC_Log_Levels::INFO);
@@ -677,7 +689,8 @@ function woocommerce_victoriabank_mia_init()
 
             $qr_url = $order->get_meta(self::MOD_QR_URL, true);
             if (empty($qr_url)) {
-                $message = sprintf(__('Order #%1$s missing meta %2$s.', 'wc-victoriabank-mia'), $order_id, self::MOD_QR_URL);
+                /* translators: 1: Order ID, 2: Meta field name */
+                $message = sprintf(__('Order #%1$s missing meta field %2$s.', 'wc-victoriabank-mia'), $order_id, self::MOD_QR_URL);
                 $this->log($message, WC_Log_Levels::ERROR);
                 return;
             }
@@ -802,6 +815,7 @@ function woocommerce_victoriabank_mia_init()
         protected function get_test_message($message)
         {
             if ($this->testmode) {
+                /* translators: 1: Original message */
                 $message = esc_html(sprintf(__('TEST: %1$s', 'wc-victoriabank-mia'), $message));
             }
 

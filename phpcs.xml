@@ -68,4 +68,12 @@
 	<rule ref="Squiz.Commenting.InlineComment.NoSpaceBefore">
 		<type>warning</type>
 	</rule>
+
+	<rule ref="WordPress.WP.I18n.MissingTranslatorsComment">
+		<type>warning</type>
+	</rule>
+
+	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
+		<type>warning</type>
+	</rule>
 </ruleset>
