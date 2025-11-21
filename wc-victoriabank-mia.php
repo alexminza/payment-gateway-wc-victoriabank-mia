@@ -54,6 +54,7 @@ function woocommerce_victoriabank_mia_init()
         const MOD_ID             = 'victoriabank_mia';
         const MOD_TITLE          = 'Victoriabank MIA';
         const MOD_PREFIX         = 'victoriabank_mia_';
+        const MOD_VERSION        = '1.0.1';
 
         const SUPPORTED_CURRENCIES = array('MDL');
         const ORDER_TEMPLATE       = 'Order #%1$s';

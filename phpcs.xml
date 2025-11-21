@@ -11,7 +11,9 @@
 
 	<rule ref="WordPress.WP.I18n">
 		<properties>
-			<property name="text_domain" type="array" value="wc-victoriabank-mia" />
+			<property name="text_domain" type="array">
+				<element value="wc-victoriabank-mia"/>
+			</property>
 		</properties>
 	</rule>
 
@@ -27,6 +29,7 @@
 		<exclude name="WordPress.WhiteSpace.OperatorSpacing" />
 		<exclude name="WordPress.WhiteSpace.ControlStructureSpacing" />
 		<exclude name="WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned" />
+		<exclude name="WordPress.Arrays.ArrayKeySpacingRestrictions.NoSpacesAroundArrayKeys" />
 
 		<exclude name="Generic.WhiteSpace.DisallowSpaceIndent" />
 		<exclude name="Generic.WhiteSpace.ArbitraryParenthesesSpacing" />
@@ -66,6 +69,10 @@
 		</properties>
 	</rule>
 
+	<rule ref="Squiz.Commenting.FileComment.Missing">
+		<type>warning</type>
+	</rule>
+
 	<rule ref="Squiz.Commenting.InlineComment.NoSpaceBefore">
 		<type>warning</type>
 	</rule>
@@ -75,6 +82,10 @@
 	</rule>
 
 	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
+		<type>warning</type>
+	</rule>
+
+	<rule ref="NormalizedArrays.Arrays.CommaAfterLast.MissingMultiLine">
 		<type>warning</type>
 	</rule>
 </ruleset>
