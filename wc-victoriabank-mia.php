@@ -375,29 +375,29 @@ function woocommerce_victoriabank_mia_init()
          */
         private function victoriabank_mia_pay($client, $auth_token, $order_id, $order_name, $total_amount, $currency, $creditor_account, $company_name, $validity_minutes)
         {
-            $qr_data = [
-                'header' => [
-                    'qrType' => 'DYNM', # Type of QR code: DYNM - Dynamic QR, STAT - Static QR, HYBR - Hybrid QR
-                    'amountType' => 'Fixed', # Specifies the type of amount: Fixed - Dynamic QR, Controlled - Static QR, Free - Hybrid QR
-                    'pmtContext' => 'e' #Payment context: m - mobile payment, e - e-commerce payment, i - invoice payment, o - other
-                ],
-                'extension' => [
-                    'creditorAccount' => [
-                        'iban' => $creditor_account
-                    ],
-                    'amount' => [
+            $qr_data = array(
+                'header' => array(
+                    'qrType' => 'DYNM', // Type of QR code: DYNM - Dynamic QR, STAT - Static QR, HYBR - Hybrid QR
+                    'amountType' => 'Fixed', // Specifies the type of amount: Fixed - Dynamic QR, Controlled - Static QR, Free - Hybrid QR
+                    'pmtContext' => 'e', // Payment context: m - mobile payment, e - e-commerce payment, i - invoice payment, o - other
+                ),
+                'extension' => array(
+                    'creditorAccount' => array(
+                        'iban' => $creditor_account,
+                    ),
+                    'amount' => array(
                         'sum' => $total_amount,
-                        'currency' => $currency
-                    ],
+                        'currency' => $currency,
+                    ),
                     'dba' => $company_name,
                     'remittanceInfo4Payer' => $order_name,
                     'creditorRef' => strval($order_id),
-                    'ttl' => [
-                        'length' => $validity_minutes, #The duration for which the QR code is valid.
-                        'units' => 'mm' #The unit of time for the TTL: ss - seconds, mm - minutes
-                    ]
-                ]
-            ];
+                    'ttl' => array(
+                        'length' => $validity_minutes, // The duration for which the QR code is valid.
+                        'units' => 'mm', // The unit of time for the TTL: ss - seconds, mm - minutes
+                    ),
+                ),
+            );
 
             return $client->createPayeeQr($qr_data, $auth_token);
         }
@@ -571,7 +571,7 @@ function woocommerce_victoriabank_mia_init()
             $order->payment_complete($callback_payment_transaction_id);
             //endregion
 
-            $message = esc_html(sprintf(__('Payment completed via %1$s: %2$s', 'wc-victoriabank-mia'), $this->method_title, json_encode($callback_data)));
+            $message = esc_html(sprintf(__('Payment completed via %1$s: %2$s', 'wc-victoriabank-mia'), $this->method_title, wp_json_encode($callback_data)));
             $message = $this->get_test_message($message);
             $this->log($message, WC_Log_Levels::INFO);
             $order->add_order_note($message);
@@ -758,18 +758,18 @@ function woocommerce_victoriabank_mia_init()
         protected function get_order_by_qr_extension_id($qr_extension_id)
         {
             //NOTE: Victoriabank MIA API does not currently support passing Order ID for transactions
-            #https://stackoverflow.com/questions/71438717/extend-wc-get-orders-with-a-custom-meta-key-and-meta-value
-            $args = [
-                'meta_key'   => self::MOD_QR_EXTENSION_ID,
-                'meta_value' => $qr_extension_id
-            ];
+            // https://stackoverflow.com/questions/71438717/extend-wc-get-orders-with-a-custom-meta-key-and-meta-value
+            $args = array(
+                'meta_key'   => self::MOD_QR_EXTENSION_ID, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+                'meta_value' => $qr_extension_id, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+            );
 
             $orders = wc_get_orders($args);
             if (count($orders) === 1) {
                 return $orders[0];
             }
 
-            $log_context = ['orders' => $orders];
+            $log_context = array('orders' => $orders);
             $this->log(sprintf('Duplicate order meta %1$s: %2$s', self::MOD_QR_EXTENSION_ID, $qr_extension_id), WC_Log_Levels::ERROR, $log_context);
             return false;
         }
@@ -780,10 +780,10 @@ function woocommerce_victoriabank_mia_init()
          */
         protected function format_price($price, $currency)
         {
-            $args = [
+            $args = array(
                 'currency' => $currency,
-                'in_span' => false
-            ];
+                'in_span' => false,
+            );
 
             return wc_price($price, $args);
         }
@@ -802,8 +802,9 @@ function woocommerce_victoriabank_mia_init()
          */
         protected function get_test_message($message)
         {
-            if ($this->testmode)
+            if ($this->testmode) {
                 $message = esc_html(sprintf(__('TEST: %1$s', 'wc-victoriabank-mia'), $message));
+            }
 
             return $message;
         }
@@ -871,18 +872,19 @@ function woocommerce_victoriabank_mia_init()
          */
         protected static function static_log($message, $level = WC_Log_Levels::DEBUG, $additional_context = null)
         {
-            $log_context = ['source' => self::MOD_ID];
-            if (!empty($additional_context))
+            $log_context = array('source' => self::MOD_ID);
+            if (!empty($additional_context)) {
                 $log_context = array_merge($log_context, $additional_context);
+            }
 
             $logger = wc_get_logger();
             $logger->log($level, $message, $log_context);
         }
 
-        protected static function print_var($var)
+        protected static function print_var($expression)
         {
             //https://woocommerce.github.io/code-reference/namespaces/default.html#function_wc_print_r
-            return wc_print_r($var, true);
+            return wc_print_r($expression, true);
         }
 
         /**
@@ -890,8 +892,9 @@ function woocommerce_victoriabank_mia_init()
          */
         protected static function print_response_object($response)
         {
-            if (!empty($response))
-                return json_encode($response->toArray());
+            if (!empty($response)) {
+                return wp_json_encode($response->toArray());
+            }
 
             return '';
         }
@@ -902,8 +905,9 @@ function woocommerce_victoriabank_mia_init()
          */
         protected static function return_response($status_code, $response_text = null)
         {
-            if (empty($response_text))
+            if (empty($response_text)) {
                 $response_text = get_status_header_desc($status_code);
+            }
 
             http_response_code($status_code);
             echo esc_html($response_text);
@@ -944,30 +948,36 @@ function woocommerce_victoriabank_mia_init()
 }
 
 //region Declare WooCommerce compatibility
-add_action('before_woocommerce_init', function () {
-    if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
-        // WooCommerce HPOS compatibility
-        // https://developer.woocommerce.com/docs/features/high-performance-order-storage/recipe-book/#declaring-extension-incompatibility
-        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
+add_action(
+    'before_woocommerce_init',
+    function () {
+        if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
+            // WooCommerce HPOS compatibility
+            // https://developer.woocommerce.com/docs/features/high-performance-order-storage/recipe-book/#declaring-extension-incompatibility
+            \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
 
-        // WooCommerce Cart Checkout Blocks compatibility
-        // https://github.com/woocommerce/woocommerce/pull/36426
-        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks', __FILE__, true);
+            // WooCommerce Cart Checkout Blocks compatibility
+            // https://github.com/woocommerce/woocommerce/pull/36426
+            \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks', __FILE__, true);
+        }
     }
-});
+);
 //endregion
 
 //region Register WooCommerce Blocks payment method type
-add_action('woocommerce_blocks_loaded', function () {
-    if (class_exists(\Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType::class)) {
-        require_once plugin_dir_path(__FILE__) . 'wc-victoriabank-mia-wbc.php';
+add_action(
+    'woocommerce_blocks_loaded',
+    function () {
+        if (class_exists(\Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType::class)) {
+            require_once plugin_dir_path(__FILE__) . 'wc-victoriabank-mia-wbc.php';
 
-        add_action(
-            'woocommerce_blocks_payment_method_type_registration',
-            function (\Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry) {
-                $payment_method_registry->register(new WC_Victoriabank_MIA_WBC());
-            }
-        );
+            add_action(
+                'woocommerce_blocks_payment_method_type_registration',
+                function (\Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry) {
+                    $payment_method_registry->register(new WC_Victoriabank_MIA_WBC());
+                }
+            );
+        }
     }
-});
+);
 //endregion
