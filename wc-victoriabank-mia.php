@@ -97,12 +97,10 @@ function woocommerce_victoriabank_mia_init()
             $this->transaction_validity = intval($this->get_option('transaction_validity', self::DEFAULT_VALIDITY));
 
             // https://github.com/alexminza/victoriabank-mia-sdk-php/blob/main/src/VictoriabankMia/VictoriabankMiaClient.php
-            $this->victoriabank_mia_base_url     = $this->testmode ? VictoriabankMiaClient::TEST_BASE_URL : VictoriabankMiaClient::DEFAULT_BASE_URL;
-
+            $this->victoriabank_mia_base_url    = $this->testmode ? VictoriabankMiaClient::TEST_BASE_URL : VictoriabankMiaClient::DEFAULT_BASE_URL;
             $this->victoriabank_mia_username    = $this->get_option('victoriabank_mia_username');
             $this->victoriabank_mia_password    = $this->get_option('victoriabank_mia_password');
             $this->victoriabank_mia_certificate = $this->get_option('victoriabank_mia_certificate');
-
             $this->victoriabank_mia_creditor_account = $this->get_option('victoriabank_mia_creditor_account');
             $this->victoriabank_mia_company_name     = $this->get_option('victoriabank_mia_company_name');
 
@@ -221,7 +219,7 @@ function woocommerce_victoriabank_mia_init()
 
         public function is_valid_for_use()
         {
-            if (!in_array(get_woocommerce_currency(), self::SUPPORTED_CURRENCIES)) {
+            if (!in_array(get_woocommerce_currency(), self::SUPPORTED_CURRENCIES, true)) {
                 return false;
             }
 
@@ -426,7 +424,7 @@ function woocommerce_victoriabank_mia_init()
                 );
 
                 if (!empty($create_qr_response)) {
-                    //NOTE: remove redundant large image data
+                    // NOTE: remove redundant large image data
                     $create_qr_response['qrAsImage'] = null;
                 }
 
@@ -435,10 +433,10 @@ function woocommerce_victoriabank_mia_init()
                 $this->log(
                     $ex->getMessage(),
                     WC_Log_Levels::ERROR,
-                    [
+                    array(
                         'order_id' => $order_id,
-                        'exception' => $ex
-                    ]
+                        'exception' => $ex,
+                    )
                 );
             }
 
@@ -463,7 +461,7 @@ function woocommerce_victoriabank_mia_init()
                 $redirect_url = wp_is_mobile() ? $qr_url : $this->get_redirect_url($order);
                 return array(
                     'result'   => 'success',
-                    'redirect' => $redirect_url
+                    'redirect' => $redirect_url,
                 );
             }
 
@@ -482,13 +480,14 @@ function woocommerce_victoriabank_mia_init()
 
             return array(
                 'result'   => 'failure',
-                'messages' => $message
+                'messages' => $message,
             );
         }
 
         public function check_response()
         {
-            if (($_SERVER['REQUEST_METHOD'] ?? '') === 'GET') {
+            $request_method = isset($_SERVER['REQUEST_METHOD']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_METHOD'])) : '';
+            if (strtoupper($request_method) === 'GET') {
                 $message = sprintf(__('%1$s Callback URL', 'wc-victoriabank-mia'), $this->method_title);
                 return self::return_response(WP_Http::OK, $message);
             }
@@ -507,7 +506,7 @@ function woocommerce_victoriabank_mia_init()
                 $this->log(
                     $ex->getMessage(),
                     WC_Log_Levels::ERROR,
-                    ['exception' => $ex]
+                    array('exception' => $ex)
                 );
 
                 return self::return_response(WP_Http::UNAUTHORIZED, 'Invalid callback signature');
@@ -611,12 +610,12 @@ function woocommerce_victoriabank_mia_init()
                 $this->log(
                     $ex->getMessage(),
                     WC_Log_Levels::ERROR,
-                    [
+                    array(
                         'order_id' => $order_id,
                         'amount' => $amount,
                         'reason' => $reason,
-                        'exception' => $ex
-                    ]
+                        'exception' => $ex,
+                    )
                 );
 
                 $message = esc_html(sprintf(__('Order #%1$s refund of %2$s via %3$s failed: %4$s', 'wc-victoriabank-mia'), $order_id, $this->format_price($order_total, $order_currency), $this->method_title, $ex->getMessage()));
@@ -645,7 +644,7 @@ function woocommerce_victoriabank_mia_init()
          */
         public function thankyou_order_received_text($thank_you_title, $order)
         {
-            //https://rudrastyh.com/woocommerce/thank-you-page.html
+            // https://rudrastyh.com/woocommerce/thank-you-page.html
             if (!empty($order)) {
                 if (!$order->is_paid() && $order->get_payment_method() === self::MOD_ID) {
                     $thank_you_title .= '<br />' . __('This order has a pending payment. Follow the instructions below.', 'wc-victoriabank-mia');
@@ -702,8 +701,8 @@ function woocommerce_victoriabank_mia_init()
             <?php
 
             if (!$is_mobile) {
-                //https://cdnjs.com/libraries/qrcodejs
-                //<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                // https://cdnjs.com/libraries/qrcodejs
+                // <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
                 $js_div_id = wp_json_encode($qr_code_js_div_id);
                 $js_text = wp_json_encode($qr_url);
@@ -722,31 +721,31 @@ function woocommerce_victoriabank_mia_init()
 
         public function ajax_check_status()
         {
-            $order_id = intval($_POST['order_id'] ?? 0);
-            $nonce = sanitize_text_field($_POST['nonce'] ?? '');
+            $order_id = isset($_POST['order_id']) ? intval(wp_unslash($_POST['order_id'])) : 0;
+            $nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
 
             $expected_nonce = self::MOD_PREFIX . $order_id;
             if (empty($order_id) || !wp_verify_nonce($nonce, $expected_nonce)) {
-                $response = [
+                $response = array(
                     'success' => false,
-                    'message' => __('Invalid request', 'wc-victoriabank-mia')
-                ];
+                    'message' => __('Invalid request', 'wc-victoriabank-mia'),
+                );
                 wp_send_json_error($response, WP_Http::UNPROCESSABLE_ENTITY);
             }
 
             $order = wc_get_order($order_id);
             if (empty($order)) {
-                $response = [
+                $response = array(
                     'success' => false,
-                    'message' => __('Order not found', 'wc-victoriabank-mia')
-                ];
+                    'message' => __('Order not found', 'wc-victoriabank-mia'),
+                );
                 wp_send_json_error($response, WP_Http::UNPROCESSABLE_ENTITY);
             }
 
-            $response = [
+            $response = array(
                 'success' => true,
                 'paid' => $order->is_paid(),
-            ];
+            );
             wp_send_json($response);
         }
         //endregion
@@ -757,7 +756,7 @@ function woocommerce_victoriabank_mia_init()
          */
         protected function get_order_by_qr_extension_id($qr_extension_id)
         {
-            //NOTE: Victoriabank MIA API does not currently support passing Order ID for transactions
+            // NOTE: Victoriabank MIA API does not currently support passing Order ID for transactions
             // https://stackoverflow.com/questions/71438717/extend-wc-get-orders-with-a-custom-meta-key-and-meta-value
             $args = array(
                 'meta_key'   => self::MOD_QR_EXTENSION_ID, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
@@ -820,7 +819,7 @@ function woocommerce_victoriabank_mia_init()
 
         protected function get_callback_url()
         {
-            //https://developer.woocommerce.com/docs/extensions/core-concepts/woocommerce-plugin-api-callback/
+            // https://developer.woocommerce.com/docs/extensions/core-concepts/woocommerce-plugin-api-callback/
             $callback_url = WC()->api_request_url("wc_{$this->id}");
             return apply_filters("{$this->id}_callback_url", $callback_url);
         }
@@ -831,7 +830,7 @@ function woocommerce_victoriabank_mia_init()
                 array(
                     'page'   => 'wc-status',
                     'tab'    => 'logs',
-                    'source' => self::MOD_ID
+                    'source' => self::MOD_ID,
                 ),
                 admin_url('admin.php')
             );
@@ -843,7 +842,7 @@ function woocommerce_victoriabank_mia_init()
                 array(
                     'page'    => 'wc-settings',
                     'tab'     => 'checkout',
-                    'section' => self::MOD_ID
+                    'section' => self::MOD_ID,
                 ),
                 admin_url('admin.php')
             );
@@ -856,11 +855,12 @@ function woocommerce_victoriabank_mia_init()
          */
         protected function log($message, $level = WC_Log_Levels::DEBUG, $additional_context = null)
         {
-            //https://developer.woocommerce.com/docs/best-practices/data-management/logging/
-            //https://stackoverflow.com/questions/1423157/print-php-call-stack
-            $log_context = ['source' => $this->id];
-            if (!empty($additional_context))
+            // https://developer.woocommerce.com/docs/best-practices/data-management/logging/
+            // https://stackoverflow.com/questions/1423157/print-php-call-stack
+            $log_context = array('source' => $this->id);
+            if (!empty($additional_context)) {
                 $log_context = array_merge($log_context, $additional_context);
+            }
 
             $this->logger->log($level, $message, $log_context);
         }
@@ -883,7 +883,7 @@ function woocommerce_victoriabank_mia_init()
 
         protected static function print_var($expression)
         {
-            //https://woocommerce.github.io/code-reference/namespaces/default.html#function_wc_print_r
+            // https://woocommerce.github.io/code-reference/namespaces/default.html#function_wc_print_r
             return wc_print_r($expression, true);
         }
 
@@ -935,7 +935,7 @@ function woocommerce_victoriabank_mia_init()
                 '<a href="%1$s">%2$s</a>',
                 esc_url(WC_Victoriabank_MIA::get_settings_url()),
                 esc_html__('Settings', 'wc-victoriabank-mia')
-            )
+            ),
         );
 
         return array_merge($plugin_links, $links);
