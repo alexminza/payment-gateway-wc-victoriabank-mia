@@ -660,7 +660,7 @@ function woocommerce_victoriabank_mia_init()
         {
             // https://rudrastyh.com/woocommerce/thank-you-page.html
             if (!empty($order)) {
-                if (!$order->is_paid() && $order->get_payment_method() === self::MOD_ID) {
+                if (!$order->is_paid() && $order->get_payment_method() === $this->id) {
                     $thank_you_title .= '<br />' . __('This order has a pending payment. Follow the instructions below.', 'wc-victoriabank-mia');
                 }
             }
