@@ -562,7 +562,7 @@ function woocommerce_victoriabank_mia_init()
 
             if ($order->is_paid()) {
                 /* translators: 1: Order ID */
-                $message = sprintf(__('Callback order already fully paid: %1$s.', 'wc-victoriabank-mia'), $order_id);
+                $message = sprintf(__('Callback order #%1$s already fully paid.', 'wc-victoriabank-mia'), $order_id);
                 $this->log($message, WC_Log_Levels::ERROR);
 
                 return self::return_response(WP_Http::OK, 'Order already fully paid');
