@@ -545,6 +545,7 @@ function woocommerce_victoriabank_mia_init()
             $callback_amount = floatval($callback_data_payment_amount['sum']);
             $callback_currency = strval($callback_data_payment_amount['currency']);
 
+            $order_id = $order->get_id();
             $order_total = $order->get_total();
             $order_currency = $order->get_currency();
 
@@ -561,7 +562,7 @@ function woocommerce_victoriabank_mia_init()
 
             if ($order->is_paid()) {
                 /* translators: 1: Order ID */
-                $message = sprintf(__('Callback order already fully paid: %1$s.', 'wc-victoriabank-mia'), $order->get_id());
+                $message = sprintf(__('Callback order already fully paid: %1$s.', 'wc-victoriabank-mia'), $order_id);
                 $this->log($message, WC_Log_Levels::ERROR);
 
                 return self::return_response(WP_Http::OK, 'Order already fully paid');
@@ -579,8 +580,8 @@ function woocommerce_victoriabank_mia_init()
             $order->payment_complete($callback_payment_transaction_id);
             //endregion
 
-            /* translators: 1: Payment method title, 2: Payment notification callback data */
-            $message = esc_html(sprintf(__('Payment completed via %1$s: %2$s', 'wc-victoriabank-mia'), $this->method_title, wp_json_encode($callback_data)));
+            /* translators: 1: Order ID, 2: Payment method title, 3: Payment notification callback data */
+            $message = esc_html(sprintf(__('Order #%1$s payment completed via %2$s: %3$s', 'wc-victoriabank-mia'), $order_id, $this->method_title, wp_json_encode($callback_data)));
             $message = $this->get_test_message($message);
             $this->log($message, WC_Log_Levels::INFO);
             $order->add_order_note($message);
