@@ -76,7 +76,7 @@ function woocommerce_victoriabank_mia_init()
         {
             $this->id                 = self::MOD_ID;
             $this->method_title       = self::MOD_TITLE;
-            $this->method_description = 'Payment Gateway for Victoriabank MIA for WooCommerce';
+            $this->method_description = 'Payment Gateway for Victoriabank MIA';
             $this->has_fields         = false;
             $this->supports           = array('products', 'refunds');
 
