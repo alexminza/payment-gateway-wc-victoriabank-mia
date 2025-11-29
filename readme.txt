@@ -1,12 +1,14 @@
 === Payment Gateway for Victoriabank MIA for WooCommerce ===
 Contributors: alexminza
-Tags: WooCommerce, Moldova, Victoriabank, MIA, QR, payment gateway
+Tags: Moldova, Victoriabank, MIA, QR, payment gateway
 Requires at least: 4.8
 Tested up to: 6.8
 Stable tag: 1.0.0
 Requires PHP: 7.2.5
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
+
+Accept MIA payments directly on your store with the Victoriabank MIA payment gateway for WooCommerce.
 
 == Description ==
 
