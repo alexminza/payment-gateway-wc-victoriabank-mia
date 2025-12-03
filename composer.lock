@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8b0f88a54d4fe2f32e9c05c9a5218261",
+    "content-hash": "a16b98d5f3d4b55c7b5c4c50db3ae74f",
     "packages": [
         {
             "name": "alexminza/victoriabank-mia-sdk",
@@ -1227,5 +1227,5 @@
     "platform-overrides": {
         "php": "7.2.5"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
