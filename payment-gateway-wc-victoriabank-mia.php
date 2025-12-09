@@ -328,7 +328,7 @@ function woocommerce_victoriabank_mia_init()
         {
             $options = array(
                 'base_uri' => $this->victoriabank_mia_base_url,
-                'timeout' => self::DEFAULT_TIMEOUT,
+                'timeout'  => self::DEFAULT_TIMEOUT,
             );
 
             if ($this->debug) {
@@ -985,7 +985,7 @@ add_action(
     'woocommerce_blocks_loaded',
     function () {
         if (class_exists(\Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType::class)) {
-            require_once plugin_dir_path(__FILE__) . 'wc-victoriabank-mia-wbc.php';
+            require_once plugin_dir_path(__FILE__) . 'payment-gateway-wc-victoriabank-mia-wbc.php';
 
             add_action(
                 'woocommerce_blocks_payment_method_type_registration',
