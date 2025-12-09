@@ -16,7 +16,7 @@ msgstr ""
 
 #. Description of the plugin
 #: wc-victoriabank-mia.php
-msgid "Accept MIA payments directly on your store with the Payment Gateway for Victoriabank MIA for WooCommerce."
+msgid "Accept MIA Instant Payments directly on your store with the Payment Gateway for Victoriabank MIA for WooCommerce."
 msgstr ""
 
 #: wc-victoriabank-mia.php:128
