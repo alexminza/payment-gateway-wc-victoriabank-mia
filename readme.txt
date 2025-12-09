@@ -2,7 +2,7 @@
 Contributors: alexminza
 Tags: Moldova, Victoriabank, MIA, QR, payment gateway
 Requires at least: 4.8
-Tested up to: 6.8
+Tested up to: 6.9
 Stable tag: 1.0.1
 Requires PHP: 7.2.5
 License: GPLv3 or later
@@ -19,7 +19,7 @@ Accept MIA Instant Payments directly on your store with the Payment Gateway for 
 * Online payments with [MIA Instant Payments](https://mia.bnm.md/en)
 * Reverse transactions – complete refunds[^1]
 * Supports WooCommerce [block-based checkout experience](https://woocommerce.com/checkout-blocks/)
-* Free to use – [Open-source GPL-3.0 license on GitHub](https://github.com/alexminza/wc-victoriabank-mia)
+* Free to use – [Open-source GPL-3.0 license on GitHub](https://github.com/alexminza/payment-gateway-wc-victoriabank-mia)
 
 [^1]: Partial refunds are not currently supported by Victoriabank MIA.
 
@@ -54,9 +54,9 @@ Victoriabank MIA currently supports transactions in MDL (Moldovan Leu).
 
 = How can I contribute to the plugin? =
 
-If you're a developer and you have some ideas to improve the plugin or to solve a bug, feel free to raise an issue or submit a pull request in the [Github repository for the plugin](https://github.com/alexminza/wc-victoriabank-mia).
+If you're a developer and you have some ideas to improve the plugin or to solve a bug, feel free to raise an issue or submit a pull request in the [Github repository for the plugin](https://github.com/alexminza/payment-gateway-wc-victoriabank-mia).
 
-You can also contribute to the plugin by translating it. Simply visit [translate.wordpress.org](https://translate.wordpress.org/projects/wp-plugins/wc-victoriabank-mia) to get started.
+You can also contribute to the plugin by translating it. Simply visit [translate.wordpress.org](https://translate.wordpress.org/projects/wp-plugins/payment-gateway-wc-victoriabank-mia) to get started.
 
 == Screenshots ==
 
@@ -66,7 +66,7 @@ You can also contribute to the plugin by translating it. Simply visit [translate
 
 == Changelog ==
 
-See [wc-victoriabank-mia project releases on GitHub](https://github.com/alexminza/wc-victoriabank-mia/releases) for details.
+See [payment-gateway-wc-victoriabank-mia project releases on GitHub](https://github.com/alexminza/payment-gateway-wc-victoriabank-mia/releases) for details.
 
 = 1.0.1 =
 Minor improvements
