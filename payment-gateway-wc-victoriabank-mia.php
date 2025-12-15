@@ -659,12 +659,14 @@ function woocommerce_victoriabank_mia_init()
             );
 
             $orders = wc_get_orders($args);
-            if (count($orders) === 1) {
+            $orders_count = count($orders);
+            if ($orders_count === 1) {
                 return $orders[0];
+            } elseif ($orders_count > 1) {
+                $log_context = array('orders' => $orders);
+                $this->log(sprintf('Duplicate order meta %1$s: %2$s', self::MOD_QR_EXTENSION_ID, $qr_extension_id), WC_Log_Levels::ERROR, $log_context);
             }
 
-            $log_context = array('orders' => $orders);
-            $this->log(sprintf('Duplicate order meta %1$s: %2$s', self::MOD_QR_EXTENSION_ID, $qr_extension_id), WC_Log_Levels::ERROR, $log_context);
             return false;
         }
 
