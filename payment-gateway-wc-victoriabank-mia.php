@@ -732,19 +732,22 @@ function woocommerce_victoriabank_mia_init()
          */
         protected function get_order_by_qr_extension_id($qr_extension_id)
         {
-            //NOTE: Victoriabank MIA API does not currently support passing Order ID for transactions
-            #https://stackoverflow.com/questions/71438717/extend-wc-get-orders-with-a-custom-meta-key-and-meta-value
+            // NOTE: Victoriabank MIA API does not currently support passing Order ID for transactions
+            // https://stackoverflow.com/questions/71438717/extend-wc-get-orders-with-a-custom-meta-key-and-meta-value
             $args = array(
-                'meta_key'   => self::MOD_QR_EXTENSION_ID,
-                'meta_value' => $qr_extension_id
+                'meta_key'   => self::MOD_QR_EXTENSION_ID, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+                'meta_value' => $qr_extension_id, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
             );
 
             $orders = wc_get_orders($args);
-            if (count($orders) == 1) {
+            $orders_count = count($orders);
+            if ($orders_count === 1) {
                 return $orders[0];
+            } elseif ($orders_count > 1) {
+                $log_context = array('orders' => $orders);
+                $this->log(sprintf('Duplicate order meta %1$s: %2$s', self::MOD_QR_EXTENSION_ID, $qr_extension_id), WC_Log_Levels::ERROR, $log_context);
             }
 
-            $this->log(self::print_var($orders));
             return false;
         }
 
