@@ -122,8 +122,8 @@ function woocommerce_victoriabank_mia_init()
             add_action("woocommerce_thankyou_{$this->id}", array($this, 'thankyou_page'), 10, 1);
             add_filter('woocommerce_thankyou_order_received_text', array($this, 'thankyou_order_received_text'), 20, 2);
 
-            add_action("wp_ajax_{$this->id}_check_status", array($this, 'ajax_check_status'));
-            add_action("wp_ajax_nopriv_{$this->id}_check_status", array($this, 'ajax_check_status'));
+            add_action("wp_ajax_{$this->id}_check_status", array($this, 'ajax_check_order_status'));
+            add_action("wp_ajax_nopriv_{$this->id}_check_status", array($this, 'ajax_check_order_status'));
         }
 
         public function init_form_fields()
@@ -695,12 +695,12 @@ function woocommerce_victoriabank_mia_init()
             }
         }
 
-        public function ajax_check_status()
+        public function ajax_check_order_status()
         {
             $order_id = isset($_POST['order_id']) ? intval(wp_unslash($_POST['order_id'])) : 0;
             $nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
 
-            $expected_nonce = self::MOD_PREFIX . $order_id;
+            $expected_nonce = "{$this->id}-check-order-status-{$order_id}";
             if (empty($order_id) || !wp_verify_nonce($nonce, $expected_nonce)) {
                 $response = array(
                     'success' => false,
