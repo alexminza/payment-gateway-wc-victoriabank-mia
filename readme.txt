@@ -71,6 +71,9 @@ See [payment-gateway-wc-victoriabank-mia project releases on GitHub](https://git
 = 1.1.0 =
 Improved QR payment UI/UX.
 
+= 1.0.1 =
+Minor improvements.
+
 = 1.0.0 =
 Initial version release.
 
@@ -78,6 +81,9 @@ Initial version release.
 
 = 1.1.0 =
 Improved QR payment UI/UX.
+
+= 1.0.1 =
+Minor improvements.
 
 = 1.0.0 =
 Initial version release.

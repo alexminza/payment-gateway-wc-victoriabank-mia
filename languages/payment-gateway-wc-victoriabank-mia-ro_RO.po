@@ -19,53 +19,45 @@ msgstr ""
 #. Description of the plugin
 #: payment-gateway-wc-victoriabank-mia.php
 msgid ""
-"Accept MIA payments directly on your store with the Payment Gateway for "
-"Victoriabank MIA for WooCommerce."
+"Accept MIA Instant Payments directly on your store with the Payment Gateway "
+"for Victoriabank MIA for WooCommerce."
 msgstr ""
-"Acceptă plăți MIA direct în magazin cu gateway-ul de plată Victoriabank MIA "
-"pentru WooCommerce."
+"Acceptă MIA plăți instant direct în magazin cu gateway-ul de plată "
+"Victoriabank MIA pentru WooCommerce."
 
-#: payment-gateway-wc-victoriabank-mia.php:52
-msgid ""
-"Victoriabank MIA payment gateway requires WooCommerce to be installed and "
-"active."
-msgstr ""
-"Gateway-ul de plată Victoriabank MIA necesită ca modulul WooCommerce să fie "
-"instalat și activ."
-
-#: payment-gateway-wc-victoriabank-mia.php:133
+#: payment-gateway-wc-victoriabank-mia.php:118
 msgid "Enable/Disable"
 msgstr "Activare/Dezactivare"
 
-#: payment-gateway-wc-victoriabank-mia.php:135
+#: payment-gateway-wc-victoriabank-mia.php:120
 msgid "Enable this gateway"
 msgstr "Activează acest gateway de plată"
 
-#: payment-gateway-wc-victoriabank-mia.php:139
+#: payment-gateway-wc-victoriabank-mia.php:124
 msgid "Title"
 msgstr "Titlu"
 
-#: payment-gateway-wc-victoriabank-mia.php:141
+#: payment-gateway-wc-victoriabank-mia.php:126
 msgid "Payment method title that the customer will see during checkout."
 msgstr "Titlul metodei de plată afișat clientului în timpul plății."
 
-#: payment-gateway-wc-victoriabank-mia.php:146
+#: payment-gateway-wc-victoriabank-mia.php:131
 msgid "Description"
 msgstr "Descriere"
 
-#: payment-gateway-wc-victoriabank-mia.php:148
+#: payment-gateway-wc-victoriabank-mia.php:133
 msgid "Payment method description that the customer will see during checkout."
 msgstr "Descrierea metodei de plată afișată clientului în timpul plății."
 
-#: payment-gateway-wc-victoriabank-mia.php:154
+#: payment-gateway-wc-victoriabank-mia.php:139
 msgid "Test mode"
 msgstr "Mod testare"
 
-#: payment-gateway-wc-victoriabank-mia.php:156
+#: payment-gateway-wc-victoriabank-mia.php:141
 msgid "Enabled"
 msgstr "Activat"
 
-#: payment-gateway-wc-victoriabank-mia.php:157
+#: payment-gateway-wc-victoriabank-mia.php:142
 msgid ""
 "Use Test or Live bank gateway to process the payments. Disable when ready to "
 "accept live payments."
@@ -73,19 +65,19 @@ msgstr ""
 "Conectare la mediul de Test sau Producție al băncii pentru procesarea "
 "plăților. Dezactivați atunci când sunteți gata să acceptați plăți reale."
 
-#: payment-gateway-wc-victoriabank-mia.php:162
+#: payment-gateway-wc-victoriabank-mia.php:147
 msgid "Debug mode"
 msgstr "Mod depanare"
 
-#: payment-gateway-wc-victoriabank-mia.php:164
+#: payment-gateway-wc-victoriabank-mia.php:149
 msgid "Enable logging"
 msgstr "Activează jurnalizare"
 
-#: payment-gateway-wc-victoriabank-mia.php:166
+#: payment-gateway-wc-victoriabank-mia.php:151
 msgid "View logs"
 msgstr "Vizualizați jurnalele"
 
-#: payment-gateway-wc-victoriabank-mia.php:167
+#: payment-gateway-wc-victoriabank-mia.php:152
 msgid ""
 "Save debug messages to the WooCommerce System Status logs. Note: this may "
 "log personal information. Use this for debugging purposes only and delete "
@@ -95,50 +87,51 @@ msgstr ""
 "Notă: acest lucru poate înregistra informații personale. Utilizați această "
 "opțiune numai pentru depanare și ștergeți jurnalele atunci când ați terminat."
 
-#: payment-gateway-wc-victoriabank-mia.php:171
+#: payment-gateway-wc-victoriabank-mia.php:156
 msgid "Order description"
 msgstr "Descriere comandă"
 
-#: payment-gateway-wc-victoriabank-mia.php:173
+#. translators: 1: Example placeholder shown to user, represents Order ID
+#: payment-gateway-wc-victoriabank-mia.php:159
 #, php-format
 msgid "Format: <code>%1$s</code> - Order ID"
 msgstr "Format: <code>%1$s</code> - ID Comandă"
 
-#: payment-gateway-wc-victoriabank-mia.php:174
+#: payment-gateway-wc-victoriabank-mia.php:160
 msgid "Order description that the customer will see on the bank payment page."
 msgstr ""
 "Descrierea comenzii afișată clientului pe pagina băncii în timpul plății."
 
-#: payment-gateway-wc-victoriabank-mia.php:178
+#: payment-gateway-wc-victoriabank-mia.php:164
 msgid "Transaction validity"
 msgstr "Valabilitatea tranzacției"
 
-#: payment-gateway-wc-victoriabank-mia.php:180
+#: payment-gateway-wc-victoriabank-mia.php:166
 msgid "minutes"
 msgstr "minute"
 
-#: payment-gateway-wc-victoriabank-mia.php:185
-#: payment-gateway-wc-victoriabank-mia.php:284
+#: payment-gateway-wc-victoriabank-mia.php:171
+#: payment-gateway-wc-victoriabank-mia.php:275
 msgid "Connection Settings"
 msgstr "Setări conexiune"
 
-#: payment-gateway-wc-victoriabank-mia.php:186
+#: payment-gateway-wc-victoriabank-mia.php:172
 msgid "Payment gateway connection credentials are provided by the bank."
 msgstr "Datele de conectare la gateway-ul de plată sunt furnizate de bancă."
 
-#: payment-gateway-wc-victoriabank-mia.php:190
+#: payment-gateway-wc-victoriabank-mia.php:176
 msgid "Username"
 msgstr "Nume utilizator"
 
-#: payment-gateway-wc-victoriabank-mia.php:194
+#: payment-gateway-wc-victoriabank-mia.php:180
 msgid "Password"
 msgstr "Parolă"
 
-#: payment-gateway-wc-victoriabank-mia.php:198
+#: payment-gateway-wc-victoriabank-mia.php:184
 msgid "Certificate"
 msgstr "Certificat"
 
-#: payment-gateway-wc-victoriabank-mia.php:200
+#: payment-gateway-wc-victoriabank-mia.php:186
 msgid ""
 "Victoriabank Public Key Certificate to validate the authenticity of the "
 "payment notifications."
@@ -146,41 +139,42 @@ msgstr ""
 "Certificatul de cheie publică al Victoriabank pentru validarea "
 "autenticității notificărilor de plată."
 
-#: payment-gateway-wc-victoriabank-mia.php:204
+#: payment-gateway-wc-victoriabank-mia.php:190
 msgid "Company Name"
 msgstr "Nume companie"
 
-#: payment-gateway-wc-victoriabank-mia.php:208
+#: payment-gateway-wc-victoriabank-mia.php:194
 msgid "Creditor Account"
 msgstr "Cont creditor"
 
-#: payment-gateway-wc-victoriabank-mia.php:210
+#: payment-gateway-wc-victoriabank-mia.php:196
 msgid "IBAN"
 msgstr "IBAN"
 
-#: payment-gateway-wc-victoriabank-mia.php:214
+#: payment-gateway-wc-victoriabank-mia.php:200
 msgid "Payment Notification"
 msgstr "Notificare plăți"
 
-#: payment-gateway-wc-victoriabank-mia.php:217
+#: payment-gateway-wc-victoriabank-mia.php:203
 msgid "Provide this URL to the bank to enable online payment notifications."
 msgstr ""
 "Furnizați băncii această adresă URL pentru activare notificări de plată "
 "online."
 
-#: payment-gateway-wc-victoriabank-mia.php:218
+#: payment-gateway-wc-victoriabank-mia.php:204
 msgid "Callback URL"
 msgstr "URL apel invers (Callback URL)"
 
-#: payment-gateway-wc-victoriabank-mia.php:273
+#: payment-gateway-wc-victoriabank-mia.php:262
 msgid "Unsupported store currency"
 msgstr "Valuta magazinului nu este suportată"
 
-#: payment-gateway-wc-victoriabank-mia.php:275
+#: payment-gateway-wc-victoriabank-mia.php:264
 msgid "Supported currencies"
 msgstr "Valute suportate"
 
-#: payment-gateway-wc-victoriabank-mia.php:283
+#. translators: 1: Plugin installation instructions URL
+#: payment-gateway-wc-victoriabank-mia.php:274
 #, php-format
 msgid ""
 "See plugin documentation for <a href=\"%1$s\" target=\"_blank\">installation "
@@ -189,11 +183,12 @@ msgstr ""
 "Consultați documentația modulului pentru <a href=\"%1$s\" "
 "target=\"_blank\">instrucțiuni de instalare</a>."
 
-#: payment-gateway-wc-victoriabank-mia.php:284
+#: payment-gateway-wc-victoriabank-mia.php:275
 msgid "Not configured"
 msgstr "Neconfigurat"
 
-#: payment-gateway-wc-victoriabank-mia.php:313
+#. translators: 1: Payment method title, 2: Plugin settings URL
+#: payment-gateway-wc-victoriabank-mia.php:305
 #, php-format
 msgid ""
 "%1$s is not properly configured. Verify plugin <a href=\"%2$s\">Connection "
@@ -202,7 +197,8 @@ msgstr ""
 "%1$s nu este configurat corect. Verificați <a href=\"%2$s\">Setările de "
 "conexiune</a>."
 
-#: payment-gateway-wc-victoriabank-mia.php:319
+#. translators: 1: Payment method title, 2: Plugin settings URL
+#: payment-gateway-wc-victoriabank-mia.php:312
 #, php-format
 msgid ""
 "See <a href=\"%2$s\">%1$s settings</a> page for log details and setup "
@@ -211,60 +207,69 @@ msgstr ""
 "Consultați pagina de <a href=\"%2$s\">setări %1$s</a> pentru vizualizarea "
 "jurnalului și instrucțiuni de configurare."
 
-#: payment-gateway-wc-victoriabank-mia.php:447
+#. translators: 1: Order ID, 2: Payment method title, 3: API response details
+#: payment-gateway-wc-victoriabank-mia.php:449
 #, php-format
-msgid "Payment initiated via %1$s: %2$s"
-msgstr "Plată inițiată prin %1$s: %2$s"
+msgid "Order #%1$s payment initiated via %2$s: %3$s"
+msgstr "Plata comenzii #%1$s inițiată prin %2$s: %3$s"
 
-#: payment-gateway-wc-victoriabank-mia.php:459
+#. translators: 1: Order ID, 2: Payment method title
+#: payment-gateway-wc-victoriabank-mia.php:461
 #, php-format
 msgid "Order #%1$s payment initiation failed via %2$s."
 msgstr "Inițierea plății comenzii #%1$s prin %2$s a eșuat."
 
-#: payment-gateway-wc-victoriabank-mia.php:482
+#. translators: 1: Payment method title
+#: payment-gateway-wc-victoriabank-mia.php:485
 #, php-format
 msgid "%1$s Callback URL"
 msgstr "%1$s Callback URL"
 
-#: payment-gateway-wc-victoriabank-mia.php:491
-#, php-format
-msgid "Payment notification callback: %1$s"
-msgstr "Notificare de plată: %1$s"
+#: payment-gateway-wc-victoriabank-mia.php:508
+msgid "Payment notification callback"
+msgstr "Notificare de plată"
 
-#: payment-gateway-wc-victoriabank-mia.php:514
+#. translators: 1: QR Extension ID, 2: Payment method title
+#: payment-gateway-wc-victoriabank-mia.php:543
 #, php-format
 msgid "Order not found by QR Extension ID: %1$s received from %2$s."
 msgstr "Comanda nu a fost gasită după QR Extension ID: %1$s primit de la %2$s."
 
-#: payment-gateway-wc-victoriabank-mia.php:531
+#. translators: 1: Callback notification price, 2: Order total price
+#: payment-gateway-wc-victoriabank-mia.php:565
 #, php-format
-msgid "Order amount mismatch: Callback: %1$f %2$s, Order: %3$f %4$s."
-msgstr "Sumă comandă incorectă: Notificare: %1$f %2$s, Comandă: %3$f %4$s."
+msgid "Order amount mismatch: Callback: %1$s, Order: %2$s."
+msgstr "Sumă comandă incorectă: Notificare: %1$s, Comandă: %2$s."
 
-#: payment-gateway-wc-victoriabank-mia.php:538
+#. translators: 1: Order ID
+#: payment-gateway-wc-victoriabank-mia.php:573
 #, php-format
-msgid "Callback order already fully paid: %1$d."
-msgstr "Comanda este deja plătită integral: %1$d."
+msgid "Callback order #%1$s already fully paid."
+msgstr "Comanda #%1$s este deja plătită integral."
 
-#: payment-gateway-wc-victoriabank-mia.php:556
+#. translators: 1: Order ID, 2: Payment method title, 3: Payment notification callback data
+#: payment-gateway-wc-victoriabank-mia.php:592
 #, php-format
-msgid "Payment completed via %1$s: %2$s"
-msgstr "Plată finalizată prin %1$s: %2$s"
+msgid "Order #%1$s payment completed via %2$s: %3$s"
+msgstr "Plata comenzii #%1$s finalizată prin %2$s: %3$s"
 
-#: payment-gateway-wc-victoriabank-mia.php:580
+#. translators: 1: Payment method title
+#: payment-gateway-wc-victoriabank-mia.php:616
 #, php-format
 msgid "Partial refunds are not currently supported by %1$s."
 msgstr "Rambursările parțiale nu sunt acceptate în prezent de %1$s."
 
-#: payment-gateway-wc-victoriabank-mia.php:596
+#. translators: 1: Order ID, 2: Refund amount, 3: Payment method title, 4: Error message
+#: payment-gateway-wc-victoriabank-mia.php:641
 #, php-format
-msgid "Refund of %1$s %2$s via %3$s failed: %4$s"
-msgstr "Rambursarea sumei de %1$s %2$s prin %3$s a eșuat: %4$s"
+msgid "Order #%1$s refund of %2$s via %3$s failed: %4$s"
+msgstr "Rambursarea comenzii #%1$s în suma de %2$s prin %3$s a eșuat: %4$s"
 
-#: payment-gateway-wc-victoriabank-mia.php:606
+#. translators: 1: Order ID, 2: Refund amount, 3: Payment method title
+#: payment-gateway-wc-victoriabank-mia.php:652
 #, php-format
-msgid "Refund of %1$s %2$s via %3$s approved."
-msgstr "Rambursarea sumei de %1$s %2$s prin %3$s a fost aprobată."
+msgid "Order #%1$s refund of %2$s via %3$s approved."
+msgstr "Rambursarea comenzii #%1$s suma de %2$s prin %3$s a fost aprobată."
 
 #: payment-gateway-wc-victoriabank-mia.php:625
 msgid "This order has a pending payment. Follow the instructions below."
@@ -318,6 +323,6 @@ msgstr "Comanda nu a fost găsită"
 msgid "TEST: %1$s"
 msgstr "TEST: %1$s"
 
-#: payment-gateway-wc-victoriabank-mia.php:894
+#: payment-gateway-wc-victoriabank-mia.php:836
 msgid "Settings"
 msgstr "Setări"

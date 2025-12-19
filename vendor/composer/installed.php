@@ -1,19 +1,19 @@
 <?php return array(
     'root' => array(
         'name' => 'alexminza/payment-gateway-wc-victoriabank-mia',
-        'pretty_version' => '1.0.0.x-dev',
-        'version' => '1.0.0.9999999-dev',
-        'reference' => '1add5aaca5853c6d2c699cff3fda1a56d6d23f78',
+        'pretty_version' => '1.0.1.x-dev',
+        'version' => '1.0.1.9999999-dev',
+        'reference' => '7db3188644835a77e38b558751fae76bd6ad4de4',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'dev' => true,
+        'dev' => false,
     ),
     'versions' => array(
         'alexminza/payment-gateway-wc-victoriabank-mia' => array(
-            'pretty_version' => '1.0.0.x-dev',
-            'version' => '1.0.0.9999999-dev',
-            'reference' => '1add5aaca5853c6d2c699cff3fda1a56d6d23f78',
+            'pretty_version' => '1.0.1.x-dev',
+            'version' => '1.0.1.9999999-dev',
+            'reference' => '7db3188644835a77e38b558751fae76bd6ad4de4',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
