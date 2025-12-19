@@ -426,8 +426,8 @@ function victoriabank_mia_init()
                     $ex->getMessage(),
                     WC_Log_Levels::ERROR,
                     array(
+                        'exception' => (string) $ex,
                         'order_id' => $order_id,
-                        'exception' => $ex,
                     )
                 );
             }
@@ -515,7 +515,7 @@ function victoriabank_mia_init()
                     $ex->getMessage(),
                     WC_Log_Levels::ERROR,
                     array(
-                        'exception' => $ex,
+                        'exception' => (string) $ex,
                         'callback_body' => $callback_body,
                         'callback_data' => $callback_data,
                     )
@@ -629,10 +629,10 @@ function victoriabank_mia_init()
                     $ex->getMessage(),
                     WC_Log_Levels::ERROR,
                     array(
+                        'exception' => (string) $ex,
                         'order_id' => $order_id,
                         'amount' => $amount,
                         'reason' => $reason,
-                        'exception' => $ex,
                     )
                 );
 
