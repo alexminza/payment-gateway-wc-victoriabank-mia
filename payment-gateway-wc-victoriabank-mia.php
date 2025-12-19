@@ -807,35 +807,34 @@ function victoriabank_mia_init()
             exit;
         }
         //endregion
+
+        //region Init
+        public static function plugin_action_links($links)
+        {
+            $plugin_links = array(
+                sprintf(
+                    '<a href="%1$s">%2$s</a>',
+                    esc_url(self::get_settings_url()),
+                    esc_html__('Settings', 'payment-gateway-wc-victoriabank-mia')
+                ),
+            );
+
+            return array_merge($plugin_links, $links);
+        }
+
+        public static function add_gateway($methods)
+        {
+            $methods[] = self::class;
+            return $methods;
+        }
+        //endregion
     }
 
-    //region Add gateway to WooCommerce
-    // https://developer.woocommerce.com/docs/features/payments/payment-gateway-plugin-base/
-    function woocommerce_victoriabank_mia_add_gateway($methods)
-    {
-        $methods[] = WC_Gateway_Victoriabank_MIA::class;
-        return $methods;
-    }
-
-    add_filter('woocommerce_payment_gateways', 'woocommerce_victoriabank_mia_add_gateway');
-    //endregion
-
-    //region Admin init
-    function woocommerce_victoriabank_mia_plugin_links($links)
-    {
-        $plugin_links = array(
-            sprintf(
-                '<a href="%1$s">%2$s</a>',
-                esc_url(WC_Gateway_Victoriabank_MIA::get_settings_url()),
-                esc_html__('Settings', 'payment-gateway-wc-victoriabank-mia')
-            ),
-        );
-
-        return array_merge($plugin_links, $links);
-    }
+    //region Init payment gateway
+    add_filter('woocommerce_payment_gateways', array(WC_Gateway_Victoriabank_MIA::class, 'add_gateway'));
 
     if (is_admin()) {
-        add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'woocommerce_victoriabank_mia_plugin_links');
+        add_filter('plugin_action_links_' . plugin_basename(__FILE__), array(WC_Gateway_Victoriabank_MIA::class, 'plugin_action_links'));
     }
     //endregion
 }
