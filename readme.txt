@@ -69,12 +69,15 @@ You can also contribute to the plugin by translating it. Simply visit [translate
 See [payment-gateway-wc-victoriabank-mia project releases on GitHub](https://github.com/alexminza/payment-gateway-wc-victoriabank-mia/releases) for details.
 
 = 1.0.1 =
-Minor improvements
+Minor improvements.
 
 = 1.0.0 =
 Initial version release.
 
 == Upgrade Notice ==
+
+= 1.0.1 =
+Minor improvements.
 
 = 1.0.0 =
 Initial version release.
