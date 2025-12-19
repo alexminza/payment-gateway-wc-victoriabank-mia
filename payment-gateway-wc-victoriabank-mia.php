@@ -79,7 +79,7 @@ function victoriabank_mia_init()
             $this->enabled            = $this->get_option('enabled', 'no');
             $this->title              = $this->get_option('title', $this->method_title);
             $this->description        = $this->get_option('description');
-            $this->icon               = apply_filters("woocommerce_{$this->id}_icon", plugins_url('/assets/img/mia.svg', __FILE__));
+            $this->icon               = plugins_url('/assets/img/mia.svg', __FILE__);
 
             $this->testmode           = wc_string_to_bool($this->get_option('testmode', 'no'));
             $this->debug              = wc_string_to_bool($this->get_option('debug', 'no'));
@@ -623,7 +623,6 @@ function victoriabank_mia_init()
                 $auth_token = $this->victoriabank_mia_generate_token($client);
 
                 $client->reverseTransaction($transaction_id, $auth_token);
-                // $this->log(self::print_var($payment_refund_response));
             } catch (Exception $ex) {
                 $this->log(
                     $ex->getMessage(),
@@ -702,7 +701,7 @@ function victoriabank_mia_init()
         protected function get_order_description($order)
         {
             $description = sprintf($this->order_template, $order->get_id());
-            return apply_filters("{$this->id}_order_description", $description, $order); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
+            return apply_filters('victoriabank_mia_order_description', $description, $order);
         }
 
         /**
@@ -724,14 +723,14 @@ function victoriabank_mia_init()
         protected function get_redirect_url($order)
         {
             $redirect_url = $this->get_return_url($order);
-            return apply_filters("{$this->id}_redirect_url", $redirect_url); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
+            return apply_filters('victoriabank_mia_redirect_url', $redirect_url);
         }
 
         protected function get_callback_url()
         {
             // https://developer.woocommerce.com/docs/extensions/core-concepts/woocommerce-plugin-api-callback/
             $callback_url = WC()->api_request_url("wc_{$this->id}");
-            return apply_filters("{$this->id}_callback_url", $callback_url); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
+            return apply_filters('victoriabank_mia_callback_url', $callback_url);
         }
 
         protected static function get_logs_url()
