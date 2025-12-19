@@ -43,7 +43,7 @@ function victoriabank_mia_init()
         return;
     }
 
-    class WC_Victoriabank_MIA extends WC_Payment_Gateway
+    class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway
     {
         //region Constants
         const MOD_ID             = 'victoriabank_mia';
@@ -813,7 +813,7 @@ function victoriabank_mia_init()
     // https://developer.woocommerce.com/docs/features/payments/payment-gateway-plugin-base/
     function woocommerce_victoriabank_mia_add_gateway($methods)
     {
-        $methods[] = WC_Victoriabank_MIA::class;
+        $methods[] = WC_Gateway_Victoriabank_MIA::class;
         return $methods;
     }
 
@@ -826,7 +826,7 @@ function victoriabank_mia_init()
         $plugin_links = array(
             sprintf(
                 '<a href="%1$s">%2$s</a>',
-                esc_url(WC_Victoriabank_MIA::get_settings_url()),
+                esc_url(WC_Gateway_Victoriabank_MIA::get_settings_url()),
                 esc_html__('Settings', 'payment-gateway-wc-victoriabank-mia')
             ),
         );
@@ -867,7 +867,7 @@ add_action(
             add_action(
                 'woocommerce_blocks_payment_method_type_registration',
                 function (\Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry) {
-                    $payment_method_registry->register(new WC_Victoriabank_MIA_WBC());
+                    $payment_method_registry->register(new WC_Gateway_Victoriabank_MIA_WBC());
                 }
             );
         }
