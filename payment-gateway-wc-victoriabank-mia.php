@@ -17,7 +17,7 @@
  * Requires at least: 4.8
  * Tested up to: 6.9
  * WC requires at least: 3.3
- * WC tested up to: 10.3.6
+ * WC tested up to: 10.4.2
  * Requires Plugins: woocommerce
  */
 
@@ -32,22 +32,17 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 use Victoriabank\VictoriabankMia\VictoriabankMiaClient;
 
-add_action('plugins_loaded', 'woocommerce_victoriabank_mia_plugins_loaded', 0);
+add_action('plugins_loaded', 'victoriabank_mia_init', 0);
 
-function woocommerce_victoriabank_mia_plugins_loaded()
+function victoriabank_mia_init()
 {
+    // https://developer.woocommerce.com/docs/features/payments/payment-gateway-plugin-base/
     // load_plugin_textdomain('payment-gateway-wc-victoriabank-mia', false, dirname(plugin_basename(__FILE__)) . '/languages');
 
-    // https://woocommerce.com/document/query-whether-woocommerce-is-activated/
-    if (!class_exists('WooCommerce')) {
+    if (!class_exists('WC_Payment_Gateway')) {
         return;
     }
 
-    woocommerce_victoriabank_mia_init();
-}
-
-function woocommerce_victoriabank_mia_init()
-{
     class WC_Victoriabank_MIA extends WC_Payment_Gateway
     {
         //region Constants
