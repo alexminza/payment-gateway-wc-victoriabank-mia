@@ -480,10 +480,12 @@ function victoriabank_mia_init()
         public function check_response()
         {
             $request_method = isset($_SERVER['REQUEST_METHOD']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_METHOD'])) : '';
-            if (strtoupper($request_method) !== 'POST') {
+            if ($request_method === 'GET') {
                 /* translators: 1: Payment method title */
                 $message = sprintf(__('%1$s Callback URL', 'payment-gateway-wc-victoriabank-mia'), $this->method_title);
                 return self::return_response(WP_Http::OK, $message);
+            } elseif ($request_method !== 'POST') {
+                return self::return_response(WP_Http::METHOD_NOT_ALLOWED);
             }
 
             //region Validate callback
