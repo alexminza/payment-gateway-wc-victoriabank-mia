@@ -6,8 +6,8 @@ msgstr ""
 "1.0.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payment-gateway-"
 "wc-victoriabank-mia\n"
-"POT-Creation-Date: 2025-12-19 16:03+0200\n"
-"PO-Revision-Date: 2025-12-19 16:04+0200\n"
+"POT-Creation-Date: 2025-12-19 16:17+0200\n"
+"PO-Revision-Date: 2025-12-19 16:18+0200\n"
 "Last-Translator: Alexander Minza <alex@alexminza.com>\n"
 "Language-Team: \n"
 "Language: ru_RU\n"
@@ -227,58 +227,58 @@ msgstr "Ошибка инициирования оплаты заказа #%1$s 
 msgid "%1$s Callback URL"
 msgstr "%1$s Callback URL"
 
-#: payment-gateway-wc-victoriabank-mia.php:506
+#: payment-gateway-wc-victoriabank-mia.php:508
 msgid "Payment notification callback"
 msgstr "Уведомление об оплате"
 
 #. translators: 1: QR Extension ID, 2: Payment method title
-#: payment-gateway-wc-victoriabank-mia.php:541
+#: payment-gateway-wc-victoriabank-mia.php:543
 #, php-format
 msgid "Order not found by QR Extension ID: %1$s received from %2$s."
 msgstr "Заказ не найден по QR Extension ID: %1$s полученному от %2$s."
 
 #. translators: 1: Callback notification price, 2: Order total price
-#: payment-gateway-wc-victoriabank-mia.php:563
+#: payment-gateway-wc-victoriabank-mia.php:565
 #, php-format
 msgid "Order amount mismatch: Callback: %1$s, Order: %2$s."
 msgstr "Несоответствие суммы заказа: Уведомление: %1$s, Заказ: %2$s."
 
 #. translators: 1: Order ID
-#: payment-gateway-wc-victoriabank-mia.php:571
+#: payment-gateway-wc-victoriabank-mia.php:573
 #, php-format
 msgid "Callback order #%1$s already fully paid."
 msgstr "Заказ #%1$s уже полностью оплачен."
 
 #. translators: 1: Order ID, 2: Payment method title, 3: Payment notification callback data
-#: payment-gateway-wc-victoriabank-mia.php:590
+#: payment-gateway-wc-victoriabank-mia.php:592
 #, php-format
 msgid "Order #%1$s payment completed via %2$s: %3$s"
 msgstr "Платеж заказа #%1$s проведен через %2$s: %3$s"
 
 #. translators: 1: Payment method title
-#: payment-gateway-wc-victoriabank-mia.php:614
+#: payment-gateway-wc-victoriabank-mia.php:616
 #, php-format
 msgid "Partial refunds are not currently supported by %1$s."
 msgstr "Частичный возврат средств в настоящее время не поддерживается %1$s."
 
 #. translators: 1: Order ID, 2: Refund amount, 3: Payment method title, 4: Error message
-#: payment-gateway-wc-victoriabank-mia.php:639
+#: payment-gateway-wc-victoriabank-mia.php:641
 #, php-format
 msgid "Order #%1$s refund of %2$s via %3$s failed: %4$s"
 msgstr "Ошибка возврата заказа #%1$s на сумму %2$s через %3$s: %4$s"
 
 #. translators: 1: Order ID, 2: Refund amount, 3: Payment method title
-#: payment-gateway-wc-victoriabank-mia.php:650
+#: payment-gateway-wc-victoriabank-mia.php:652
 #, php-format
 msgid "Order #%1$s refund of %2$s via %3$s approved."
 msgstr "Возврат заказа #%1$s на сумму %2$s через %3$s подтвержден."
 
 #. translators: 1: Original message
-#: payment-gateway-wc-victoriabank-mia.php:714
+#: payment-gateway-wc-victoriabank-mia.php:716
 #, php-format
 msgid "TEST: %1$s"
 msgstr "ТЕСТ: %1$s"
 
-#: payment-gateway-wc-victoriabank-mia.php:834
+#: payment-gateway-wc-victoriabank-mia.php:836
 msgid "Settings"
 msgstr "Настройки"

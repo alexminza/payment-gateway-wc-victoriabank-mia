@@ -6,8 +6,8 @@ msgstr ""
 "1.0.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payment-gateway-"
 "wc-victoriabank-mia\n"
-"POT-Creation-Date: 2025-12-19 16:03+0200\n"
-"PO-Revision-Date: 2025-12-19 16:03+0200\n"
+"POT-Creation-Date: 2025-12-19 16:17+0200\n"
+"PO-Revision-Date: 2025-12-19 16:17+0200\n"
 "Last-Translator: Alexander Minza <alex@alexminza.com>\n"
 "Language-Team: \n"
 "Language: ro_RO\n"
@@ -225,58 +225,58 @@ msgstr "Inițierea plății comenzii #%1$s prin %2$s a eșuat."
 msgid "%1$s Callback URL"
 msgstr "%1$s Callback URL"
 
-#: payment-gateway-wc-victoriabank-mia.php:506
+#: payment-gateway-wc-victoriabank-mia.php:508
 msgid "Payment notification callback"
 msgstr "Notificare de plată"
 
 #. translators: 1: QR Extension ID, 2: Payment method title
-#: payment-gateway-wc-victoriabank-mia.php:541
+#: payment-gateway-wc-victoriabank-mia.php:543
 #, php-format
 msgid "Order not found by QR Extension ID: %1$s received from %2$s."
 msgstr "Comanda nu a fost gasită după QR Extension ID: %1$s primit de la %2$s."
 
 #. translators: 1: Callback notification price, 2: Order total price
-#: payment-gateway-wc-victoriabank-mia.php:563
+#: payment-gateway-wc-victoriabank-mia.php:565
 #, php-format
 msgid "Order amount mismatch: Callback: %1$s, Order: %2$s."
 msgstr "Sumă comandă incorectă: Notificare: %1$s, Comandă: %2$s."
 
 #. translators: 1: Order ID
-#: payment-gateway-wc-victoriabank-mia.php:571
+#: payment-gateway-wc-victoriabank-mia.php:573
 #, php-format
 msgid "Callback order #%1$s already fully paid."
 msgstr "Comanda #%1$s este deja plătită integral."
 
 #. translators: 1: Order ID, 2: Payment method title, 3: Payment notification callback data
-#: payment-gateway-wc-victoriabank-mia.php:590
+#: payment-gateway-wc-victoriabank-mia.php:592
 #, php-format
 msgid "Order #%1$s payment completed via %2$s: %3$s"
 msgstr "Plata comenzii #%1$s finalizată prin %2$s: %3$s"
 
 #. translators: 1: Payment method title
-#: payment-gateway-wc-victoriabank-mia.php:614
+#: payment-gateway-wc-victoriabank-mia.php:616
 #, php-format
 msgid "Partial refunds are not currently supported by %1$s."
 msgstr "Rambursările parțiale nu sunt acceptate în prezent de %1$s."
 
 #. translators: 1: Order ID, 2: Refund amount, 3: Payment method title, 4: Error message
-#: payment-gateway-wc-victoriabank-mia.php:639
+#: payment-gateway-wc-victoriabank-mia.php:641
 #, php-format
 msgid "Order #%1$s refund of %2$s via %3$s failed: %4$s"
 msgstr "Rambursarea comenzii #%1$s în suma de %2$s prin %3$s a eșuat: %4$s"
 
 #. translators: 1: Order ID, 2: Refund amount, 3: Payment method title
-#: payment-gateway-wc-victoriabank-mia.php:650
+#: payment-gateway-wc-victoriabank-mia.php:652
 #, php-format
 msgid "Order #%1$s refund of %2$s via %3$s approved."
 msgstr "Rambursarea comenzii #%1$s suma de %2$s prin %3$s a fost aprobată."
 
 #. translators: 1: Original message
-#: payment-gateway-wc-victoriabank-mia.php:714
+#: payment-gateway-wc-victoriabank-mia.php:716
 #, php-format
 msgid "TEST: %1$s"
 msgstr "TEST: %1$s"
 
-#: payment-gateway-wc-victoriabank-mia.php:834
+#: payment-gateway-wc-victoriabank-mia.php:836
 msgid "Settings"
 msgstr "Setări"
