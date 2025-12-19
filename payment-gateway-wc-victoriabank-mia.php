@@ -480,28 +480,45 @@ function victoriabank_mia_init()
         public function check_response()
         {
             $request_method = isset($_SERVER['REQUEST_METHOD']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_METHOD'])) : '';
-            if (strtoupper($request_method) === 'GET') {
+            if (strtoupper($request_method) !== 'POST') {
                 /* translators: 1: Payment method title */
                 $message = sprintf(__('%1$s Callback URL', 'payment-gateway-wc-victoriabank-mia'), $this->method_title);
                 return self::return_response(WP_Http::OK, $message);
             }
 
             //region Validate callback
+            $callback_body = null;
             $callback_data = null;
 
             try {
-                $callback_body = file_get_contents('php://input');
-                /* translators: 1: Payment notification callback body */
-                $this->log(sprintf(__('Payment notification callback: %1$s', 'payment-gateway-wc-victoriabank-mia'), self::print_var($callback_body)));
+                $callback_body = wc_clean(file_get_contents('php://input'));
+                if (empty($callback_body)) {
+                    throw new Exception('Empty callback body');
+                }
 
                 $callback_body = trim($callback_body, '"');
-                $callback_data = (array) VictoriabankMiaClient::decodeValidateCallback($callback_body, $this->victoriabank_mia_certificate);
-                $this->log(self::print_var($callback_data));
+                $callback_data = (array) wc_clean(VictoriabankMiaClient::decodeValidateCallback($callback_body, $this->victoriabank_mia_certificate));
+                if (empty($callback_data) || !is_array($callback_data)) {
+                    throw new Exception('Invalid callback data');
+                }
+
+                $this->log(
+                    sprintf(__('Payment notification callback', 'payment-gateway-wc-victoriabank-mia')),
+                    WC_Log_Levels::DEBUG,
+                    array(
+                        'callback_body' => $callback_body,
+                        'callback_data' => $callback_data,
+                    )
+                );
             } catch (Exception $ex) {
                 $this->log(
                     $ex->getMessage(),
                     WC_Log_Levels::ERROR,
-                    array('exception' => $ex)
+                    array(
+                        'exception' => $ex,
+                        'callback_body' => $callback_body,
+                        'callback_data' => $callback_data,
+                    )
                 );
 
                 return self::return_response(WP_Http::UNAUTHORIZED, 'Invalid callback signature');
