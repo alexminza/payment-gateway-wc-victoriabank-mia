@@ -403,6 +403,27 @@ function victoriabank_mia_init()
                 $client = $this->init_victoriabank_mia_client();
                 $auth_token = $this->victoriabank_mia_generate_token($client);
 
+                //region Existing QR
+                $qr_extension_id = strval($order->get_meta(self::MOD_QR_EXTENSION_ID, true));
+                $qr_url = strval($order->get_meta(self::MOD_QR_URL, true));
+                if (!empty($qr_extension_id) && !empty($qr_url)) {
+                    // $this->log(self::print_var($qr_extension_id));
+                    $qr_extension_status = $client->getQrExtensionStatus($qr_extension_id, $auth_token);
+                    if (!empty($qr_extension_status)) {
+                        $this->log(self::print_var($qr_extension_status));
+                        if (strtolower(strval($qr_extension_status['status'])) === 'active') {
+                            $qr_extension_status_ttl = intval($qr_extension_status['ttl']['length']);
+                            if ($qr_extension_status_ttl > intdiv($this->transaction_validity * 60, 2)) {
+                                return array(
+                                    'result'   => 'success',
+                                    'redirect' => $qr_url,
+                                );
+                            }
+                        }
+                    }
+                }
+                //endregion
+
                 $create_qr_response = $this->victoriabank_mia_pay(
                     $client,
                     $auth_token,
@@ -605,7 +626,7 @@ function victoriabank_mia_init()
             }
 
             $order = wc_get_order($order_id);
-            $payment_reference = $order->get_meta(self::MOD_PAYMENT_REFERENCE, true);
+            $payment_reference = strval($order->get_meta(self::MOD_PAYMENT_REFERENCE, true));
             $transaction_id = VictoriabankMiaClient::getPaymentTransactionId($payment_reference);
             $order_total = $order->get_total();
             $order_currency = $order->get_currency();
