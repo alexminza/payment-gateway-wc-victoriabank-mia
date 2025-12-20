@@ -406,14 +406,24 @@ function victoriabank_mia_init()
                 //region Existing QR
                 $qr_extension_id = strval($order->get_meta(self::MOD_QR_EXTENSION_ID, true));
                 $qr_url = strval($order->get_meta(self::MOD_QR_URL, true));
+
                 if (!empty($qr_extension_id) && !empty($qr_url)) {
-                    // $this->log(self::print_var($qr_extension_id));
                     $qr_extension_status = $client->getQrExtensionStatus($qr_extension_id, $auth_token);
+
                     if (!empty($qr_extension_status)) {
                         $this->log(self::print_var($qr_extension_status));
-                        if (strtolower(strval($qr_extension_status['status'])) === 'active') {
-                            $qr_extension_status_ttl = intval($qr_extension_status['ttl']['length']);
-                            if ($qr_extension_status_ttl > intdiv($this->transaction_validity * 60, 2)) {
+
+                        $qr_extension_status_value = strval($qr_extension_status['status']);
+                        if (strtolower($qr_extension_status_value) === 'active') {
+                            $qr_extension_status_ttl = (array) $qr_extension_status['ttl'];
+                            $qr_extension_status_ttl_length = intval($qr_extension_status_ttl['length']);
+                            $qr_extension_status_ttl_units = strval($qr_extension_status_ttl['units']);
+
+                            $qr_extension_status_ttl_minutes = strtolower($qr_extension_status_ttl_units) === 'mm'
+                                ? $qr_extension_status_ttl_length
+                                : $qr_extension_status_ttl_length * 60;
+
+                            if ($qr_extension_status_ttl_minutes > intdiv($this->transaction_validity, 2)) {
                                 return array(
                                     'result'   => 'success',
                                     'redirect' => $qr_url,
