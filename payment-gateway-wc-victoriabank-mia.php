@@ -422,9 +422,9 @@ function victoriabank_mia_init()
 
                             $qr_extension_status_ttl_minutes = strtolower($qr_extension_status_ttl_units) === 'mm'
                                 ? $qr_extension_status_ttl_length
-                                : $qr_extension_status_ttl_length * 60;
+                                : intdiv($qr_extension_status_ttl_length, 60);
 
-                            if ($qr_extension_status_ttl_minutes > intdiv($this->transaction_validity, 2)) {
+                            if ($qr_extension_status_ttl_minutes >= intdiv($this->transaction_validity, 2)) {
                                 return array(
                                     'result'   => 'success',
                                     'redirect' => $qr_url,
