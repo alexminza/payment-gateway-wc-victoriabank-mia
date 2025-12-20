@@ -127,6 +127,9 @@ function victoriabank_mia_init()
                     'description' => __('Payment method title that the customer will see during checkout.', 'payment-gateway-wc-victoriabank-mia'),
                     'desc_tip'    => true,
                     'default'     => self::MOD_TITLE,
+                    'custom_attributes' => array(
+                        'required' => 'required',
+                    ),
                 ),
                 'description'     => array(
                     'title'       => __('Description', 'payment-gateway-wc-victoriabank-mia'),
@@ -160,6 +163,9 @@ function victoriabank_mia_init()
                     'description' => __('Format: <code>%1$s</code> - Order ID', 'payment-gateway-wc-victoriabank-mia'),
                     'desc_tip'    => __('Order description that the customer will see on the bank payment page.', 'payment-gateway-wc-victoriabank-mia'),
                     'default'     => self::ORDER_TEMPLATE,
+                    'custom_attributes' => array(
+                        'required' => 'required',
+                    ),
                 ),
                 'transaction_validity'  => array(
                     'title'       => __('Transaction validity', 'payment-gateway-wc-victoriabank-mia'),
@@ -168,6 +174,7 @@ function victoriabank_mia_init()
                         'min'  => 1,
                         'step' => 1,
                         'max'  => self::MAX_VALIDITY,
+                        'required' => 'required',
                     ),
                     /* translators: 1: Transaction validity in minutes */
                     'description' => sprintf(__('Default: %1$s minutes', 'payment-gateway-wc-victoriabank-mia'), self::DEFAULT_VALIDITY),
@@ -182,10 +189,16 @@ function victoriabank_mia_init()
                 'victoriabank_mia_username' => array(
                     'title'       => __('Username', 'payment-gateway-wc-victoriabank-mia'),
                     'type'        => 'text',
+                    'custom_attributes' => array(
+                        'required' => 'required',
+                    ),
                 ),
                 'victoriabank_mia_password' => array(
                     'title'       => __('Password', 'payment-gateway-wc-victoriabank-mia'),
                     'type'        => 'password',
+                    'custom_attributes' => array(
+                        'required' => 'required',
+                    ),
                 ),
                 'victoriabank_mia_certificate' => array(
                     'title'       => __('Certificate', 'payment-gateway-wc-victoriabank-mia'),
@@ -194,16 +207,25 @@ function victoriabank_mia_init()
                     'desc_tip'    => true,
                     'placeholder' => "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----",
                     'class'       => 'code',
+                    'custom_attributes' => array(
+                        'required' => 'required',
+                    ),
                 ),
                 'victoriabank_mia_company_name' => array(
                     'title'       => __('Company Name', 'payment-gateway-wc-victoriabank-mia'),
                     'type'        => 'text',
+                    'custom_attributes' => array(
+                        'required' => 'required',
+                    ),
                 ),
                 'victoriabank_mia_creditor_account' => array(
                     'title'       => __('Creditor Account', 'payment-gateway-wc-victoriabank-mia'),
                     'type'        => 'text',
                     'description' => __('IBAN', 'payment-gateway-wc-victoriabank-mia'),
                     'placeholder' => 'MD00XX000000000000000000',
+                    'custom_attributes' => array(
+                        'required' => 'required',
+                    ),
                 ),
 
                 'payment_notification' => array(
