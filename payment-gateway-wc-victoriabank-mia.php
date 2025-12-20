@@ -163,7 +163,8 @@ function victoriabank_mia_init()
                 'transaction_validity'  => array(
                     'title'       => __('Transaction validity', 'payment-gateway-wc-victoriabank-mia'),
                     'type'        => 'decimal',
-                    'description' => __('minutes', 'payment-gateway-wc-victoriabank-mia'),
+                    /* translators: 1: Transaction validity in minutes */
+                    'description' => sprintf(__('Default: %1$s minutes', 'payment-gateway-wc-victoriabank-mia'), self::DEFAULT_VALIDITY),
                     'default'     => self::DEFAULT_VALIDITY,
                 ),
 
