@@ -162,7 +162,11 @@ function victoriabank_mia_init()
                 ),
                 'transaction_validity'  => array(
                     'title'       => __('Transaction validity', 'payment-gateway-wc-victoriabank-mia'),
-                    'type'        => 'decimal',
+                    'type'        => 'number',
+                    'custom_attributes' => array(
+                        'min'  => 1,
+                        'step' => 1,
+                    ),
                     /* translators: 1: Transaction validity in minutes */
                     'description' => sprintf(__('Default: %1$s minutes', 'payment-gateway-wc-victoriabank-mia'), self::DEFAULT_VALIDITY),
                     'default'     => self::DEFAULT_VALIDITY,
@@ -186,6 +190,8 @@ function victoriabank_mia_init()
                     'type'        => 'textarea',
                     'description' => __('Victoriabank Public Key Certificate to validate the authenticity of the payment notifications.', 'payment-gateway-wc-victoriabank-mia'),
                     'desc_tip'    => true,
+                    'placeholder' => "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----",
+                    'class'       => 'code',
                 ),
                 'victoriabank_mia_company_name' => array(
                     'title'       => __('Company Name', 'payment-gateway-wc-victoriabank-mia'),
@@ -195,6 +201,7 @@ function victoriabank_mia_init()
                     'title'       => __('Creditor Account', 'payment-gateway-wc-victoriabank-mia'),
                     'type'        => 'text',
                     'description' => __('IBAN', 'payment-gateway-wc-victoriabank-mia'),
+                    'placeholder' => 'MD00XX000000000000000000',
                 ),
 
                 'payment_notification' => array(
@@ -245,11 +252,14 @@ function victoriabank_mia_init()
             parent::admin_options();
         }
 
+        //region Settings validation
         protected function check_settings()
         {
             return !empty($this->victoriabank_mia_username)
                 && !empty($this->victoriabank_mia_password)
-                && !empty($this->victoriabank_mia_certificate);
+                && $this->validate_certificate($this->victoriabank_mia_certificate)
+                && !empty($this->victoriabank_mia_company_name)
+                && $this->validate_iban($this->victoriabank_mia_creditor_account);
         }
 
         protected function validate_settings()
@@ -278,6 +288,88 @@ function victoriabank_mia_init()
             }
 
             return $validate_result;
+        }
+
+        // https://developer.woocommerce.com/docs/extensions/settings-and-config/implementing-settings/
+        public function validate_order_template_field($key, $value)
+        {
+            if (isset($value) && empty($value)) {
+                WC_Admin_Settings::add_error(esc_html__('Order description field must be set.', 'payment-gateway-wc-victoriabank-mia'));
+            }
+
+            return $value;
+        }
+
+        public function validate_transaction_validity_field($key, $value)
+        {
+            if (isset($value) && !$this->validate_transaction_validity($value)) {
+                WC_Admin_Settings::add_error(esc_html__('Transaction validity field must be a positive integer.', 'payment-gateway-wc-victoriabank-mia'));
+            }
+
+            return $value;
+        }
+
+        public function validate_victoriabank_mia_username_field($key, $value)
+        {
+            if (isset($value) && empty($value)) {
+                WC_Admin_Settings::add_error(esc_html__('Username field must be set.', 'payment-gateway-wc-victoriabank-mia'));
+            }
+
+            return $value;
+        }
+
+        public function validate_victoriabank_mia_password_field($key, $value)
+        {
+            if (isset($value) && empty($value)) {
+                WC_Admin_Settings::add_error(esc_html__('Password field must be set.', 'payment-gateway-wc-victoriabank-mia'));
+            }
+
+            return $value;
+        }
+
+        public function validate_victoriabank_mia_certificate_field($key, $value)
+        {
+            if (isset($value) && !$this->validate_certificate($value)) {
+                WC_Admin_Settings::add_error(esc_html__('Invalid Certificate field.', 'payment-gateway-wc-victoriabank-mia'));
+            }
+
+            return $value;
+        }
+
+        public function validate_victoriabank_mia_company_name_field($key, $value)
+        {
+            if (isset($value) && empty($value)) {
+                WC_Admin_Settings::add_error(esc_html__('Company Name field must be set.', 'payment-gateway-wc-victoriabank-mia'));
+            }
+
+            return $value;
+        }
+
+        public function validate_victoriabank_mia_creditor_account_field($key, $value)
+        {
+            if (isset($value) && !$this->validate_iban($value)) {
+                WC_Admin_Settings::add_error(esc_html__('Invalid IBAN field. Must start with MD and have 24 characters.', 'payment-gateway-wc-victoriabank-mia'));
+            }
+
+            return $value;
+        }
+
+        protected function validate_transaction_validity($value)
+        {
+            return intval($value) > 0;
+        }
+
+        protected function validate_certificate($value)
+        {
+            return !empty($value)
+                && !empty(openssl_pkey_get_public($value));
+        }
+
+        protected function validate_iban($value)
+        {
+            return !empty($value)
+                && strlen($value) == 24
+                && str_starts_with($value, 'MD');
         }
 
         protected function logs_admin_website_notice()
@@ -313,6 +405,7 @@ function victoriabank_mia_init()
             $message = sprintf(wp_kses_post(__('See <a href="%2$s">%1$s settings</a> page for log details and setup instructions.', 'payment-gateway-wc-victoriabank-mia')), esc_html($this->method_title), esc_url(self::get_settings_url()));
             return $message;
         }
+        //endregion
 
         //region Victoriabank MIA
         protected function init_victoriabank_mia_client()
