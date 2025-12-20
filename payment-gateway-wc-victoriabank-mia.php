@@ -75,6 +75,9 @@ function victoriabank_mia_init()
             $this->has_fields         = false;
             $this->supports           = array('products', 'refunds');
 
+            $this->init_form_fields();
+            $this->init_settings();
+
             //region Initialize user set variables
             $this->enabled            = $this->get_option('enabled', 'no');
             $this->title              = $this->get_option('title', $this->method_title);
@@ -99,9 +102,6 @@ function victoriabank_mia_init()
             $this->victoriabank_mia_certificate = $this->get_option('victoriabank_mia_certificate');
             $this->victoriabank_mia_creditor_account = $this->get_option('victoriabank_mia_creditor_account');
             $this->victoriabank_mia_company_name     = $this->get_option('victoriabank_mia_company_name');
-
-            $this->init_form_fields();
-            $this->init_settings();
             //endregion
 
             if (is_admin()) {
