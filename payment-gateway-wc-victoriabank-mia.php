@@ -71,7 +71,7 @@ function victoriabank_mia_init()
         public function __construct()
         {
             $this->id                 = self::MOD_ID;
-            $this->method_title       = __('Victoriabank MIA', 'payment-gateway-wc-victoriabank-mia');
+            $this->method_title       = 'Victoriabank MIA';
             $this->method_description = __('Payment Gateway for Victoriabank MIA Instant Payments', 'payment-gateway-wc-victoriabank-mia');
             $this->has_fields         = false;
             $this->supports           = array('products', 'refunds');
@@ -136,7 +136,7 @@ function victoriabank_mia_init()
                     'type'        => 'textarea',
                     'description' => __('Payment method description that the customer will see during checkout.', 'payment-gateway-wc-victoriabank-mia'),
                     'desc_tip'    => true,
-                    'default'     => '',
+                    'default'     => __('Pay instantly by scanning the QR code using your bank\'s mobile application.', 'payment-gateway-wc-victoriabank-mia'),
                 ),
 
                 'testmode'        => array(
