@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Payment Gateway for Victoriabank MIA for WooCommerce 1.0.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payment-gateway-wc-victoriabank-mia\n"
-"POT-Creation-Date: 2025-12-21 18:41+0200\n"
+"POT-Creation-Date: 2025-12-21 19:55+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,7 +25,7 @@ msgid "Accept MIA Instant Payments directly on your store with the Payment Gatew
 msgstr ""
 
 #: payment-gateway-wc-victoriabank-mia.php:75
-msgid "Payment Gateway for Victoriabank MIA Instant Payments"
+msgid "Accept MIA Instant Payments through Victoriabank."
 msgstr ""
 
 #: payment-gateway-wc-victoriabank-mia.php:121

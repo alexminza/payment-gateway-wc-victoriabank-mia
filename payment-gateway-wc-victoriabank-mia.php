@@ -72,7 +72,7 @@ function victoriabank_mia_init()
         {
             $this->id                 = self::MOD_ID;
             $this->method_title       = 'Victoriabank MIA';
-            $this->method_description = __('Payment Gateway for Victoriabank MIA Instant Payments', 'payment-gateway-wc-victoriabank-mia');
+            $this->method_description = __('Accept MIA Instant Payments through Victoriabank.', 'payment-gateway-wc-victoriabank-mia');
             $this->has_fields         = false;
             $this->supports           = array('products', 'refunds');
 
