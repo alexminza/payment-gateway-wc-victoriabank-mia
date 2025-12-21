@@ -337,7 +337,7 @@ function victoriabank_mia_init()
             if (isset($value) && !$this->validate_transaction_validity($value)) {
                 $field_label = $this->form_fields[$key]['title'];
                 /* translators: 1: Field label, 2: Min value, 3: Max value */
-                WC_Admin_Settings::add_error(sprintf(esc_html__('%1$s field must be an integer between %1$d and %2$d.', 'payment-gateway-wc-victoriabank-mia'), $field_label, self::MIN_VALIDITY, self::MAX_VALIDITY));
+                WC_Admin_Settings::add_error(sprintf(esc_html__('%1$s field must be an integer between %2$d and %3$d.', 'payment-gateway-wc-victoriabank-mia'), $field_label, self::MIN_VALIDITY, self::MAX_VALIDITY));
             }
 
             return $value;
