@@ -538,8 +538,6 @@ function victoriabank_mia_init()
                     $qr_extension_status = $client->getQrExtensionStatus($qr_extension_id, $auth_token);
 
                     if (!empty($qr_extension_status)) {
-                        $this->log_var('process_payment qr_extension_status', $qr_extension_status);
-
                         $qr_extension_status_value = strval($qr_extension_status['status']);
                         if (strtolower($qr_extension_status_value) === 'active') {
                             $qr_extension_status_ttl = (array) $qr_extension_status['ttl'];
@@ -577,8 +575,6 @@ function victoriabank_mia_init()
                     // NOTE: remove redundant large image data
                     $create_qr_response['qrAsImage'] = null;
                 }
-
-                $this->log_var('process_payment create_qr_response', $create_qr_response);
             } catch (Exception $ex) {
                 $this->log(
                     $ex->getMessage(),
