@@ -538,7 +538,7 @@ function victoriabank_mia_init()
                     $qr_extension_status = $client->getQrExtensionStatus($qr_extension_id, $auth_token);
 
                     if (!empty($qr_extension_status)) {
-                        $this->log(self::print_var($qr_extension_status));
+                        $this->log_var('process_payment qr_extension_status', $qr_extension_status);
 
                         $qr_extension_status_value = strval($qr_extension_status['status']);
                         if (strtolower($qr_extension_status_value) === 'active') {
@@ -578,7 +578,7 @@ function victoriabank_mia_init()
                     $create_qr_response['qrAsImage'] = null;
                 }
 
-                $this->log(self::print_var($create_qr_response));
+                $this->log_var('process_payment create_qr_response', $create_qr_response);
             } catch (Exception $ex) {
                 $this->log(
                     $ex->getMessage(),
@@ -934,20 +934,15 @@ function victoriabank_mia_init()
             $this->logger->log($level, $message, $log_context);
         }
 
-        /**
-         * @param string $message
-         * @param string $level
-         * @param array  $additional_context
-         */
-        protected static function static_log($message, $level = WC_Log_Levels::DEBUG, $additional_context = null)
+        protected function log_var($message, $var)
         {
-            $log_context = array('source' => self::MOD_ID);
-            if (!empty($additional_context)) {
-                $log_context = array_merge($log_context, $additional_context);
-            }
-
-            $logger = wc_get_logger();
-            $logger->log($level, $message, $log_context);
+            $this->log(
+                $message,
+                WC_Log_Levels::DEBUG,
+                array(
+                    'var' => self::print_var($var),
+                )
+            );
         }
 
         protected static function print_var($expression)
