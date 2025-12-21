@@ -315,13 +315,20 @@ function victoriabank_mia_init()
         }
 
         // https://developer.woocommerce.com/docs/extensions/settings-and-config/implementing-settings/
-        public function validate_order_template_field($key, $value)
+        public function validate_required_field($key, $value)
         {
             if (isset($value) && empty($value)) {
-                WC_Admin_Settings::add_error(esc_html__('Order description field must be set.', 'payment-gateway-wc-victoriabank-mia'));
+                $field_label = $this->form_fields[$key]['title'];
+                /* translators: %s: Field label */
+                WC_Admin_Settings::add_error(sprintf(esc_html__('%s field must be set.', 'payment-gateway-wc-victoriabank-mia'), $field_label));
             }
 
             return $value;
+        }
+
+        public function validate_order_template_field($key, $value)
+        {
+            return $this->validate_required_field($key, $value);
         }
 
         public function validate_transaction_validity_field($key, $value)
@@ -335,20 +342,12 @@ function victoriabank_mia_init()
 
         public function validate_victoriabank_mia_username_field($key, $value)
         {
-            if (isset($value) && empty($value)) {
-                WC_Admin_Settings::add_error(esc_html__('Username field must be set.', 'payment-gateway-wc-victoriabank-mia'));
-            }
-
-            return $value;
+            return $this->validate_required_field($key, $value);
         }
 
         public function validate_victoriabank_mia_password_field($key, $value)
         {
-            if (isset($value) && empty($value)) {
-                WC_Admin_Settings::add_error(esc_html__('Password field must be set.', 'payment-gateway-wc-victoriabank-mia'));
-            }
-
-            return $value;
+            return $this->validate_required_field($key, $value);
         }
 
         public function validate_victoriabank_mia_certificate_field($key, $value)
@@ -362,11 +361,7 @@ function victoriabank_mia_init()
 
         public function validate_victoriabank_mia_company_name_field($key, $value)
         {
-            if (isset($value) && empty($value)) {
-                WC_Admin_Settings::add_error(esc_html__('Company Name field must be set.', 'payment-gateway-wc-victoriabank-mia'));
-            }
-
-            return $value;
+            return $this->validate_required_field($key, $value);
         }
 
         public function validate_victoriabank_mia_creditor_account_field($key, $value)
