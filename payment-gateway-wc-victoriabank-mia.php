@@ -47,7 +47,6 @@ function victoriabank_mia_init()
     {
         //region Constants
         const MOD_ID             = 'victoriabank_mia';
-        const MOD_TITLE          = 'Victoriabank MIA';
         const MOD_PREFIX         = 'victoriabank_mia_';
         const MOD_VERSION        = '1.0.2';
 
@@ -72,23 +71,23 @@ function victoriabank_mia_init()
         public function __construct()
         {
             $this->id                 = self::MOD_ID;
-            $this->method_title       = self::MOD_TITLE;
-            $this->method_description = 'Payment Gateway for Victoriabank MIA';
+            $this->method_title       = __('Victoriabank MIA', 'payment-gateway-wc-victoriabank-mia');
+            $this->method_description = __('Payment Gateway for Victoriabank MIA Instant Payments', 'payment-gateway-wc-victoriabank-mia');
             $this->has_fields         = false;
             $this->supports           = array('products', 'refunds');
 
+            //region Initialize settings
             $this->init_form_fields();
             $this->init_settings();
 
-            //region Initialize user set variables
-            $this->enabled            = $this->get_option('enabled', 'no');
-            $this->title              = $this->get_option('title', $this->method_title);
-            $this->description        = $this->get_option('description');
-            $this->icon               = plugins_url('/assets/img/mia.svg', __FILE__);
+            $this->enabled     = $this->get_option('enabled', 'no');
+            $this->title       = $this->get_option('title', $this->method_title);
+            $this->description = $this->get_option('description');
+            $this->icon        = plugins_url('/assets/img/mia.svg', __FILE__);
 
-            $this->testmode           = wc_string_to_bool($this->get_option('testmode', 'no'));
-            $this->debug              = wc_string_to_bool($this->get_option('debug', 'no'));
-            $this->logger             = new WC_Logger(null, $this->debug ? WC_Log_Levels::DEBUG : WC_Log_Levels::INFO);
+            $this->testmode    = wc_string_to_bool($this->get_option('testmode', 'no'));
+            $this->debug       = wc_string_to_bool($this->get_option('debug', 'no'));
+            $this->logger      = new WC_Logger(null, $this->debug ? WC_Log_Levels::DEBUG : WC_Log_Levels::INFO);
 
             if ($this->testmode) {
                 $this->description = $this->get_test_message($this->description);
@@ -98,17 +97,17 @@ function victoriabank_mia_init()
             $this->transaction_validity = intval($this->get_option('transaction_validity', self::DEFAULT_VALIDITY));
 
             // https://github.com/alexminza/victoriabank-mia-sdk-php/blob/main/src/VictoriabankMia/VictoriabankMiaClient.php
-            $this->victoriabank_mia_base_url    = $this->testmode ? VictoriabankMiaClient::TEST_BASE_URL : VictoriabankMiaClient::DEFAULT_BASE_URL;
-            $this->victoriabank_mia_username    = $this->get_option('victoriabank_mia_username');
-            $this->victoriabank_mia_password    = $this->get_option('victoriabank_mia_password');
-            $this->victoriabank_mia_certificate = $this->get_option('victoriabank_mia_certificate');
+            $this->victoriabank_mia_base_url         = $this->testmode ? VictoriabankMiaClient::TEST_BASE_URL : VictoriabankMiaClient::DEFAULT_BASE_URL;
+            $this->victoriabank_mia_username         = $this->get_option('victoriabank_mia_username');
+            $this->victoriabank_mia_password         = $this->get_option('victoriabank_mia_password');
+            $this->victoriabank_mia_certificate      = $this->get_option('victoriabank_mia_certificate');
             $this->victoriabank_mia_creditor_account = $this->get_option('victoriabank_mia_creditor_account');
             $this->victoriabank_mia_company_name     = $this->get_option('victoriabank_mia_company_name');
-            //endregion
 
             if (is_admin()) {
                 add_action("woocommerce_update_options_payment_gateways_{$this->id}", array($this, 'process_admin_options'));
             }
+            //endregion
 
             add_action("woocommerce_api_wc_{$this->id}", array($this, 'check_response'));
         }
@@ -127,7 +126,7 @@ function victoriabank_mia_init()
                     'type'        => 'text',
                     'description' => __('Payment method title that the customer will see during checkout.', 'payment-gateway-wc-victoriabank-mia'),
                     'desc_tip'    => true,
-                    'default'     => self::MOD_TITLE,
+                    'default'     => $this->method_title,
                     'custom_attributes' => array(
                         'required' => 'required',
                     ),
