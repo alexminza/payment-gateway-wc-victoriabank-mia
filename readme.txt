@@ -3,7 +3,7 @@ Contributors: alexminza
 Tags: Moldova, Victoriabank, MIA, QR, payment gateway
 Requires at least: 4.8
 Tested up to: 6.9
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 Requires PHP: 7.2.5
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -68,6 +68,9 @@ You can also contribute to the plugin by translating it. Simply visit [translate
 
 See [payment-gateway-wc-victoriabank-mia project releases on GitHub](https://github.com/alexminza/payment-gateway-wc-victoriabank-mia/releases) for details.
 
+= 1.0.2 =
+Improved QR code generation logic and settings validation.
+
 = 1.0.1 =
 Minor improvements.
 
@@ -75,6 +78,9 @@ Minor improvements.
 Initial version release.
 
 == Upgrade Notice ==
+
+= 1.0.2 =
+Improved QR code generation logic and settings validation.
 
 = 1.0.1 =
 Minor improvements.

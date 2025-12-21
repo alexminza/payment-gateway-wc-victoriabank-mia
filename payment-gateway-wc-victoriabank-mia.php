@@ -4,7 +4,7 @@
  * Plugin Name: Payment Gateway for Victoriabank MIA for WooCommerce
  * Description: Accept MIA Instant Payments directly on your store with the Payment Gateway for Victoriabank MIA for WooCommerce.
  * Plugin URI: https://github.com/alexminza/payment-gateway-wc-victoriabank-mia
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Alexander Minza
  * Author URI: https://profiles.wordpress.org/alexminza
  * Developer: Alexander Minza
@@ -37,8 +37,6 @@ add_action('plugins_loaded', 'victoriabank_mia_init', 0);
 function victoriabank_mia_init()
 {
     // https://developer.woocommerce.com/docs/features/payments/payment-gateway-plugin-base/
-    // load_plugin_textdomain('payment-gateway-wc-victoriabank-mia', false, dirname(plugin_basename(__FILE__)) . '/languages');
-
     if (!class_exists('WC_Payment_Gateway')) {
         return;
     }
@@ -47,9 +45,8 @@ function victoriabank_mia_init()
     {
         //region Constants
         const MOD_ID             = 'victoriabank_mia';
-        const MOD_TITLE          = 'Victoriabank MIA';
         const MOD_PREFIX         = 'victoriabank_mia_';
-        const MOD_VERSION        = '1.0.1';
+        const MOD_VERSION        = '1.0.2';
 
         const SUPPORTED_CURRENCIES = array('MDL');
         const ORDER_TEMPLATE       = 'Order #%1$s';
@@ -61,7 +58,9 @@ function victoriabank_mia_init()
         const MOD_PAYMENT_REFERENCE =  self::MOD_PREFIX . 'payment_reference';
 
         const DEFAULT_TIMEOUT  = 30; // seconds
-        const DEFAULT_VALIDITY = 15; // minutes
+        const DEFAULT_VALIDITY = 360; // minutes
+        const MIN_VALIDITY     = 1;  //minutes
+        const MAX_VALIDITY     = 1440; //minutes
         //endregion
 
         protected $testmode, $debug, $logger, $order_template, $transaction_validity;
@@ -70,20 +69,23 @@ function victoriabank_mia_init()
         public function __construct()
         {
             $this->id                 = self::MOD_ID;
-            $this->method_title       = self::MOD_TITLE;
-            $this->method_description = 'Payment Gateway for Victoriabank MIA';
+            $this->method_title       = 'Victoriabank MIA';
+            $this->method_description = __('Accept MIA Instant Payments through Victoriabank.', 'payment-gateway-wc-victoriabank-mia');
             $this->has_fields         = false;
             $this->supports           = array('products', 'refunds');
 
-            //region Initialize user set variables
-            $this->enabled            = $this->get_option('enabled', 'no');
-            $this->title              = $this->get_option('title', $this->method_title);
-            $this->description        = $this->get_option('description');
-            $this->icon               = plugins_url('/assets/img/mia.svg', __FILE__);
+            //region Initialize settings
+            $this->init_form_fields();
+            $this->init_settings();
 
-            $this->testmode           = wc_string_to_bool($this->get_option('testmode', 'no'));
-            $this->debug              = wc_string_to_bool($this->get_option('debug', 'no'));
-            $this->logger             = new WC_Logger(null, $this->debug ? WC_Log_Levels::DEBUG : WC_Log_Levels::INFO);
+            $this->enabled     = $this->get_option('enabled', 'no');
+            $this->title       = $this->get_option('title', $this->method_title);
+            $this->description = $this->get_option('description');
+            $this->icon        = plugins_url('/assets/img/mia.svg', __FILE__);
+
+            $this->testmode    = wc_string_to_bool($this->get_option('testmode', 'no'));
+            $this->debug       = wc_string_to_bool($this->get_option('debug', 'no'));
+            $this->logger      = new WC_Logger(null, $this->debug ? WC_Log_Levels::DEBUG : WC_Log_Levels::INFO);
 
             if ($this->testmode) {
                 $this->description = $this->get_test_message($this->description);
@@ -93,26 +95,25 @@ function victoriabank_mia_init()
             $this->transaction_validity = intval($this->get_option('transaction_validity', self::DEFAULT_VALIDITY));
 
             // https://github.com/alexminza/victoriabank-mia-sdk-php/blob/main/src/VictoriabankMia/VictoriabankMiaClient.php
-            $this->victoriabank_mia_base_url    = $this->testmode ? VictoriabankMiaClient::TEST_BASE_URL : VictoriabankMiaClient::DEFAULT_BASE_URL;
-            $this->victoriabank_mia_username    = $this->get_option('victoriabank_mia_username');
-            $this->victoriabank_mia_password    = $this->get_option('victoriabank_mia_password');
-            $this->victoriabank_mia_certificate = $this->get_option('victoriabank_mia_certificate');
+            $this->victoriabank_mia_base_url         = $this->testmode ? VictoriabankMiaClient::TEST_BASE_URL : VictoriabankMiaClient::DEFAULT_BASE_URL;
+            $this->victoriabank_mia_username         = $this->get_option('victoriabank_mia_username');
+            $this->victoriabank_mia_password         = $this->get_option('victoriabank_mia_password');
+            $this->victoriabank_mia_certificate      = $this->get_option('victoriabank_mia_certificate');
             $this->victoriabank_mia_creditor_account = $this->get_option('victoriabank_mia_creditor_account');
             $this->victoriabank_mia_company_name     = $this->get_option('victoriabank_mia_company_name');
-
-            $this->init_form_fields();
-            $this->init_settings();
-            //endregion
 
             if (is_admin()) {
                 add_action("woocommerce_update_options_payment_gateways_{$this->id}", array($this, 'process_admin_options'));
             }
+            //endregion
 
             add_action("woocommerce_api_wc_{$this->id}", array($this, 'check_response'));
         }
 
         public function init_form_fields()
         {
+            $blog_info_name = get_bloginfo('name');
+
             $this->form_fields = array(
                 'enabled'         => array(
                     'title'       => __('Enable/Disable', 'payment-gateway-wc-victoriabank-mia'),
@@ -125,14 +126,17 @@ function victoriabank_mia_init()
                     'type'        => 'text',
                     'description' => __('Payment method title that the customer will see during checkout.', 'payment-gateway-wc-victoriabank-mia'),
                     'desc_tip'    => true,
-                    'default'     => self::MOD_TITLE,
+                    'default'     => $this->method_title,
+                    'custom_attributes' => array(
+                        'required' => 'required',
+                    ),
                 ),
                 'description'     => array(
                     'title'       => __('Description', 'payment-gateway-wc-victoriabank-mia'),
                     'type'        => 'textarea',
                     'description' => __('Payment method description that the customer will see during checkout.', 'payment-gateway-wc-victoriabank-mia'),
                     'desc_tip'    => true,
-                    'default'     => '',
+                    'default'     => __('Pay instantly by scanning the QR code using your bank\'s mobile application.', 'payment-gateway-wc-victoriabank-mia'),
                 ),
 
                 'testmode'        => array(
@@ -157,13 +161,26 @@ function victoriabank_mia_init()
                     'type'        => 'text',
                     /* translators: 1: Example placeholder shown to user, represents Order ID */
                     'description' => __('Format: <code>%1$s</code> - Order ID', 'payment-gateway-wc-victoriabank-mia'),
-                    'desc_tip'    => __('Order description that the customer will see on the bank payment page.', 'payment-gateway-wc-victoriabank-mia'),
+                    'desc_tip'    => __('Order description that the customer will see in the app during payment.', 'payment-gateway-wc-victoriabank-mia'),
                     'default'     => self::ORDER_TEMPLATE,
+                    'custom_attributes' => array(
+                        'required' => 'required',
+                        'minlength' => 2,
+                        'maxlength' => 35,
+                    ),
                 ),
                 'transaction_validity'  => array(
                     'title'       => __('Transaction validity', 'payment-gateway-wc-victoriabank-mia'),
-                    'type'        => 'decimal',
-                    'description' => __('minutes', 'payment-gateway-wc-victoriabank-mia'),
+                    'type'        => 'number',
+                    /* translators: 1: Transaction validity in minutes */
+                    'description' => sprintf(__('Default: %1$s minutes', 'payment-gateway-wc-victoriabank-mia'), self::DEFAULT_VALIDITY),
+                    'desc_tip'    => __('QR code validity time in minutes.', 'payment-gateway-wc-victoriabank-mia'),
+                    'custom_attributes' => array(
+                        'min'      => self::MIN_VALIDITY,
+                        'step'     => 1,
+                        'max'      => self::MAX_VALIDITY,
+                        'required' => 'required',
+                    ),
                     'default'     => self::DEFAULT_VALIDITY,
                 ),
 
@@ -175,36 +192,63 @@ function victoriabank_mia_init()
                 'victoriabank_mia_username' => array(
                     'title'       => __('Username', 'payment-gateway-wc-victoriabank-mia'),
                     'type'        => 'text',
+                    'custom_attributes' => array(
+                        'required' => 'required',
+                    ),
                 ),
                 'victoriabank_mia_password' => array(
                     'title'       => __('Password', 'payment-gateway-wc-victoriabank-mia'),
                     'type'        => 'password',
+                    'custom_attributes' => array(
+                        'required' => 'required',
+                    ),
                 ),
                 'victoriabank_mia_certificate' => array(
                     'title'       => __('Certificate', 'payment-gateway-wc-victoriabank-mia'),
                     'type'        => 'textarea',
-                    'description' => __('Victoriabank Public Key Certificate to validate the authenticity of the payment notifications.', 'payment-gateway-wc-victoriabank-mia'),
-                    'desc_tip'    => true,
+                    'description' => 'VBCA.crt',
+                    'desc_tip'    => __('Victoriabank Public Key Certificate to validate the authenticity of the payment notifications.', 'payment-gateway-wc-victoriabank-mia'),
+                    'placeholder' => "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----",
+                    'class'       => 'code',
+                    'custom_attributes' => array(
+                        'required' => 'required',
+                    ),
                 ),
                 'victoriabank_mia_company_name' => array(
                     'title'       => __('Company Name', 'payment-gateway-wc-victoriabank-mia'),
                     'type'        => 'text',
+                    'description' => $blog_info_name,
+                    'desc_tip'    => __('Commercial name that the customer will see in the app during payment.', 'payment-gateway-wc-victoriabank-mia'),
+                    'custom_attributes' => array(
+                        'required' => 'required',
+                        'minlength' => 2,
+                        'maxlength' => 25,
+                    ),
+                    'default'     => $blog_info_name,
                 ),
                 'victoriabank_mia_creditor_account' => array(
                     'title'       => __('Creditor Account', 'payment-gateway-wc-victoriabank-mia'),
                     'type'        => 'text',
                     'description' => __('IBAN', 'payment-gateway-wc-victoriabank-mia'),
+                    'desc_tip'    => __('IBAN account for receiving payments.', 'payment-gateway-wc-victoriabank-mia'),
+                    'placeholder' => 'MD00XX000000000000000000',
+                    'custom_attributes' => array(
+                        'required'  => 'required',
+                        'minlength' => 24,
+                        'maxlength' => 24,
+                        'pattern'   => '^MD.*',
+                    ),
                 ),
 
                 'payment_notification' => array(
                     'title'       => __('Payment Notification', 'payment-gateway-wc-victoriabank-mia'),
+                    'type'        => 'title',
                     'description' => sprintf(
                         '%1$s<br /><br /><b>%2$s:</b> <code>%3$s</code>',
                         esc_html__('Provide this URL to the bank to enable online payment notifications.', 'payment-gateway-wc-victoriabank-mia'),
                         esc_html__('Callback URL', 'payment-gateway-wc-victoriabank-mia'),
                         esc_url($this->get_callback_url())
                     ),
-                    'type'        => 'title',
                 ),
             );
         }
@@ -244,11 +288,14 @@ function victoriabank_mia_init()
             parent::admin_options();
         }
 
+        //region Settings validation
         protected function check_settings()
         {
             return !empty($this->victoriabank_mia_username)
                 && !empty($this->victoriabank_mia_password)
-                && !empty($this->victoriabank_mia_certificate);
+                && $this->validate_certificate($this->victoriabank_mia_certificate)
+                && !empty($this->victoriabank_mia_company_name)
+                && $this->validate_iban($this->victoriabank_mia_creditor_account);
         }
 
         protected function validate_settings()
@@ -277,6 +324,93 @@ function victoriabank_mia_init()
             }
 
             return $validate_result;
+        }
+
+        // https://developer.woocommerce.com/docs/extensions/settings-and-config/implementing-settings/
+        protected function get_settings_field_label($key)
+        {
+            $form_fields = $this->get_form_fields();
+            return $form_fields[$key]['title'];
+        }
+
+        public function validate_required_field($key, $value)
+        {
+            if (isset($value) && empty($value)) {
+                /* translators: 1: Field label */
+                WC_Admin_Settings::add_error(sprintf(esc_html__('%1$s field must be set.', 'payment-gateway-wc-victoriabank-mia'), $this->get_settings_field_label($key)));
+            }
+
+            return $value;
+        }
+
+        public function validate_order_template_field($key, $value)
+        {
+            return $this->validate_required_field($key, $value);
+        }
+
+        public function validate_transaction_validity_field($key, $value)
+        {
+            if (isset($value) && !$this->validate_transaction_validity($value)) {
+                /* translators: 1: Field label, 2: Min value, 3: Max value */
+                WC_Admin_Settings::add_error(sprintf(esc_html__('%1$s field must be an integer between %2$d and %3$d.', 'payment-gateway-wc-victoriabank-mia'), $this->get_settings_field_label($key), self::MIN_VALIDITY, self::MAX_VALIDITY));
+            }
+
+            return $value;
+        }
+
+        public function validate_victoriabank_mia_username_field($key, $value)
+        {
+            return $this->validate_required_field($key, $value);
+        }
+
+        public function validate_victoriabank_mia_password_field($key, $value)
+        {
+            return $this->validate_required_field($key, $value);
+        }
+
+        public function validate_victoriabank_mia_certificate_field($key, $value)
+        {
+            if (isset($value) && !$this->validate_certificate($value)) {
+                /* translators: 1: Field label */
+                WC_Admin_Settings::add_error(sprintf(esc_html__('Invalid %1$s field.', 'payment-gateway-wc-victoriabank-mia'), $this->get_settings_field_label($key)));
+            }
+
+            return $value;
+        }
+
+        public function validate_victoriabank_mia_company_name_field($key, $value)
+        {
+            return $this->validate_required_field($key, $value);
+        }
+
+        public function validate_victoriabank_mia_creditor_account_field($key, $value)
+        {
+            if (isset($value) && !$this->validate_iban($value)) {
+                /* translators: 1: Field label */
+                WC_Admin_Settings::add_error(sprintf(esc_html__('Invalid %1$s field. Must start with MD and have 24 characters.', 'payment-gateway-wc-victoriabank-mia'), $this->get_settings_field_label($key)));
+            }
+
+            return $value;
+        }
+
+        protected function validate_transaction_validity($value)
+        {
+            $transaction_validity = intval($value);
+            return $transaction_validity >= self::MIN_VALIDITY
+                && $transaction_validity <= self::MAX_VALIDITY;
+        }
+
+        protected function validate_certificate($value)
+        {
+            return !empty($value)
+                && !empty(openssl_pkey_get_public($value));
+        }
+
+        protected function validate_iban($value)
+        {
+            return !empty($value)
+                && strlen($value) === 24
+                && substr($value, 0, 2) === 'MD';
         }
 
         protected function logs_admin_website_notice()
@@ -312,6 +446,7 @@ function victoriabank_mia_init()
             $message = sprintf(wp_kses_post(__('See <a href="%2$s">%1$s settings</a> page for log details and setup instructions.', 'payment-gateway-wc-victoriabank-mia')), esc_html($this->method_title), esc_url(self::get_settings_url()));
             return $message;
         }
+        //endregion
 
         //region Victoriabank MIA
         protected function init_victoriabank_mia_client()
@@ -403,6 +538,35 @@ function victoriabank_mia_init()
                 $client = $this->init_victoriabank_mia_client();
                 $auth_token = $this->victoriabank_mia_generate_token($client);
 
+                //region Existing QR
+                $qr_extension_id = strval($order->get_meta(self::MOD_QR_EXTENSION_ID, true));
+                $qr_url = strval($order->get_meta(self::MOD_QR_URL, true));
+
+                if (!empty($qr_extension_id) && !empty($qr_url)) {
+                    $qr_extension_status = $client->getQrExtensionStatus($qr_extension_id, $auth_token);
+
+                    if (!empty($qr_extension_status)) {
+                        $qr_extension_status_value = strval($qr_extension_status['status']);
+                        if (strtolower($qr_extension_status_value) === 'active') {
+                            $qr_extension_status_ttl = (array) $qr_extension_status['ttl'];
+                            $qr_extension_status_ttl_length = intval($qr_extension_status_ttl['length']);
+                            $qr_extension_status_ttl_units = strval($qr_extension_status_ttl['units']);
+
+                            $qr_extension_status_ttl_minutes = strtolower($qr_extension_status_ttl_units) === 'mm'
+                                ? $qr_extension_status_ttl_length
+                                : intdiv($qr_extension_status_ttl_length, 60);
+
+                            if ($qr_extension_status_ttl_minutes >= intdiv($this->transaction_validity, 2)) {
+                                return array(
+                                    'result'   => 'success',
+                                    'redirect' => $qr_url,
+                                );
+                            }
+                        }
+                    }
+                }
+                //endregion
+
                 $create_qr_response = $this->victoriabank_mia_pay(
                     $client,
                     $auth_token,
@@ -419,8 +583,6 @@ function victoriabank_mia_init()
                     // NOTE: remove redundant large image data
                     $create_qr_response['qrAsImage'] = null;
                 }
-
-                $this->log(self::print_var($create_qr_response));
             } catch (Exception $ex) {
                 $this->log(
                     $ex->getMessage(),
@@ -480,11 +642,11 @@ function victoriabank_mia_init()
         public function check_response()
         {
             $request_method = isset($_SERVER['REQUEST_METHOD']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_METHOD'])) : '';
-            if ($request_method === 'GET') {
+            if ('GET' === $request_method) {
                 /* translators: 1: Payment method title */
                 $message = sprintf(__('%1$s Callback URL', 'payment-gateway-wc-victoriabank-mia'), $this->method_title);
                 return self::return_response(WP_Http::OK, $message);
-            } elseif ($request_method !== 'POST') {
+            } elseif ('POST' !== $request_method) {
                 return self::return_response(WP_Http::METHOD_NOT_ALLOWED);
             }
 
@@ -605,7 +767,7 @@ function victoriabank_mia_init()
             }
 
             $order = wc_get_order($order_id);
-            $payment_reference = $order->get_meta(self::MOD_PAYMENT_REFERENCE, true);
+            $payment_reference = strval($order->get_meta(self::MOD_PAYMENT_REFERENCE, true));
             $transaction_id = VictoriabankMiaClient::getPaymentTransactionId($payment_reference);
             $order_total = $order->get_total();
             $order_currency = $order->get_currency();
@@ -673,7 +835,7 @@ function victoriabank_mia_init()
 
             $orders = wc_get_orders($args);
             $orders_count = count($orders);
-            if ($orders_count === 1) {
+            if (1 === $orders_count) {
                 return $orders[0];
             } elseif ($orders_count > 1) {
                 $log_context = array('orders' => $orders);
@@ -776,26 +938,21 @@ function victoriabank_mia_init()
             $this->logger->log($level, $message, $log_context);
         }
 
-        /**
-         * @param string $message
-         * @param string $level
-         * @param array  $additional_context
-         */
-        protected static function static_log($message, $level = WC_Log_Levels::DEBUG, $additional_context = null)
+        protected function log_var($message, $value)
         {
-            $log_context = array('source' => self::MOD_ID);
-            if (!empty($additional_context)) {
-                $log_context = array_merge($log_context, $additional_context);
-            }
-
-            $logger = wc_get_logger();
-            $logger->log($level, $message, $log_context);
+            $this->log(
+                $message,
+                WC_Log_Levels::DEBUG,
+                array(
+                    'value' => self::print_var($value),
+                )
+            );
         }
 
-        protected static function print_var($expression)
+        protected static function print_var($value)
         {
             // https://woocommerce.github.io/code-reference/namespaces/default.html#function_wc_print_r
-            return wc_print_r($expression, true);
+            return wc_print_r($value, true);
         }
 
         /**
