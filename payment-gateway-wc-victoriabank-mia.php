@@ -60,7 +60,7 @@ function victoriabank_mia_init()
         const MOD_PAYMENT_REFERENCE =  self::MOD_PREFIX . 'payment_reference';
 
         const DEFAULT_TIMEOUT  = 30; // seconds
-        const DEFAULT_VALIDITY = 60; // minutes
+        const DEFAULT_VALIDITY = 360; // minutes
         const MIN_VALIDITY     = 1;  //minutes
         const MAX_VALIDITY     = 1440; //minutes
         //endregion
