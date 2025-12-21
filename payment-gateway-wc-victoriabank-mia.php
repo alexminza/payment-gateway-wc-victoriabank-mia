@@ -62,6 +62,7 @@ function victoriabank_mia_init()
 
         const DEFAULT_TIMEOUT  = 30; // seconds
         const DEFAULT_VALIDITY = 60; // minutes
+        const MIN_VALIDITY     = 1;  //minutes
         const MAX_VALIDITY     = 1440; //minutes
         //endregion
 
@@ -171,7 +172,7 @@ function victoriabank_mia_init()
                     'title'       => __('Transaction validity', 'payment-gateway-wc-victoriabank-mia'),
                     'type'        => 'number',
                     'custom_attributes' => array(
-                        'min'  => 1,
+                        'min'  => self::MIN_VALIDITY,
                         'step' => 1,
                         'max'  => self::MAX_VALIDITY,
                         'required' => 'required',
@@ -319,8 +320,8 @@ function victoriabank_mia_init()
         {
             if (isset($value) && empty($value)) {
                 $field_label = $this->form_fields[$key]['title'];
-                /* translators: %s: Field label */
-                WC_Admin_Settings::add_error(sprintf(esc_html__('%s field must be set.', 'payment-gateway-wc-victoriabank-mia'), $field_label));
+                /* translators: 1: Field label */
+                WC_Admin_Settings::add_error(sprintf(esc_html__('%1$s field must be set.', 'payment-gateway-wc-victoriabank-mia'), $field_label));
             }
 
             return $value;
@@ -334,7 +335,9 @@ function victoriabank_mia_init()
         public function validate_transaction_validity_field($key, $value)
         {
             if (isset($value) && !$this->validate_transaction_validity($value)) {
-                WC_Admin_Settings::add_error(esc_html__('Transaction validity field must be a positive integer.', 'payment-gateway-wc-victoriabank-mia'));
+                $field_label = $this->form_fields[$key]['title'];
+                /* translators: 1: Field label, 2: Min value, 3: Max value */
+                WC_Admin_Settings::add_error(sprintf(esc_html__('%1$s field must be an integer between %1$d and %2$d.', 'payment-gateway-wc-victoriabank-mia'), $field_label, self::MIN_VALIDITY, self::MAX_VALIDITY));
             }
 
             return $value;
@@ -376,7 +379,7 @@ function victoriabank_mia_init()
         protected function validate_transaction_validity($value)
         {
             $transaction_validity = intval($value);
-            return $transaction_validity > 0
+            return $transaction_validity >= self::MIN_VALIDITY
                 && $transaction_validity <= self::MAX_VALIDITY;
         }
 
