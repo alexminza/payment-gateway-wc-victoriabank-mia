@@ -114,6 +114,8 @@ function victoriabank_mia_init()
 
         public function init_form_fields()
         {
+            $blog_info_name = get_bloginfo('name');
+
             $this->form_fields = array(
                 'enabled'         => array(
                     'title'       => __('Enable/Disable', 'payment-gateway-wc-victoriabank-mia'),
@@ -165,6 +167,8 @@ function victoriabank_mia_init()
                     'default'     => self::ORDER_TEMPLATE,
                     'custom_attributes' => array(
                         'required' => 'required',
+                        'minlength' => 2,
+                        'maxlength' => 35,
                     ),
                 ),
                 'transaction_validity'  => array(
@@ -215,11 +219,14 @@ function victoriabank_mia_init()
                 'victoriabank_mia_company_name' => array(
                     'title'       => __('Company Name', 'payment-gateway-wc-victoriabank-mia'),
                     'type'        => 'text',
-                    'description' => __('Commercial name that the customer will see in the app during payment.', 'payment-gateway-wc-victoriabank-mia'),
-                    'desc_tip'    => true,
+                    'description' => $blog_info_name,
+                    'desc_tip'    => __('Commercial name that the customer will see in the app during payment.', 'payment-gateway-wc-victoriabank-mia'),
                     'custom_attributes' => array(
                         'required' => 'required',
+                        'minlength' => 2,
+                        'maxlength' => 25,
                     ),
+                    'default'     => $blog_info_name,
                 ),
                 'victoriabank_mia_creditor_account' => array(
                     'title'       => __('Creditor Account', 'payment-gateway-wc-victoriabank-mia'),
