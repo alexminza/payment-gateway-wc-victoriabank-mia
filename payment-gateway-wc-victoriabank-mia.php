@@ -37,8 +37,6 @@ add_action('plugins_loaded', 'victoriabank_mia_init', 0);
 function victoriabank_mia_init()
 {
     // https://developer.woocommerce.com/docs/features/payments/payment-gateway-plugin-base/
-    // load_plugin_textdomain('payment-gateway-wc-victoriabank-mia', false, dirname(plugin_basename(__FILE__)) . '/languages');
-
     if (!class_exists('WC_Payment_Gateway')) {
         return;
     }
@@ -411,7 +409,7 @@ function victoriabank_mia_init()
         protected function validate_iban($value)
         {
             return !empty($value)
-                && strlen($value) == 24
+                && strlen($value) === 24
                 && str_starts_with($value, 'MD');
         }
 
@@ -644,11 +642,11 @@ function victoriabank_mia_init()
         public function check_response()
         {
             $request_method = isset($_SERVER['REQUEST_METHOD']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_METHOD'])) : '';
-            if ($request_method === 'GET') {
+            if ('GET' === $request_method) {
                 /* translators: 1: Payment method title */
                 $message = sprintf(__('%1$s Callback URL', 'payment-gateway-wc-victoriabank-mia'), $this->method_title);
                 return self::return_response(WP_Http::OK, $message);
-            } elseif ($request_method !== 'POST') {
+            } elseif ('POST' !== $request_method) {
                 return self::return_response(WP_Http::METHOD_NOT_ALLOWED);
             }
 
@@ -837,7 +835,7 @@ function victoriabank_mia_init()
 
             $orders = wc_get_orders($args);
             $orders_count = count($orders);
-            if ($orders_count === 1) {
+            if (1 === $orders_count) {
                 return $orders[0];
             } elseif ($orders_count > 1) {
                 $log_context = array('orders' => $orders);
@@ -940,21 +938,21 @@ function victoriabank_mia_init()
             $this->logger->log($level, $message, $log_context);
         }
 
-        protected function log_var($message, $var)
+        protected function log_var($message, $value)
         {
             $this->log(
                 $message,
                 WC_Log_Levels::DEBUG,
                 array(
-                    'var' => self::print_var($var),
+                    'value' => self::print_var($value),
                 )
             );
         }
 
-        protected static function print_var($expression)
+        protected static function print_var($value)
         {
             // https://woocommerce.github.io/code-reference/namespaces/default.html#function_wc_print_r
-            return wc_print_r($expression, true);
+            return wc_print_r($value, true);
         }
 
         /**
