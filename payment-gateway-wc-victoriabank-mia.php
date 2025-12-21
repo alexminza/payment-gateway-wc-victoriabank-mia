@@ -225,19 +225,22 @@ function victoriabank_mia_init()
                     'description' => __('IBAN', 'payment-gateway-wc-victoriabank-mia'),
                     'placeholder' => 'MD00XX000000000000000000',
                     'custom_attributes' => array(
-                        'required' => 'required',
+                        'required'  => 'required',
+                        'minlength' => 24,
+                        'maxlength' => 24,
+                        'pattern'   => '^MD.*',
                     ),
                 ),
 
                 'payment_notification' => array(
                     'title'       => __('Payment Notification', 'payment-gateway-wc-victoriabank-mia'),
+                    'type'        => 'title',
                     'description' => sprintf(
                         '%1$s<br /><br /><b>%2$s:</b> <code>%3$s</code>',
                         esc_html__('Provide this URL to the bank to enable online payment notifications.', 'payment-gateway-wc-victoriabank-mia'),
                         esc_html__('Callback URL', 'payment-gateway-wc-victoriabank-mia'),
                         esc_url($this->get_callback_url())
                     ),
-                    'type'        => 'title',
                 ),
             );
         }
