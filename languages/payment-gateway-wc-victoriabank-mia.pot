@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Payment Gateway for Victoriabank MIA for WooCommerce 1.0.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payment-gateway-wc-victoriabank-mia\n"
-"POT-Creation-Date: 2025-12-21 17:19+0200\n"
+"POT-Creation-Date: 2025-12-21 17:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -95,7 +95,7 @@ msgid "Format: <code>%1$s</code> - Order ID"
 msgstr ""
 
 #: payment-gateway-wc-victoriabank-mia.php:164
-msgid "Order description that the customer will see on the bank payment page."
+msgid "Order description that the customer will see in the app during payment."
 msgstr ""
 
 #: payment-gateway-wc-victoriabank-mia.php:171
@@ -103,184 +103,196 @@ msgid "Transaction validity"
 msgstr ""
 
 #. translators: 1: Transaction validity in minutes
-#: payment-gateway-wc-victoriabank-mia.php:180
+#: payment-gateway-wc-victoriabank-mia.php:174
 #, php-format
 msgid "Default: %1$s minutes"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:185
-#: payment-gateway-wc-victoriabank-mia.php:313
-msgid "Connection Settings"
+#: payment-gateway-wc-victoriabank-mia.php:175
+msgid "QR code validity time in minutes."
 msgstr ""
 
 #: payment-gateway-wc-victoriabank-mia.php:186
+#: payment-gateway-wc-victoriabank-mia.php:317
+msgid "Connection Settings"
+msgstr ""
+
+#: payment-gateway-wc-victoriabank-mia.php:187
 msgid "Payment gateway connection credentials are provided by the bank."
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:190
+#: payment-gateway-wc-victoriabank-mia.php:191
 msgid "Username"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:197
+#: payment-gateway-wc-victoriabank-mia.php:198
 msgid "Password"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:204
+#: payment-gateway-wc-victoriabank-mia.php:205
 msgid "Certificate"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:206
+#: payment-gateway-wc-victoriabank-mia.php:208
 msgid "Victoriabank Public Key Certificate to validate the authenticity of the payment notifications."
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:215
+#: payment-gateway-wc-victoriabank-mia.php:216
 msgid "Company Name"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:222
+#: payment-gateway-wc-victoriabank-mia.php:218
+msgid "Commercial name that the customer will see in the app during payment."
+msgstr ""
+
+#: payment-gateway-wc-victoriabank-mia.php:225
 msgid "Creditor Account"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:224
+#: payment-gateway-wc-victoriabank-mia.php:227
 msgid "IBAN"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:235
-msgid "Payment Notification"
+#: payment-gateway-wc-victoriabank-mia.php:228
+msgid "IBAN account for receiving payments."
 msgstr ""
 
 #: payment-gateway-wc-victoriabank-mia.php:239
+msgid "Payment Notification"
+msgstr ""
+
+#: payment-gateway-wc-victoriabank-mia.php:243
 msgid "Provide this URL to the bank to enable online payment notifications."
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:240
+#: payment-gateway-wc-victoriabank-mia.php:244
 msgid "Callback URL"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:300
+#: payment-gateway-wc-victoriabank-mia.php:304
 msgid "Unsupported store currency"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:302
+#: payment-gateway-wc-victoriabank-mia.php:306
 msgid "Supported currencies"
 msgstr ""
 
 #. translators: 1: Plugin installation instructions URL
-#: payment-gateway-wc-victoriabank-mia.php:312
+#: payment-gateway-wc-victoriabank-mia.php:316
 #, php-format
 msgid "See plugin documentation for <a href=\"%1$s\" target=\"_blank\">installation instructions</a>."
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:313
+#: payment-gateway-wc-victoriabank-mia.php:317
 msgid "Not configured"
 msgstr ""
 
 #. translators: 1: Field label
-#: payment-gateway-wc-victoriabank-mia.php:331
+#: payment-gateway-wc-victoriabank-mia.php:335
 #, php-format
 msgid "%1$s field must be set."
 msgstr ""
 
 #. translators: 1: Field label, 2: Min value, 3: Max value
-#: payment-gateway-wc-victoriabank-mia.php:346
+#: payment-gateway-wc-victoriabank-mia.php:350
 #, php-format
 msgid "%1$s field must be an integer between %2$d and %3$d."
 msgstr ""
 
 #. translators: 1: Field label
-#: payment-gateway-wc-victoriabank-mia.php:366
+#: payment-gateway-wc-victoriabank-mia.php:370
 #, php-format
 msgid "Invalid %1$s field."
 msgstr ""
 
 #. translators: 1: Field label
-#: payment-gateway-wc-victoriabank-mia.php:381
+#: payment-gateway-wc-victoriabank-mia.php:385
 #, php-format
 msgid "Invalid %1$s field. Must start with MD and have 24 characters."
 msgstr ""
 
 #. translators: 1: Payment method title, 2: Plugin settings URL
-#: payment-gateway-wc-victoriabank-mia.php:430
+#: payment-gateway-wc-victoriabank-mia.php:434
 #, php-format
 msgid "%1$s is not properly configured. Verify plugin <a href=\"%2$s\">Connection Settings</a>."
 msgstr ""
 
 #. translators: 1: Payment method title, 2: Plugin settings URL
-#: payment-gateway-wc-victoriabank-mia.php:437
+#: payment-gateway-wc-victoriabank-mia.php:441
 #, php-format
 msgid "See <a href=\"%2$s\">%1$s settings</a> page for log details and setup instructions."
 msgstr ""
 
 #. translators: 1: Order ID, 2: Payment method title, 3: API response details
-#: payment-gateway-wc-victoriabank-mia.php:602
+#: payment-gateway-wc-victoriabank-mia.php:606
 #, php-format
 msgid "Order #%1$s payment initiated via %2$s: %3$s"
 msgstr ""
 
 #. translators: 1: Order ID, 2: Payment method title
-#: payment-gateway-wc-victoriabank-mia.php:614
+#: payment-gateway-wc-victoriabank-mia.php:618
 #, php-format
 msgid "Order #%1$s payment initiation failed via %2$s."
 msgstr ""
 
 #. translators: 1: Payment method title
-#: payment-gateway-wc-victoriabank-mia.php:638
+#: payment-gateway-wc-victoriabank-mia.php:642
 #, php-format
 msgid "%1$s Callback URL"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:661
+#: payment-gateway-wc-victoriabank-mia.php:665
 msgid "Payment notification callback"
 msgstr ""
 
 #. translators: 1: QR Extension ID, 2: Payment method title
-#: payment-gateway-wc-victoriabank-mia.php:696
+#: payment-gateway-wc-victoriabank-mia.php:700
 #, php-format
 msgid "Order not found by QR Extension ID: %1$s received from %2$s."
 msgstr ""
 
 #. translators: 1: Callback notification price, 2: Order total price
-#: payment-gateway-wc-victoriabank-mia.php:718
+#: payment-gateway-wc-victoriabank-mia.php:722
 #, php-format
 msgid "Order amount mismatch: Callback: %1$s, Order: %2$s."
 msgstr ""
 
 #. translators: 1: Order ID
-#: payment-gateway-wc-victoriabank-mia.php:726
+#: payment-gateway-wc-victoriabank-mia.php:730
 #, php-format
 msgid "Callback order #%1$s already fully paid."
 msgstr ""
 
 #. translators: 1: Order ID, 2: Payment method title, 3: Payment notification callback data
-#: payment-gateway-wc-victoriabank-mia.php:745
+#: payment-gateway-wc-victoriabank-mia.php:749
 #, php-format
 msgid "Order #%1$s payment completed via %2$s: %3$s"
 msgstr ""
 
 #. translators: 1: Payment method title
-#: payment-gateway-wc-victoriabank-mia.php:769
+#: payment-gateway-wc-victoriabank-mia.php:773
 #, php-format
 msgid "Partial refunds are not currently supported by %1$s."
 msgstr ""
 
 #. translators: 1: Order ID, 2: Refund amount, 3: Payment method title, 4: Error message
-#: payment-gateway-wc-victoriabank-mia.php:794
+#: payment-gateway-wc-victoriabank-mia.php:798
 #, php-format
 msgid "Order #%1$s refund of %2$s via %3$s failed: %4$s"
 msgstr ""
 
 #. translators: 1: Order ID, 2: Refund amount, 3: Payment method title
-#: payment-gateway-wc-victoriabank-mia.php:805
+#: payment-gateway-wc-victoriabank-mia.php:809
 #, php-format
 msgid "Order #%1$s refund of %2$s via %3$s approved."
 msgstr ""
 
 #. translators: 1: Original message
-#: payment-gateway-wc-victoriabank-mia.php:869
+#: payment-gateway-wc-victoriabank-mia.php:873
 #, php-format
 msgid "TEST: %1$s"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:984
+#: payment-gateway-wc-victoriabank-mia.php:988
 msgid "Settings"
 msgstr ""

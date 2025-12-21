@@ -161,7 +161,7 @@ function victoriabank_mia_init()
                     'type'        => 'text',
                     /* translators: 1: Example placeholder shown to user, represents Order ID */
                     'description' => __('Format: <code>%1$s</code> - Order ID', 'payment-gateway-wc-victoriabank-mia'),
-                    'desc_tip'    => __('Order description that the customer will see on the bank payment page.', 'payment-gateway-wc-victoriabank-mia'),
+                    'desc_tip'    => __('Order description that the customer will see in the app during payment.', 'payment-gateway-wc-victoriabank-mia'),
                     'default'     => self::ORDER_TEMPLATE,
                     'custom_attributes' => array(
                         'required' => 'required',
@@ -170,14 +170,15 @@ function victoriabank_mia_init()
                 'transaction_validity'  => array(
                     'title'       => __('Transaction validity', 'payment-gateway-wc-victoriabank-mia'),
                     'type'        => 'number',
-                    'custom_attributes' => array(
-                        'min'  => self::MIN_VALIDITY,
-                        'step' => 1,
-                        'max'  => self::MAX_VALIDITY,
-                        'required' => 'required',
-                    ),
                     /* translators: 1: Transaction validity in minutes */
                     'description' => sprintf(__('Default: %1$s minutes', 'payment-gateway-wc-victoriabank-mia'), self::DEFAULT_VALIDITY),
+                    'desc_tip'    => __('QR code validity time in minutes.', 'payment-gateway-wc-victoriabank-mia'),
+                    'custom_attributes' => array(
+                        'min'      => self::MIN_VALIDITY,
+                        'step'     => 1,
+                        'max'      => self::MAX_VALIDITY,
+                        'required' => 'required',
+                    ),
                     'default'     => self::DEFAULT_VALIDITY,
                 ),
 
@@ -203,8 +204,8 @@ function victoriabank_mia_init()
                 'victoriabank_mia_certificate' => array(
                     'title'       => __('Certificate', 'payment-gateway-wc-victoriabank-mia'),
                     'type'        => 'textarea',
-                    'description' => __('Victoriabank Public Key Certificate to validate the authenticity of the payment notifications.', 'payment-gateway-wc-victoriabank-mia'),
-                    'desc_tip'    => true,
+                    'description' => 'VBCA.crt',
+                    'desc_tip'    => __('Victoriabank Public Key Certificate to validate the authenticity of the payment notifications.', 'payment-gateway-wc-victoriabank-mia'),
                     'placeholder' => "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----",
                     'class'       => 'code',
                     'custom_attributes' => array(
@@ -214,6 +215,8 @@ function victoriabank_mia_init()
                 'victoriabank_mia_company_name' => array(
                     'title'       => __('Company Name', 'payment-gateway-wc-victoriabank-mia'),
                     'type'        => 'text',
+                    'description' => __('Commercial name that the customer will see in the app during payment.', 'payment-gateway-wc-victoriabank-mia'),
+                    'desc_tip'    => true,
                     'custom_attributes' => array(
                         'required' => 'required',
                     ),
@@ -222,6 +225,7 @@ function victoriabank_mia_init()
                     'title'       => __('Creditor Account', 'payment-gateway-wc-victoriabank-mia'),
                     'type'        => 'text',
                     'description' => __('IBAN', 'payment-gateway-wc-victoriabank-mia'),
+                    'desc_tip'    => __('IBAN account for receiving payments.', 'payment-gateway-wc-victoriabank-mia'),
                     'placeholder' => 'MD00XX000000000000000000',
                     'custom_attributes' => array(
                         'required'  => 'required',
