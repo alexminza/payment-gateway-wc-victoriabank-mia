@@ -410,7 +410,7 @@ function victoriabank_mia_init()
         {
             return !empty($value)
                 && strlen($value) === 24
-                && str_starts_with($value, 'MD');
+                && substr($value, 0, 2) === 'MD';
         }
 
         protected function logs_admin_website_notice()
