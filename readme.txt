@@ -46,7 +46,7 @@ Use the *WooCommerce > Settings > Payments > Victoriabank MIA* screen to configu
 
 = Where can I get the Connection Settings? =
 
-The connection settings are provided by Victoriabank. This data is used by the plugin to connect to the Victoriabank MIA payment gateway and process the transactions. Please see [https://oferte.victoriabank.md/mia-business](https://oferte.victoriabank.md/mia-business) and contact [mia@vb.md](mailto:mia@vb.md) for details.
+The connection settings are provided by Victoriabank. This data is used by the plugin to connect to the Victoriabank MIA payment gateway and process the transactions. Please see [https://www.victoriabank.md/en/operatiuni-curente/mia-business](https://www.victoriabank.md/en/operatiuni-curente/mia-business) and contact [mia@vb.md](mailto:mia@vb.md) for details.
 
 = What store settings are supported? =
 
