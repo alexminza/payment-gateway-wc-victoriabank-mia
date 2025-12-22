@@ -552,12 +552,12 @@ function victoriabank_mia_init()
                     $qr_extension_status_ttl_length = intval($qr_extension_status_ttl['length']);
                     $qr_extension_status_ttl_units = strval($qr_extension_status_ttl['units']);
 
-                    $min_validity_minutes = intdiv($this->transaction_validity, 2);
-                    $remaining_minutes = strtolower($qr_extension_status_ttl_units) === 'mm'
-                        ? $qr_extension_status_ttl_length
-                        : intdiv($qr_extension_status_ttl_length, 60);
+                    $min_validity_seconds = $this->transaction_validity * 60 / 2;
+                    $remaining_seconds = strtolower($qr_extension_status_ttl_units) === 'mm'
+                        ? $qr_extension_status_ttl_length * 60
+                        : $qr_extension_status_ttl_length;
 
-                    return $remaining_minutes >= $min_validity_minutes;
+                    return $remaining_seconds >= $min_validity_seconds;
                 }
             }
 
