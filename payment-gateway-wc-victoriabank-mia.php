@@ -4,7 +4,7 @@
  * Plugin Name: Payment Gateway for Victoriabank MIA for WooCommerce
  * Description: Accept MIA Instant Payments directly on your store with the Payment Gateway for Victoriabank MIA for WooCommerce.
  * Plugin URI: https://github.com/alexminza/payment-gateway-wc-victoriabank-mia
- * Version: 1.0.3
+ * Version: 1.0.4
  * Author: Alexander Minza
  * Author URI: https://profiles.wordpress.org/alexminza
  * Developer: Alexander Minza
@@ -46,7 +46,7 @@ function victoriabank_mia_init()
         //region Constants
         const MOD_ID             = 'victoriabank_mia';
         const MOD_PREFIX         = 'victoriabank_mia_';
-        const MOD_VERSION        = '1.0.3';
+        const MOD_VERSION        = '1.0.4';
 
         const SUPPORTED_CURRENCIES = array('MDL');
         const ORDER_TEMPLATE       = 'Order #%1$s';
