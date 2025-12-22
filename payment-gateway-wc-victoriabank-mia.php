@@ -576,16 +576,27 @@ function victoriabank_mia_init()
                 $auth_token = $this->victoriabank_mia_generate_token($client);
 
                 //region Existing QR
-                $qr_extension_id = strval($order->get_meta(self::MOD_QR_EXTENSION_ID, true));
-                $qr_url = strval($order->get_meta(self::MOD_QR_URL, true));
+                try {
+                    $qr_extension_id = strval($order->get_meta(self::MOD_QR_EXTENSION_ID, true));
+                    $qr_url = strval($order->get_meta(self::MOD_QR_URL, true));
 
-                if (!empty($qr_extension_id) && !empty($qr_url)) {
-                    if ($this->victoriabank_mia_qr_active($client, $auth_token, $qr_extension_id)) {
-                        return array(
-                            'result'   => 'success',
-                            'redirect' => $qr_url,
-                        );
+                    if (!empty($qr_extension_id) && !empty($qr_url)) {
+                        if ($this->victoriabank_mia_qr_active($client, $auth_token, $qr_extension_id)) {
+                            return array(
+                                'result'   => 'success',
+                                'redirect' => $qr_url,
+                            );
+                        }
                     }
+                } catch (Exception $ex) {
+                    $this->log(
+                        $ex->getMessage(),
+                        WC_Log_Levels::ERROR,
+                        array(
+                            'exception' => (string) $ex,
+                            'order_id' => $order_id,
+                        )
+                    );
                 }
                 //endregion
 
