@@ -449,6 +449,9 @@ function victoriabank_mia_init()
         //endregion
 
         //region Victoriabank MIA
+        /**
+         * @link https://github.com/alexminza/victoriabank-mia-sdk-php/blob/main/README.md#getting-started
+         */
         protected function init_victoriabank_mia_client()
         {
             $options = array(
@@ -477,6 +480,8 @@ function victoriabank_mia_init()
 
         /**
          * @param VictoriabankMiaClient $client
+         * @link https://github.com/alexminza/victoriabank-mia-sdk-php/blob/main/README.md#get-access-token-with-username-and-password
+         * @link https://test-ipspj.victoriabank.md/index.html#operations-Token-post_identity_token
          */
         private function victoriabank_mia_generate_token($client)
         {
@@ -497,6 +502,8 @@ function victoriabank_mia_init()
          * @param string $company_name
          * @param int    $validity_minutes
          * @return GuzzleHttp\Command\Result
+         * @link https://github.com/alexminza/victoriabank-mia-sdk-php/blob/main/README.md#create-a-dynamic-order-payment-qr
+         * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-post_api_v1_qr
          */
         private function victoriabank_mia_pay($client, $auth_token, $order_id, $order_name, $total_amount, $currency, $creditor_account, $company_name, $validity_minutes)
         {
@@ -531,6 +538,7 @@ function victoriabank_mia_init()
          * @param VictoriabankMiaClient $client
          * @param string $auth_token
          * @param string $qr_extension_id
+         * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-get_api_v1_qr_extensions__qrExtensionUUID__status
          */
         private function victoriabank_mia_qr_active($client, $auth_token, $qr_extension_id)
         {
