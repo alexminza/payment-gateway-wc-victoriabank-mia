@@ -335,7 +335,7 @@ function victoriabank_mia_init()
 
         public function validate_required_field($key, $value)
         {
-            if (isset($value) && empty($value)) {
+            if (empty($value)) {
                 /* translators: 1: Field label */
                 WC_Admin_Settings::add_error(sprintf(esc_html__('%1$s field must be set.', 'payment-gateway-wc-victoriabank-mia'), $this->get_settings_field_label($key)));
             }
