@@ -17,7 +17,7 @@
  * Requires at least: 4.8
  * Tested up to: 6.9
  * WC requires at least: 3.3
- * WC tested up to: 10.4.2
+ * WC tested up to: 10.4.3
  * Requires Plugins: woocommerce
  */
 
@@ -44,23 +44,23 @@ function victoriabank_mia_init()
     class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway
     {
         //region Constants
-        const MOD_ID             = 'victoriabank_mia';
-        const MOD_PREFIX         = 'victoriabank_mia_';
-        const MOD_VERSION        = '1.0.4';
+        const MOD_ID      = 'victoriabank_mia';
+        const MOD_PREFIX  = 'victoriabank_mia_';
+        const MOD_VERSION = '1.0.4';
 
         const SUPPORTED_CURRENCIES = array('MDL');
         const ORDER_TEMPLATE       = 'Order #%1$s';
 
-        const MOD_QR_ID             =  self::MOD_PREFIX . 'qr_id';
-        const MOD_QR_EXTENSION_ID   =  self::MOD_PREFIX . 'qr_extension_id';
-        const MOD_QR_URL            =  self::MOD_PREFIX . 'qr_url';
-        const MOD_CALLBACK          =  self::MOD_PREFIX . 'callback';
-        const MOD_PAYMENT_REFERENCE =  self::MOD_PREFIX . 'payment_reference';
+        const MOD_QR_ID             = self::MOD_PREFIX . 'qr_id';
+        const MOD_QR_EXTENSION_ID   = self::MOD_PREFIX . 'qr_extension_id';
+        const MOD_QR_URL            = self::MOD_PREFIX . 'qr_url';
+        const MOD_CALLBACK          = self::MOD_PREFIX . 'callback';
+        const MOD_PAYMENT_REFERENCE = self::MOD_PREFIX . 'payment_reference';
 
-        const DEFAULT_TIMEOUT  = 30; // seconds
-        const DEFAULT_VALIDITY = 360; // minutes
-        const MIN_VALIDITY     = 1;  //minutes
-        const MAX_VALIDITY     = 1440; //minutes
+        const DEFAULT_TIMEOUT  = 30;   // seconds
+        const DEFAULT_VALIDITY = 360;  // minutes
+        const MIN_VALIDITY     = 1;    // minutes
+        const MAX_VALIDITY     = 1440; // minutes
         //endregion
 
         protected $testmode, $debug, $logger, $order_template, $transaction_validity;
@@ -151,9 +151,9 @@ function victoriabank_mia_init()
                     'title'       => __('Debug mode', 'payment-gateway-wc-victoriabank-mia'),
                     'type'        => 'checkbox',
                     'label'       => __('Enable logging', 'payment-gateway-wc-victoriabank-mia'),
-                    'default'     => 'no',
                     'description' => sprintf('<a href="%2$s">%1$s</a>', esc_html__('View logs', 'payment-gateway-wc-victoriabank-mia'), esc_url(self::get_logs_url())),
                     'desc_tip'    => __('Save debug messages to the WooCommerce System Status logs. Note: this may log personal information. Use this for debugging purposes only and delete the logs when finished.', 'payment-gateway-wc-victoriabank-mia'),
+                    'default'     => 'no',
                 ),
 
                 'order_template'  => array(
@@ -175,13 +175,13 @@ function victoriabank_mia_init()
                     /* translators: 1: Transaction validity in minutes */
                     'description' => sprintf(__('Default: %1$s minutes', 'payment-gateway-wc-victoriabank-mia'), self::DEFAULT_VALIDITY),
                     'desc_tip'    => __('QR code validity time in minutes.', 'payment-gateway-wc-victoriabank-mia'),
+                    'default'     => self::DEFAULT_VALIDITY,
                     'custom_attributes' => array(
                         'min'      => self::MIN_VALIDITY,
                         'step'     => 1,
                         'max'      => self::MAX_VALIDITY,
                         'required' => 'required',
                     ),
-                    'default'     => self::DEFAULT_VALIDITY,
                 ),
 
                 'connection_settings' => array(
@@ -219,12 +219,12 @@ function victoriabank_mia_init()
                     'type'        => 'text',
                     'description' => $blog_info_name,
                     'desc_tip'    => __('Commercial name that the customer will see in the app during payment.', 'payment-gateway-wc-victoriabank-mia'),
+                    'default'     => $blog_info_name,
                     'custom_attributes' => array(
                         'required' => 'required',
                         'minlength' => 2,
                         'maxlength' => 25,
                     ),
-                    'default'     => $blog_info_name,
                 ),
                 'victoriabank_mia_creditor_account' => array(
                     'title'       => __('Creditor Account', 'payment-gateway-wc-victoriabank-mia'),
