@@ -526,6 +526,35 @@ function victoriabank_mia_init()
 
             return $client->createPayeeQr($qr_data, $auth_token);
         }
+
+        /**
+         * @param VictoriabankMiaClient $client
+         * @param string $auth_token
+         * @param string $qr_extension_id
+         */
+        private function victoriabank_mia_qr_active($client, $auth_token, $qr_extension_id)
+        {
+            $qr_extension_status = $client->getQrExtensionStatus($qr_extension_id, $auth_token);
+
+            if (!empty($qr_extension_status)) {
+                $qr_extension_status_value = strval($qr_extension_status['status']);
+
+                if (strtolower($qr_extension_status_value) === 'active') {
+                    $qr_extension_status_ttl = (array) $qr_extension_status['ttl'];
+                    $qr_extension_status_ttl_length = intval($qr_extension_status_ttl['length']);
+                    $qr_extension_status_ttl_units = strval($qr_extension_status_ttl['units']);
+
+                    $min_validity_minutes = intdiv($this->transaction_validity, 2);
+                    $remaining_minutes = strtolower($qr_extension_status_ttl_units) === 'mm'
+                        ? $qr_extension_status_ttl_length
+                        : intdiv($qr_extension_status_ttl_length, 60);
+
+                    return $remaining_minutes >= $min_validity_minutes;
+                }
+            }
+
+            return false;
+        }
         //endregion
 
         //region Payment
@@ -543,26 +572,11 @@ function victoriabank_mia_init()
                 $qr_url = strval($order->get_meta(self::MOD_QR_URL, true));
 
                 if (!empty($qr_extension_id) && !empty($qr_url)) {
-                    $qr_extension_status = $client->getQrExtensionStatus($qr_extension_id, $auth_token);
-
-                    if (!empty($qr_extension_status)) {
-                        $qr_extension_status_value = strval($qr_extension_status['status']);
-                        if (strtolower($qr_extension_status_value) === 'active') {
-                            $qr_extension_status_ttl = (array) $qr_extension_status['ttl'];
-                            $qr_extension_status_ttl_length = intval($qr_extension_status_ttl['length']);
-                            $qr_extension_status_ttl_units = strval($qr_extension_status_ttl['units']);
-
-                            $qr_extension_status_ttl_minutes = strtolower($qr_extension_status_ttl_units) === 'mm'
-                                ? $qr_extension_status_ttl_length
-                                : intdiv($qr_extension_status_ttl_length, 60);
-
-                            if ($qr_extension_status_ttl_minutes >= intdiv($this->transaction_validity, 2)) {
-                                return array(
-                                    'result'   => 'success',
-                                    'redirect' => $qr_url,
-                                );
-                            }
-                        }
+                    if ($this->victoriabank_mia_qr_active($client, $auth_token, $qr_extension_id)) {
+                        return array(
+                            'result'   => 'success',
+                            'redirect' => $qr_url,
+                        );
                     }
                 }
                 //endregion
