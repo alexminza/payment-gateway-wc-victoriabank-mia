@@ -71,6 +71,12 @@ See [payment-gateway-wc-victoriabank-mia project releases on GitHub](https://git
 = 1.1.0 =
 Improved QR payment UI/UX.
 
+= 1.0.3 =
+Fixed vendor packages deployment.
+
+= 1.0.2 =
+Improved QR code generation logic and settings validation.
+
 = 1.0.1 =
 Minor improvements.
 
@@ -81,6 +87,12 @@ Initial version release.
 
 = 1.1.0 =
 Improved QR payment UI/UX.
+
+= 1.0.3 =
+Fixed vendor packages deployment.
+
+= 1.0.2 =
+Improved QR code generation logic and settings validation.
 
 = 1.0.1 =
 Minor improvements.
