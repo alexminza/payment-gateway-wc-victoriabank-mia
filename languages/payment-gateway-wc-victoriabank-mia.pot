@@ -3,9 +3,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Payment Gateway for Victoriabank MIA for WooCommerce 1.0.3\n"
+"Project-Id-Version: Payment Gateway for Victoriabank MIA for WooCommerce 1.0.4\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payment-gateway-wc-victoriabank-mia\n"
-"POT-Creation-Date: 2025-12-21 21:34+0200\n"
+"POT-Creation-Date: 2025-12-23 16:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -76,11 +76,11 @@ msgstr ""
 msgid "Enable logging"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:155
+#: payment-gateway-wc-victoriabank-mia.php:154
 msgid "View logs"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:156
+#: payment-gateway-wc-victoriabank-mia.php:155
 msgid "Save debug messages to the WooCommerce System Status logs. Note: this may log personal information. Use this for debugging purposes only and delete the logs when finished."
 msgstr ""
 
@@ -224,75 +224,75 @@ msgid "See <a href=\"%2$s\">%1$s settings</a> page for log details and setup ins
 msgstr ""
 
 #. translators: 1: Order ID, 2: Payment method title, 3: API response details
-#: payment-gateway-wc-victoriabank-mia.php:611
+#: payment-gateway-wc-victoriabank-mia.php:644
 #, php-format
 msgid "Order #%1$s payment initiated via %2$s: %3$s"
 msgstr ""
 
 #. translators: 1: Order ID, 2: Payment method title
-#: payment-gateway-wc-victoriabank-mia.php:623
+#: payment-gateway-wc-victoriabank-mia.php:656
 #, php-format
 msgid "Order #%1$s payment initiation failed via %2$s."
 msgstr ""
 
 #. translators: 1: Payment method title
-#: payment-gateway-wc-victoriabank-mia.php:647
+#: payment-gateway-wc-victoriabank-mia.php:680
 #, php-format
 msgid "%1$s Callback URL"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:670
+#: payment-gateway-wc-victoriabank-mia.php:703
 msgid "Payment notification callback"
 msgstr ""
 
 #. translators: 1: QR Extension ID, 2: Payment method title
-#: payment-gateway-wc-victoriabank-mia.php:705
+#: payment-gateway-wc-victoriabank-mia.php:738
 #, php-format
 msgid "Order not found by QR Extension ID: %1$s received from %2$s."
 msgstr ""
 
 #. translators: 1: Callback notification price, 2: Order total price
-#: payment-gateway-wc-victoriabank-mia.php:727
+#: payment-gateway-wc-victoriabank-mia.php:760
 #, php-format
 msgid "Order amount mismatch: Callback: %1$s, Order: %2$s."
 msgstr ""
 
 #. translators: 1: Order ID
-#: payment-gateway-wc-victoriabank-mia.php:735
+#: payment-gateway-wc-victoriabank-mia.php:768
 #, php-format
 msgid "Callback order #%1$s already fully paid."
 msgstr ""
 
 #. translators: 1: Order ID, 2: Payment method title, 3: Payment notification callback data
-#: payment-gateway-wc-victoriabank-mia.php:754
+#: payment-gateway-wc-victoriabank-mia.php:787
 #, php-format
 msgid "Order #%1$s payment completed via %2$s: %3$s"
 msgstr ""
 
 #. translators: 1: Payment method title
-#: payment-gateway-wc-victoriabank-mia.php:778
+#: payment-gateway-wc-victoriabank-mia.php:811
 #, php-format
 msgid "Partial refunds are not currently supported by %1$s."
 msgstr ""
 
 #. translators: 1: Order ID, 2: Refund amount, 3: Payment method title, 4: Error message
-#: payment-gateway-wc-victoriabank-mia.php:803
+#: payment-gateway-wc-victoriabank-mia.php:836
 #, php-format
 msgid "Order #%1$s refund of %2$s via %3$s failed: %4$s"
 msgstr ""
 
 #. translators: 1: Order ID, 2: Refund amount, 3: Payment method title
-#: payment-gateway-wc-victoriabank-mia.php:814
+#: payment-gateway-wc-victoriabank-mia.php:847
 #, php-format
 msgid "Order #%1$s refund of %2$s via %3$s approved."
 msgstr ""
 
 #. translators: 1: Original message
-#: payment-gateway-wc-victoriabank-mia.php:878
+#: payment-gateway-wc-victoriabank-mia.php:911
 #, php-format
 msgid "TEST: %1$s"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:993
+#: payment-gateway-wc-victoriabank-mia.php:1026
 msgid "Settings"
 msgstr ""
