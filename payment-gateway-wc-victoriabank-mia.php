@@ -753,7 +753,13 @@ function victoriabank_mia_init()
             //endregion
 
             $callback_data_payment = (array) $callback_data['payment'];
-            return $this->confirm_payment($order, $callback_data_payment, $callback_data, $callback_body);
+            $confirm_payment_result = $this->confirm_payment($order, $callback_data_payment, $callback_data, $callback_body);
+
+            if(is_wp_error($confirm_payment_result)) {
+                return self::return_response($confirm_payment_result->get_error_code(), $confirm_payment_result->get_error_message());
+            }
+
+            return self::return_response(WP_Http::OK);
         }
 
         /**
@@ -776,17 +782,19 @@ function victoriabank_mia_init()
 
                 $qr_extension_status = $client->getQrExtensionStatus($qr_extension_id, $auth_token);
                 if (!empty($qr_extension_status)) {
+                    $qr_extension_status = $qr_extension_status->toArray();
                     $qr_extension_status_value = strval($qr_extension_status['status']);
 
                     /* translators: 1: Order ID, 2: Payment method title, 3: Payment status */
                     $message = esc_html(sprintf(__('Order #%1$s payment %2$s QR Extension status: %3$s', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->method_title, $qr_extension_status_value));
                     $message = $this->get_test_message($message);
+                    WC_Admin_Notices::add_custom_notice('check_payment', $message);
 
                     $this->log(
                         $message,
                         WC_Log_Levels::INFO,
                         array(
-                            'qrExtensionStatus' => $qr_extension_status->toArray(),
+                            'qrExtensionStatus' => $qr_extension_status,
                         )
                     );
 
@@ -795,11 +803,13 @@ function victoriabank_mia_init()
 
                         if (!empty($qr_extension_status_payments)) {
                             $payment_data = (array) $qr_extension_status_payments[0];
-                            return $this->confirm_payment($order, $payment_data, $qr_extension_status);
+                            $confirm_payment_result = $this->confirm_payment($order, $payment_data, $qr_extension_status);
+
+                            if(is_wp_error($confirm_payment_result)) {
+                                WC_Admin_Meta_Boxes::add_error($confirm_payment_result->get_error_message());
+                            }
                         }
                     }
-
-                    WC_Admin_Notices::add_custom_notice('check_payment', $message);
                 }
             } catch (Exception $ex) {
                 $this->log(
@@ -841,7 +851,7 @@ function victoriabank_mia_init()
                 $message = sprintf(__('Order amount mismatch: Payment: %1$s, Order: %2$s.', 'payment-gateway-wc-victoriabank-mia'), $payment_data_price, $order_price);
                 $this->log($message, WC_Log_Levels::ERROR);
 
-                return self::return_response(WP_Http::UNPROCESSABLE_ENTITY, 'Order data mismatch');
+                return new WP_Error(WP_Http::UNPROCESSABLE_ENTITY, 'Order data mismatch');
             }
 
             if ($order->is_paid()) {
@@ -849,7 +859,7 @@ function victoriabank_mia_init()
                 $message = sprintf(__('Order #%1$s already fully paid.', 'payment-gateway-wc-victoriabank-mia'), $order_id);
                 $this->log($message, WC_Log_Levels::ERROR);
 
-                return self::return_response(WP_Http::OK, 'Order already fully paid');
+                return new WP_Error(WP_Http::ACCEPTED, 'Order already fully paid');
             }
             //endregion
 
@@ -878,8 +888,7 @@ function victoriabank_mia_init()
             );
 
             $order->add_order_note($message);
-
-            return self::return_response(WP_Http::OK);
+            return true;
         }
 
         public function process_refund($order_id, $amount = null, $reason = '')
