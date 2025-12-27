@@ -760,7 +760,7 @@ function victoriabank_mia_init()
 
                 if (empty($qr_extension_id)) {
                     $message = sprintf('Order #%1$s missing meta %2$s', $order_id, self::MOD_QR_EXTENSION_ID);
-                    WC_Admin_Notices::add_custom_notice('check_payment', $message);
+                    WC_Admin_Meta_Boxes::add_error($message);
                     return;
                 }
 
@@ -800,8 +800,7 @@ function victoriabank_mia_init()
                 );
 
                 $message = sprintf('Order #%1$s check payment failed.', $order_id);
-                WC_Admin_Notices::add_custom_notice('check_payment', $message);
-                // WC_Admin_Meta_Boxes::add_error($message);
+                WC_Admin_Meta_Boxes::add_error($message);
             }
         }
 
