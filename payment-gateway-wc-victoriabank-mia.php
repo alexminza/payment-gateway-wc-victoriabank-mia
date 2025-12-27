@@ -1067,38 +1067,6 @@ function victoriabank_mia_init()
         }
 
         /**
-         * @param string $message
-         */
-        protected function log_var($message, $value)
-        {
-            $this->log(
-                $message,
-                WC_Log_Levels::DEBUG,
-                array(
-                    'value' => self::print_var($value),
-                )
-            );
-        }
-
-        protected static function print_var($value)
-        {
-            // https://woocommerce.github.io/code-reference/namespaces/default.html#function_wc_print_r
-            return wc_print_r($value, true);
-        }
-
-        /**
-         * @param GuzzleHttp\Command\Result $response
-         */
-        protected static function print_response_object($response)
-        {
-            if (!empty($response)) {
-                return wp_json_encode($response->toArray());
-            }
-
-            return '';
-        }
-
-        /**
          * @param int    $status_code
          * @param string $response_text
          */
