@@ -644,9 +644,16 @@ function victoriabank_mia_init()
                 //endregion
 
                 /* translators: 1: Order ID, 2: Payment method title, 3: API response details */
-                $message = esc_html(sprintf(__('Order #%1$s payment initiated via %2$s: %3$s', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->method_title, self::print_response_object($create_qr_response)));
+                $message = esc_html(sprintf(__('Order #%1$s payment initiated via %2$s: %3$s', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->method_title, $qr_extension_id));
                 $message = $this->get_test_message($message);
-                $this->log($message, WC_Log_Levels::INFO);
+                $this->log(
+                    $message,
+                    WC_Log_Levels::INFO,
+                    array(
+                        'create_qr_response' => $create_qr_response->toArray(),
+                    )
+                );
+
                 $order->add_order_note($message);
 
                 return array(
