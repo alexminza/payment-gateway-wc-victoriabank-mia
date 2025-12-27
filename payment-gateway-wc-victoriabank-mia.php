@@ -45,11 +45,14 @@ function victoriabank_mia_init()
     {
         //region Constants
         const MOD_ID      = 'victoriabank_mia';
+        const MOD_TITLE   = 'Victoriabank MIA';
         const MOD_PREFIX  = 'victoriabank_mia_';
         const MOD_VERSION = '1.0.4';
 
         const SUPPORTED_CURRENCIES = array('MDL');
         const ORDER_TEMPLATE       = 'Order #%1$s';
+
+        const MOD_ACTION_CHECK_PAYMENT = self::MOD_PREFIX . 'check_payment';
 
         const MOD_QR_ID             = self::MOD_PREFIX . 'qr_id';
         const MOD_QR_EXTENSION_ID   = self::MOD_PREFIX . 'qr_extension_id';
@@ -69,7 +72,7 @@ function victoriabank_mia_init()
         public function __construct()
         {
             $this->id                 = self::MOD_ID;
-            $this->method_title       = 'Victoriabank MIA';
+            $this->method_title       = self::MOD_TITLE;
             $this->method_description = __('Accept MIA Instant Payments through Victoriabank.', 'payment-gateway-wc-victoriabank-mia');
             $this->has_fields         = false;
             $this->supports           = array('products', 'refunds');
@@ -742,22 +745,87 @@ function victoriabank_mia_init()
             }
             //endregion
 
-            //region Check order data
             $callback_data_payment = (array) $callback_data['payment'];
-            $callback_data_payment_amount = (array) $callback_data_payment['amount'];
-            $callback_amount = floatval($callback_data_payment_amount['sum']);
-            $callback_currency = strval($callback_data_payment_amount['currency']);
+            return $this->confirm_payment($order, $callback_data_payment, $callback_data, $callback_body);
+        }
+
+        /**
+         * @param \WC_Order $order
+         */
+        public function check_payment($order)
+        {
+            try {
+                $order_id = $order->get_id();
+                $qr_extension_id = strval($order->get_meta(self::MOD_QR_EXTENSION_ID, true));
+
+                if (empty($qr_extension_id)) {
+                    $message = sprintf('Order #%1$s missing meta %2$s', $order_id, self::MOD_QR_EXTENSION_ID);
+                    WC_Admin_Notices::add_custom_notice('check_payment', $message);
+                    return;
+                }
+
+                $client = $this->init_victoriabank_mia_client();
+                $auth_token = $this->victoriabank_mia_generate_token($client);
+
+                $qr_extension_status = $client->getQrExtensionStatus($qr_extension_id, $auth_token);
+                if (!empty($qr_extension_status)) {
+                    /* translators: 1: Order ID, 2: Payment method title, 3: API response details */
+                    $message = esc_html(sprintf(__('Order #%1$s payment %2$s QR Extension status: %3$s', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->method_title, self::print_response_object($qr_extension_status)));
+                    $message = $this->get_test_message($message);
+                    $this->log($message, WC_Log_Levels::INFO);
+                    $order->add_order_note($message);
+
+                    $qr_extension_status_value = strval($qr_extension_status['status']);
+                    if (strtolower($qr_extension_status_value) === 'paid') {
+                        $qr_extension_status_payments = (array) $qr_extension_status['payments'];
+
+                        if (!empty($qr_extension_status_payments)) {
+                            $payment_data = $qr_extension_status_payments[0];
+                            return $this->confirm_payment($order, $payment_data, $qr_extension_status);
+                        }
+                    }
+
+                    /* translators: 1: Order ID, 2: Payment method title, 3: Payment status */
+                    $message = esc_html(sprintf(__('Order #%1$s payment %2$s QR Extension status: %3$s', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->method_title, $qr_extension_status_value));
+                    WC_Admin_Notices::add_custom_notice('check_payment', $message);
+                }
+            } catch (Exception $ex) {
+                $this->log(
+                    $ex->getMessage(),
+                    WC_Log_Levels::ERROR,
+                    array(
+                        'exception' => (string) $ex,
+                        'order_id' => $order_id,
+                    )
+                );
+
+                $message = sprintf('Order #%1$s check payment failed.', $order_id);
+                WC_Admin_Notices::add_custom_notice('check_payment', $message);
+                // WC_Admin_Meta_Boxes::add_error($message);
+            }
+        }
+
+        /**
+         * @param array     $payment_data
+         * @param string    $callback_body
+         */
+        protected function confirm_payment($order, $payment_data, $callback_data, $callback_body = null)
+        {
+            //region Check order data
+            $payment_data_amount = (array) $payment_data['amount'];
+            $payment_data_amount_sum = floatval($payment_data_amount['sum']);
+            $payment_data_amount_currency = strval($payment_data_amount['currency']);
 
             $order_id = $order->get_id();
             $order_total = $order->get_total();
             $order_currency = $order->get_currency();
 
             $order_price = $this->format_price($order_total, $order_currency);
-            $callback_price = $this->format_price($callback_amount, $callback_currency);
+            $payment_data_price = $this->format_price($payment_data_amount_sum, $payment_data_amount_currency);
 
-            if ($order_price !== $callback_price) {
-                /* translators: 1: Callback notification price, 2: Order total price */
-                $message = sprintf(__('Order amount mismatch: Callback: %1$s, Order: %2$s.', 'payment-gateway-wc-victoriabank-mia'), $callback_price, $order_price);
+            if ($order_price !== $payment_data_price) {
+                /* translators: 1: Payment data price, 2: Order total price */
+                $message = sprintf(__('Order amount mismatch: Payment: %1$s, Order: %2$s.', 'payment-gateway-wc-victoriabank-mia'), $payment_data_price, $order_price);
                 $this->log($message, WC_Log_Levels::ERROR);
 
                 return self::return_response(WP_Http::UNPROCESSABLE_ENTITY, 'Order data mismatch');
@@ -765,7 +833,7 @@ function victoriabank_mia_init()
 
             if ($order->is_paid()) {
                 /* translators: 1: Order ID */
-                $message = sprintf(__('Callback order #%1$s already fully paid.', 'payment-gateway-wc-victoriabank-mia'), $order_id);
+                $message = sprintf(__('Order #%1$s already fully paid.', 'payment-gateway-wc-victoriabank-mia'), $order_id);
                 $this->log($message, WC_Log_Levels::ERROR);
 
                 return self::return_response(WP_Http::OK, 'Order already fully paid');
@@ -773,17 +841,19 @@ function victoriabank_mia_init()
             //endregion
 
             //region Complete order payment
-            $callback_payment_reference = strval($callback_data_payment['reference']);
-            $callback_payment_transaction_id = VictoriabankMiaClient::getPaymentTransactionId($callback_payment_reference);
+            if (!empty($callback_body)) {
+                $order->add_meta_data(self::MOD_CALLBACK, $callback_body, true);
+            }
 
-            $order->add_meta_data(self::MOD_CALLBACK, $callback_body, true);
-            $order->add_meta_data(self::MOD_PAYMENT_REFERENCE, $callback_payment_reference, true);
+            $payment_data_reference = strval($payment_data['reference']);
+            $payment_data_transaction_id = VictoriabankMiaClient::getPaymentTransactionId($payment_data_reference);
+            $order->add_meta_data(self::MOD_PAYMENT_REFERENCE, $payment_data_reference, true);
             $order->save();
 
-            $order->payment_complete($callback_payment_transaction_id);
+            $order->payment_complete($payment_data_transaction_id);
             //endregion
 
-            /* translators: 1: Order ID, 2: Payment method title, 3: Payment notification callback data */
+            /* translators: 1: Order ID, 2: Payment method title, 3: Payment data */
             $message = esc_html(sprintf(__('Order #%1$s payment completed via %2$s: %3$s', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->method_title, wp_json_encode($callback_data)));
             $message = $this->get_test_message($message);
             $this->log($message, WC_Log_Levels::INFO);
@@ -971,6 +1041,9 @@ function victoriabank_mia_init()
             $this->logger->log($level, $message, $log_context);
         }
 
+        /**
+         * @param string $message
+         */
         protected function log_var($message, $value)
         {
             $this->log(
@@ -1030,6 +1103,29 @@ function victoriabank_mia_init()
             return array_merge($plugin_links, $links);
         }
 
+        /**
+         * @param array $actions
+         * @param \WC_Order $order
+         */
+        public static function order_actions($actions, $order)
+        {
+            if ($order->is_paid() || $order->get_payment_method() !== self::MOD_ID) {
+                return $actions;
+            }
+
+            $actions[self::MOD_ACTION_CHECK_PAYMENT] = sprintf(esc_html__('Check %1$s order payment', 'payment-gateway-wc-victoriabank-mia'), esc_html(self::MOD_TITLE));
+            return $actions;
+        }
+
+        /**
+         * @param \WC_Order $order
+         */
+        public static function action_check_payment($order)
+        {
+            $plugin = new self();
+            return $plugin->check_payment($order);
+        }
+
         public static function add_gateway($methods)
         {
             $methods[] = self::class;
@@ -1043,6 +1139,10 @@ function victoriabank_mia_init()
 
     if (is_admin()) {
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), array(WC_Gateway_Victoriabank_MIA::class, 'plugin_action_links'));
+
+        //Add WooCommerce order actions
+        add_filter('woocommerce_order_actions', array(WC_Gateway_Victoriabank_MIA::class, 'order_actions'), 10, 2);
+        add_action('woocommerce_order_action_' . WC_Gateway_Victoriabank_MIA::MOD_ACTION_CHECK_PAYMENT, array(WC_Gateway_Victoriabank_MIA::class, 'action_check_payment'));
     }
     //endregion
 }
