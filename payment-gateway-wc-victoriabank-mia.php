@@ -794,7 +794,7 @@ function victoriabank_mia_init()
                         $qr_extension_status_payments = (array) $qr_extension_status['payments'];
 
                         if (!empty($qr_extension_status_payments)) {
-                            $payment_data = $qr_extension_status_payments[0];
+                            $payment_data = (array) $qr_extension_status_payments[0];
                             return $this->confirm_payment($order, $payment_data, $qr_extension_status);
                         }
                     }
@@ -817,7 +817,9 @@ function victoriabank_mia_init()
         }
 
         /**
+         * @param \WC_Order $order
          * @param array     $payment_data
+         * @param array     $callback_data
          * @param string    $callback_body
          */
         protected function confirm_payment($order, $payment_data, $callback_data, $callback_body = null)
@@ -865,9 +867,16 @@ function victoriabank_mia_init()
             //endregion
 
             /* translators: 1: Order ID, 2: Payment method title, 3: Payment data */
-            $message = esc_html(sprintf(__('Order #%1$s payment completed via %2$s: %3$s', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->method_title, wp_json_encode($callback_data)));
+            $message = esc_html(sprintf(__('Order #%1$s payment completed via %2$s: %3$s', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->method_title, $payment_data_transaction_id));
             $message = $this->get_test_message($message);
-            $this->log($message, WC_Log_Levels::INFO);
+            $this->log(
+                $message,
+                WC_Log_Levels::INFO,
+                array(
+                    'callback_data' => $callback_data,
+                )
+            );
+
             $order->add_order_note($message);
 
             return self::return_response(WP_Http::OK);
@@ -952,8 +961,13 @@ function victoriabank_mia_init()
             if (1 === $orders_count) {
                 return $orders[0];
             } elseif ($orders_count > 1) {
-                $log_context = array('orders' => $orders);
-                $this->log(sprintf('Duplicate order meta %1$s: %2$s', self::MOD_QR_EXTENSION_ID, $qr_extension_id), WC_Log_Levels::ERROR, $log_context);
+                $this->log(
+                    sprintf('Duplicate order meta %1$s: %2$s', self::MOD_QR_EXTENSION_ID, $qr_extension_id),
+                    WC_Log_Levels::ERROR,
+                    array(
+                        'orders' => $orders,
+                    )
+                );
             }
 
             return false;
