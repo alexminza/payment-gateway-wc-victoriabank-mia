@@ -769,13 +769,20 @@ function victoriabank_mia_init()
 
                 $qr_extension_status = $client->getQrExtensionStatus($qr_extension_id, $auth_token);
                 if (!empty($qr_extension_status)) {
-                    /* translators: 1: Order ID, 2: Payment method title, 3: API response details */
-                    $message = esc_html(sprintf(__('Order #%1$s payment %2$s QR Extension status: %3$s', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->method_title, self::print_response_object($qr_extension_status)));
-                    $message = $this->get_test_message($message);
-                    $this->log($message, WC_Log_Levels::INFO);
-                    $order->add_order_note($message);
-
                     $qr_extension_status_value = strval($qr_extension_status['status']);
+
+                    /* translators: 1: Order ID, 2: Payment method title, 3: Payment status */
+                    $message = esc_html(sprintf(__('Order #%1$s payment %2$s QR Extension status: %3$s', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->method_title, $qr_extension_status_value));
+                    $message = $this->get_test_message($message);
+
+                    $this->log(
+                        $message,
+                        WC_Log_Levels::INFO,
+                        array(
+                            'qrExtensionStatus' => $qr_extension_status->toArray(),
+                        )
+                    );
+
                     if (strtolower($qr_extension_status_value) === 'paid') {
                         $qr_extension_status_payments = (array) $qr_extension_status['payments'];
 
@@ -785,8 +792,6 @@ function victoriabank_mia_init()
                         }
                     }
 
-                    /* translators: 1: Order ID, 2: Payment method title, 3: Payment status */
-                    $message = esc_html(sprintf(__('Order #%1$s payment %2$s QR Extension status: %3$s', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->method_title, $qr_extension_status_value));
                     WC_Admin_Notices::add_custom_notice('check_payment', $message);
                 }
             } catch (Exception $ex) {
