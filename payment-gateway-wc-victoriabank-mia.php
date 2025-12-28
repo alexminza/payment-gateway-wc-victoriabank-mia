@@ -650,7 +650,7 @@ function victoriabank_mia_init()
                     $message,
                     WC_Log_Levels::INFO,
                     array(
-                        'create_qr_response' => (array) $create_qr_response,
+                        'create_qr_response' => $create_qr_response->toArray(),
                     )
                 );
 
@@ -783,7 +783,7 @@ function victoriabank_mia_init()
 
                 $qr_extension_status = $client->getQrExtensionStatus($qr_extension_id, $auth_token);
                 if (!empty($qr_extension_status)) {
-                    $qr_extension_status = (array) $qr_extension_status;
+                    $qr_extension_status = $qr_extension_status->toArray();
                     $qr_extension_status_value = strval($qr_extension_status['status']);
 
                     /* translators: 1: Order ID, 2: Payment method title, 3: Payment status */
