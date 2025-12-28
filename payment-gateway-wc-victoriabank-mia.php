@@ -340,7 +340,7 @@ function victoriabank_mia_init()
         {
             if (empty($value)) {
                 /* translators: 1: Field label */
-                WC_Admin_Settings::add_error(sprintf(esc_html__('%1$s field must be set.', 'payment-gateway-wc-victoriabank-mia'), $this->get_settings_field_label($key)));
+                WC_Admin_Settings::add_error(esc_html(sprintf(__('%1$s field must be set.', 'payment-gateway-wc-victoriabank-mia'), $this->get_settings_field_label($key))));
             }
 
             return $value;
@@ -355,7 +355,7 @@ function victoriabank_mia_init()
         {
             if (isset($value) && !$this->validate_transaction_validity($value)) {
                 /* translators: 1: Field label, 2: Min value, 3: Max value */
-                WC_Admin_Settings::add_error(sprintf(esc_html__('%1$s field must be an integer between %2$d and %3$d.', 'payment-gateway-wc-victoriabank-mia'), $this->get_settings_field_label($key), self::MIN_VALIDITY, self::MAX_VALIDITY));
+                WC_Admin_Settings::add_error(esc_html(sprintf(__('%1$s field must be an integer between %2$d and %3$d.', 'payment-gateway-wc-victoriabank-mia'), $this->get_settings_field_label($key), self::MIN_VALIDITY, self::MAX_VALIDITY)));
             }
 
             return $value;
@@ -375,7 +375,7 @@ function victoriabank_mia_init()
         {
             if (isset($value) && !$this->validate_certificate($value)) {
                 /* translators: 1: Field label */
-                WC_Admin_Settings::add_error(sprintf(esc_html__('Invalid %1$s field.', 'payment-gateway-wc-victoriabank-mia'), $this->get_settings_field_label($key)));
+                WC_Admin_Settings::add_error(esc_html(sprintf(__('Invalid %1$s field.', 'payment-gateway-wc-victoriabank-mia'), $this->get_settings_field_label($key))));
             }
 
             return $value;
@@ -390,7 +390,7 @@ function victoriabank_mia_init()
         {
             if (isset($value) && !$this->validate_iban($value)) {
                 /* translators: 1: Field label */
-                WC_Admin_Settings::add_error(sprintf(esc_html__('Invalid %1$s field. Must start with MD and have 24 characters.', 'payment-gateway-wc-victoriabank-mia'), $this->get_settings_field_label($key)));
+                WC_Admin_Settings::add_error(esc_html(sprintf(__('Invalid %1$s field. Must start with MD and have 24 characters.', 'payment-gateway-wc-victoriabank-mia'), $this->get_settings_field_label($key))));
             }
 
             return $value;
@@ -1116,7 +1116,8 @@ function victoriabank_mia_init()
                 return $actions;
             }
 
-            $actions[self::MOD_ACTION_CHECK_PAYMENT] = sprintf(esc_html__('Check %1$s order payment', 'payment-gateway-wc-victoriabank-mia'), esc_html(self::MOD_TITLE));
+            /* translators: 1: Payment method title */
+            $actions[self::MOD_ACTION_CHECK_PAYMENT] = esc_html(sprintf(__('Check %1$s order payment', 'payment-gateway-wc-victoriabank-mia'), self::MOD_TITLE));
             return $actions;
         }
 
