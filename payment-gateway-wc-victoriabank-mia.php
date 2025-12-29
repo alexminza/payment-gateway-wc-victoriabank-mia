@@ -57,7 +57,7 @@ function victoriabank_mia_init()
         const MOD_QR_ID             = self::MOD_PREFIX . 'qr_id';
         const MOD_QR_EXTENSION_ID   = self::MOD_PREFIX . 'qr_extension_id';
         const MOD_QR_URL            = self::MOD_PREFIX . 'qr_url';
-        const MOD_CALLBACK          = self::MOD_PREFIX . 'callback';
+        const MOD_PAYMENT_RECEIPT   = self::MOD_PREFIX . 'payment_receipt';
         const MOD_PAYMENT_REFERENCE = self::MOD_PREFIX . 'payment_reference';
 
         const DEFAULT_TIMEOUT  = 30;   // seconds
@@ -753,7 +753,7 @@ function victoriabank_mia_init()
             //endregion
 
             $callback_data_payment = (array) $callback_data['payment'];
-            $confirm_payment_result = $this->confirm_payment($order, $callback_data_payment, $callback_data, $callback_body);
+            $confirm_payment_result = $this->confirm_payment($order, $callback_data_payment, $callback_data);
 
             if(is_wp_error($confirm_payment_result)) {
                 return self::return_response($confirm_payment_result->get_error_code(), $confirm_payment_result->get_error_message());
@@ -830,10 +830,9 @@ function victoriabank_mia_init()
         /**
          * @param \WC_Order $order
          * @param array     $payment_data
-         * @param array     $callback_data
-         * @param string    $callback_body
+         * @param array     $payment_receipt_data
          */
-        protected function confirm_payment($order, $payment_data, $callback_data, $callback_body = null)
+        protected function confirm_payment($order, $payment_data, $payment_receipt_data)
         {
             //region Check order data
             $payment_data_amount = (array) $payment_data['amount'];
@@ -865,12 +864,10 @@ function victoriabank_mia_init()
             //endregion
 
             //region Complete order payment
-            if (!empty($callback_body)) {
-                $order->add_meta_data(self::MOD_CALLBACK, $callback_body, true);
-            }
-
             $payment_data_reference = strval($payment_data['reference']);
             $payment_data_transaction_id = VictoriabankMiaClient::getPaymentTransactionId($payment_data_reference);
+
+            $order->add_meta_data(self::MOD_PAYMENT_RECEIPT, $payment_receipt_data, true);
             $order->add_meta_data(self::MOD_PAYMENT_REFERENCE, $payment_data_reference, true);
             $order->save();
 
@@ -884,7 +881,7 @@ function victoriabank_mia_init()
                 $message,
                 WC_Log_Levels::INFO,
                 array(
-                    'callback_data' => $callback_data,
+                    'payment_receipt_data' => $payment_receipt_data,
                 )
             );
 
