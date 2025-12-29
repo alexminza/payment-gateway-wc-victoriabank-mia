@@ -867,7 +867,7 @@ function victoriabank_mia_init()
             $payment_data_reference = strval($payment_data['reference']);
             $payment_data_transaction_id = VictoriabankMiaClient::getPaymentTransactionId($payment_data_reference);
 
-            $order->add_meta_data(self::MOD_PAYMENT_RECEIPT, $payment_receipt_data, true);
+            $order->add_meta_data(self::MOD_PAYMENT_RECEIPT, wp_json_encode($payment_receipt_data), true);
             $order->add_meta_data(self::MOD_PAYMENT_REFERENCE, $payment_data_reference, true);
             $order->save();
 
