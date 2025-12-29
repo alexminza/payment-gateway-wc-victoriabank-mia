@@ -1124,7 +1124,7 @@ function victoriabank_mia_init()
         public static function action_check_payment($order)
         {
             $plugin = new self();
-            return $plugin->check_payment($order);
+            $plugin->check_payment($order);
         }
 
         public static function add_gateway($methods)
