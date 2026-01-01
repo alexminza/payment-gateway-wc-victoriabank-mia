@@ -585,8 +585,10 @@ function victoriabank_mia_init()
                         $ex->getMessage(),
                         WC_Log_Levels::ERROR,
                         array(
-                            'exception' => (string) $ex,
+                            'response' => self::get_guzzle_error_response_body($ex),
                             'order_id' => $order_id,
+                            'exception' => (string) $ex,
+                            'backtrace' => true,
                         )
                     );
                 }
@@ -613,8 +615,10 @@ function victoriabank_mia_init()
                     $ex->getMessage(),
                     WC_Log_Levels::ERROR,
                     array(
-                        'exception' => (string) $ex,
+                        'response' => self::get_guzzle_error_response_body($ex),
                         'order_id' => $order_id,
+                        'exception' => (string) $ex,
+                        'backtrace' => true,
                     )
                 );
             }
@@ -711,9 +715,10 @@ function victoriabank_mia_init()
                     $ex->getMessage(),
                     WC_Log_Levels::ERROR,
                     array(
-                        'exception' => (string) $ex,
                         'callback_body' => $callback_body,
                         'callback_data' => $callback_data,
+                        'exception' => (string) $ex,
+                        'backtrace' => true,
                     )
                 );
 
@@ -744,7 +749,7 @@ function victoriabank_mia_init()
             $callback_data_payment = (array) $callback_data['payment'];
             $confirm_payment_result = $this->confirm_payment($order, $callback_data_payment, $callback_data);
 
-            if(is_wp_error($confirm_payment_result)) {
+            if (is_wp_error($confirm_payment_result)) {
                 return self::return_response($confirm_payment_result->get_error_code(), $confirm_payment_result->get_error_message());
             }
 
@@ -792,7 +797,7 @@ function victoriabank_mia_init()
                             $payment_data = (array) $qr_extension_status_payments[0];
                             $confirm_payment_result = $this->confirm_payment($order, $payment_data, $qr_extension_status);
 
-                            if(is_wp_error($confirm_payment_result)) {
+                            if (is_wp_error($confirm_payment_result)) {
                                 WC_Admin_Meta_Boxes::add_error($confirm_payment_result->get_error_message());
                             }
                         }
@@ -803,8 +808,10 @@ function victoriabank_mia_init()
                     $ex->getMessage(),
                     WC_Log_Levels::ERROR,
                     array(
-                        'exception' => (string) $ex,
+                        'response' => self::get_guzzle_error_response_body($ex),
                         'order_id' => $order_id,
+                        'exception' => (string) $ex,
+                        'backtrace' => true,
                     )
                 );
 
@@ -916,14 +923,12 @@ function victoriabank_mia_init()
                 );
 
                 /* translators: 1: Order ID, 2: Refund amount, 3: Payment method title, 4: Error message */
-                $message = esc_html(sprintf(__('Order #%1$s refund of %2$s via %3$s failed: %4$s', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->format_price($order_total, $order_currency), $this->method_title, $ex->getMessage()));
+                $message = esc_html(sprintf(__('Order #%1$s refund of %2$s via %3$s failed.', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->format_price($order_total, $order_currency), $this->method_title));
                 $message = $this->get_test_message($message);
-                $order->add_order_note($message);
                 $this->log($message, WC_Log_Levels::ERROR);
 
-                $this->logs_admin_notice();
-
-                return new WP_Error('process_refund', $ex->getMessage());
+                $order->add_order_note($message);
+                return new WP_Error('process_refund', $message);
             }
 
             /* translators: 1: Order ID, 2: Refund amount, 3: Payment method title */
@@ -1036,6 +1041,19 @@ function victoriabank_mia_init()
             }
 
             $this->logger->log($level, $message, $log_context);
+        }
+
+        protected static function get_guzzle_error_response_body(Exception $exception)
+        {
+            // https://github.com/guzzle/guzzle/issues/2185
+            if ($exception instanceof \GuzzleHttp\Command\Exception\CommandException) {
+                $response = $exception->getResponse();
+                $response_body = (string) $response->getBody();
+
+                return $response_body;
+            }
+
+            return null;
         }
 
         protected static function return_response(int $status_code, string $response_text = null)
