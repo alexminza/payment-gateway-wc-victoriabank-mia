@@ -45,8 +45,8 @@ function victoriabank_mia_init()
     {
         //region Constants
         const MOD_ID      = 'victoriabank_mia';
-        const MOD_TITLE   = 'Victoriabank MIA';
         const MOD_PREFIX  = 'victoriabank_mia_';
+        const MOD_TITLE   = 'Victoriabank MIA';
         const MOD_VERSION = '1.0.4';
 
         const SUPPORTED_CURRENCIES = array('MDL');
@@ -482,11 +482,10 @@ function victoriabank_mia_init()
         }
 
         /**
-         * @param VictoriabankMiaClient $client
          * @link https://github.com/alexminza/victoriabank-mia-sdk-php/blob/main/README.md#get-access-token-with-username-and-password
          * @link https://test-ipspj.victoriabank.md/index.html#operations-Token-post_identity_token
          */
-        private function victoriabank_mia_generate_token($client)
+        private function victoriabank_mia_generate_token(VictoriabankMiaClient $client)
         {
             $get_token_response = $client->getToken('password', $this->victoriabank_mia_username, $this->victoriabank_mia_password);
             $access_token = strval($get_token_response['accessToken']);
@@ -495,20 +494,10 @@ function victoriabank_mia_init()
         }
 
         /**
-         * @param VictoriabankMiaClient $client
-         * @param string $auth_token
-         * @param string $order_id
-         * @param string $order_name
-         * @param float  $total_amount
-         * @param string $currency
-         * @param string $creditor_account
-         * @param string $company_name
-         * @param int    $validity_minutes
-         * @return GuzzleHttp\Command\Result
          * @link https://github.com/alexminza/victoriabank-mia-sdk-php/blob/main/README.md#create-a-dynamic-order-payment-qr
          * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-post_api_v1_qr
          */
-        private function victoriabank_mia_pay($client, $auth_token, $order_id, $order_name, $total_amount, $currency, $creditor_account, $company_name, $validity_minutes)
+        private function victoriabank_mia_pay(VictoriabankMiaClient $client, string $auth_token, string $order_id, string $order_name, float $total_amount, string $currency, string $creditor_account, string $company_name, int $validity_minutes)
         {
             $qr_data = array(
                 'header' => array(
@@ -538,12 +527,9 @@ function victoriabank_mia_init()
         }
 
         /**
-         * @param VictoriabankMiaClient $client
-         * @param string $auth_token
-         * @param string $qr_extension_id
          * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-get_api_v1_qr_extensions__qrExtensionUUID__status
          */
-        private function victoriabank_mia_qr_active($client, $auth_token, $qr_extension_id)
+        private function victoriabank_mia_qr_active(VictoriabankMiaClient $client, string $auth_token, string $qr_extension_id)
         {
             $qr_extension_status = $client->getQrExtensionStatus($qr_extension_id, $auth_token);
 
@@ -569,6 +555,9 @@ function victoriabank_mia_init()
         //endregion
 
         //region Payment
+        /**
+         * @param int $order_id
+         */
         public function process_payment($order_id)
         {
             $order = wc_get_order($order_id);
@@ -762,10 +751,7 @@ function victoriabank_mia_init()
             return self::return_response(WP_Http::OK);
         }
 
-        /**
-         * @param \WC_Order $order
-         */
-        public function check_payment($order)
+        public function check_payment(\WC_Order $order)
         {
             try {
                 $order_id = $order->get_id();
@@ -827,12 +813,7 @@ function victoriabank_mia_init()
             }
         }
 
-        /**
-         * @param \WC_Order $order
-         * @param array     $payment_data
-         * @param array     $payment_receipt_data
-         */
-        protected function confirm_payment($order, $payment_data, $payment_receipt_data)
+        protected function confirm_payment(\WC_Order $order, array $payment_data, array $payment_receipt_data)
         {
             //region Check order data
             $payment_data_amount = (array) $payment_data['amount'];
@@ -889,6 +870,11 @@ function victoriabank_mia_init()
             return true;
         }
 
+        /**
+         * @param  int    $order_id
+         * @param  float  $amount
+         * @param  string $reason
+         */
         public function process_refund($order_id, $amount = null, $reason = '')
         {
             if (!$this->check_settings()) {
@@ -951,10 +937,7 @@ function victoriabank_mia_init()
         //endregion
 
         //region Utility
-        /**
-         * @param string $qr_extension_id
-         */
-        protected function get_order_by_qr_extension_id($qr_extension_id)
+        protected function get_order_by_qr_extension_id(string $qr_extension_id)
         {
             // NOTE: Victoriabank MIA API does not currently support passing Order ID for transactions
             // https://stackoverflow.com/questions/71438717/extend-wc-get-orders-with-a-custom-meta-key-and-meta-value
@@ -980,11 +963,7 @@ function victoriabank_mia_init()
             return false;
         }
 
-        /**
-         * @param float  $price
-         * @param string $currency
-         */
-        protected function format_price($price, $currency)
+        protected function format_price(float $price, string $currency)
         {
             $args = array(
                 'currency' => $currency,
@@ -994,19 +973,13 @@ function victoriabank_mia_init()
             return wc_price($price, $args);
         }
 
-        /**
-         * @param \WC_Order $order
-         */
-        protected function get_order_description($order)
+        protected function get_order_description(\WC_Order $order)
         {
             $description = sprintf($this->order_template, $order->get_id());
             return apply_filters('victoriabank_mia_order_description', $description, $order);
         }
 
-        /**
-         * @param string $message
-         */
-        protected function get_test_message($message)
+        protected function get_test_message(string $message)
         {
             if ($this->testmode) {
                 /* translators: 1: Original message */
@@ -1016,10 +989,7 @@ function victoriabank_mia_init()
             return $message;
         }
 
-        /**
-         * @param \WC_Order $order
-         */
-        protected function get_redirect_url($order)
+        protected function get_redirect_url(\WC_Order $order)
         {
             $redirect_url = $this->get_return_url($order);
             return apply_filters('victoriabank_mia_redirect_url', $redirect_url);
@@ -1056,12 +1026,7 @@ function victoriabank_mia_init()
             );
         }
 
-        /**
-         * @param string $message
-         * @param string $level
-         * @param array  $additional_context
-         */
-        protected function log($message, $level = WC_Log_Levels::DEBUG, $additional_context = null)
+        protected function log(string $message, string $level = WC_Log_Levels::DEBUG, array $additional_context = null)
         {
             // https://developer.woocommerce.com/docs/best-practices/data-management/logging/
             // https://stackoverflow.com/questions/1423157/print-php-call-stack
@@ -1073,11 +1038,7 @@ function victoriabank_mia_init()
             $this->logger->log($level, $message, $log_context);
         }
 
-        /**
-         * @param int    $status_code
-         * @param string $response_text
-         */
-        protected static function return_response($status_code, $response_text = null)
+        protected static function return_response(int $status_code, string $response_text = null)
         {
             if (empty($response_text)) {
                 $response_text = get_status_header_desc($status_code);
@@ -1103,11 +1064,7 @@ function victoriabank_mia_init()
             return array_merge($plugin_links, $links);
         }
 
-        /**
-         * @param array $actions
-         * @param \WC_Order $order
-         */
-        public static function order_actions($actions, $order)
+        public static function order_actions(array $actions, \WC_Order $order)
         {
             if ($order->is_paid() || $order->get_payment_method() !== self::MOD_ID) {
                 return $actions;
@@ -1118,10 +1075,7 @@ function victoriabank_mia_init()
             return $actions;
         }
 
-        /**
-         * @param \WC_Order $order
-         */
-        public static function action_check_payment($order)
+        public static function action_check_payment(\WC_Order $order)
         {
             $plugin = new self();
             $plugin->check_payment($order);
