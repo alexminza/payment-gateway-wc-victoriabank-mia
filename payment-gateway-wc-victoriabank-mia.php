@@ -975,7 +975,7 @@ function victoriabank_mia_init()
                 'in_span' => false,
             );
 
-            return wc_price($price, $args);
+            return html_entity_decode(wc_price($price, $args));
         }
 
         protected function get_order_description(\WC_Order $order)
