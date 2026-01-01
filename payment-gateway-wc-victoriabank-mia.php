@@ -82,7 +82,7 @@ function victoriabank_mia_init()
             $this->init_settings();
 
             $this->enabled     = $this->get_option('enabled', 'no');
-            $this->title       = $this->get_option('title', $this->method_title);
+            $this->title       = $this->get_option('title', $this->get_method_title());
             $this->description = $this->get_option('description');
             $this->icon        = plugins_url('/assets/img/mia.svg', __FILE__);
 
@@ -129,7 +129,7 @@ function victoriabank_mia_init()
                     'type'        => 'text',
                     'description' => __('Payment method title that the customer will see during checkout.', 'payment-gateway-wc-victoriabank-mia'),
                     'desc_tip'    => true,
-                    'default'     => $this->method_title,
+                    'default'     => $this->get_method_title(),
                     'custom_attributes' => array(
                         'required' => 'required',
                     ),
@@ -439,14 +439,14 @@ function victoriabank_mia_init()
         protected function get_settings_admin_message()
         {
             /* translators: 1: Payment method title, 2: Plugin settings URL */
-            $message = sprintf(wp_kses_post(__('%1$s is not properly configured. Verify plugin <a href="%2$s">Connection Settings</a>.', 'payment-gateway-wc-victoriabank-mia')), esc_html($this->method_title), esc_url(self::get_settings_url()));
+            $message = sprintf(wp_kses_post(__('%1$s is not properly configured. Verify plugin <a href="%2$s">Connection Settings</a>.', 'payment-gateway-wc-victoriabank-mia')), esc_html($this->get_method_title()), esc_url(self::get_settings_url()));
             return $message;
         }
 
         protected function get_logs_admin_message()
         {
             /* translators: 1: Payment method title, 2: Plugin settings URL */
-            $message = sprintf(wp_kses_post(__('See <a href="%2$s">%1$s settings</a> page for log details and setup instructions.', 'payment-gateway-wc-victoriabank-mia')), esc_html($this->method_title), esc_url(self::get_settings_url()));
+            $message = sprintf(wp_kses_post(__('See <a href="%2$s">%1$s settings</a> page for log details and setup instructions.', 'payment-gateway-wc-victoriabank-mia')), esc_html($this->get_method_title()), esc_url(self::get_settings_url()));
             return $message;
         }
         //endregion
@@ -637,7 +637,7 @@ function victoriabank_mia_init()
                 //endregion
 
                 /* translators: 1: Order ID, 2: Payment method title, 3: API response details */
-                $message = esc_html(sprintf(__('Order #%1$s payment initiated via %2$s: %3$s', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->method_title, $qr_extension_id));
+                $message = esc_html(sprintf(__('Order #%1$s payment initiated via %2$s: %3$s', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->get_method_title(), $qr_extension_id));
                 $message = $this->get_test_message($message);
                 $this->log(
                     $message,
@@ -656,7 +656,7 @@ function victoriabank_mia_init()
             }
 
             /* translators: 1: Order ID, 2: Payment method title */
-            $message = esc_html(sprintf(__('Order #%1$s payment initiation failed via %2$s.', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->method_title));
+            $message = esc_html(sprintf(__('Order #%1$s payment initiation failed via %2$s.', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->get_method_title()));
             $message = $this->get_test_message($message);
             $order->add_order_note($message);
             $this->log($message, WC_Log_Levels::ERROR);
@@ -680,7 +680,7 @@ function victoriabank_mia_init()
             $request_method = isset($_SERVER['REQUEST_METHOD']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_METHOD'])) : '';
             if ('GET' === $request_method) {
                 /* translators: 1: Payment method title */
-                $message = sprintf(__('%1$s Callback URL', 'payment-gateway-wc-victoriabank-mia'), $this->method_title);
+                $message = sprintf(__('%1$s Callback URL', 'payment-gateway-wc-victoriabank-mia'), $this->get_method_title());
                 return self::return_response(WP_Http::OK, $message);
             } elseif ('POST' !== $request_method) {
                 return self::return_response(WP_Http::METHOD_NOT_ALLOWED);
@@ -739,7 +739,7 @@ function victoriabank_mia_init()
 
             if (empty($order)) {
                 /* translators: 1: QR Extension ID, 2: Payment method title */
-                $message = sprintf(__('Order not found by QR Extension ID: %1$s received from %2$s.', 'payment-gateway-wc-victoriabank-mia'), $callback_qr_extension_id, $this->method_title);
+                $message = sprintf(__('Order not found by QR Extension ID: %1$s received from %2$s.', 'payment-gateway-wc-victoriabank-mia'), $callback_qr_extension_id, $this->get_method_title());
                 $this->log($message, WC_Log_Levels::ERROR);
 
                 return self::return_response(WP_Http::UNPROCESSABLE_ENTITY, 'Order not found');
@@ -778,7 +778,7 @@ function victoriabank_mia_init()
                     $qr_extension_status_value = strval($qr_extension_status['status']);
 
                     /* translators: 1: Order ID, 2: Payment method title, 3: Payment status */
-                    $message = esc_html(sprintf(__('Order #%1$s payment %2$s QR Extension status: %3$s', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->method_title, $qr_extension_status_value));
+                    $message = esc_html(sprintf(__('Order #%1$s payment %2$s QR Extension status: %3$s', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->get_method_title(), $qr_extension_status_value));
                     $message = $this->get_test_message($message);
                     WC_Admin_Notices::add_custom_notice('check_payment', $message);
 
@@ -863,7 +863,7 @@ function victoriabank_mia_init()
             //endregion
 
             /* translators: 1: Order ID, 2: Payment method title, 3: Payment data */
-            $message = esc_html(sprintf(__('Order #%1$s payment completed via %2$s: %3$s', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->method_title, $payment_data_transaction_id));
+            $message = esc_html(sprintf(__('Order #%1$s payment completed via %2$s: %3$s', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->get_method_title(), $payment_data_transaction_id));
             $message = $this->get_test_message($message);
             $this->log(
                 $message,
@@ -898,7 +898,7 @@ function victoriabank_mia_init()
             //region Validate refund amount
             if (isset($amount) && $amount !== $order_total) {
                 /* translators: 1: Payment method title */
-                $message = esc_html(sprintf(__('Partial refunds are not currently supported by %1$s.', 'payment-gateway-wc-victoriabank-mia'), $this->method_title));
+                $message = esc_html(sprintf(__('Partial refunds are not currently supported by %1$s.', 'payment-gateway-wc-victoriabank-mia'), $this->get_method_title()));
                 $this->log($message, WC_Log_Levels::ERROR);
 
                 return new WP_Error('partial_refund', $message);
@@ -923,7 +923,7 @@ function victoriabank_mia_init()
                 );
 
                 /* translators: 1: Order ID, 2: Refund amount, 3: Payment method title, 4: Error message */
-                $message = esc_html(sprintf(__('Order #%1$s refund of %2$s via %3$s failed.', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->format_price($order_total, $order_currency), $this->method_title));
+                $message = esc_html(sprintf(__('Order #%1$s refund of %2$s via %3$s failed.', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->format_price($order_total, $order_currency), $this->get_method_title()));
                 $message = $this->get_test_message($message);
                 $this->log($message, WC_Log_Levels::ERROR);
 
@@ -932,7 +932,7 @@ function victoriabank_mia_init()
             }
 
             /* translators: 1: Order ID, 2: Refund amount, 3: Payment method title */
-            $message = esc_html(sprintf(__('Order #%1$s refund of %2$s via %3$s approved.', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->format_price($order_total, $order_currency), $this->method_title));
+            $message = esc_html(sprintf(__('Order #%1$s refund of %2$s via %3$s approved.', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->format_price($order_total, $order_currency), $this->get_method_title()));
             $message = $this->get_test_message($message);
             $this->log($message, WC_Log_Levels::INFO);
             $order->add_order_note($message);
