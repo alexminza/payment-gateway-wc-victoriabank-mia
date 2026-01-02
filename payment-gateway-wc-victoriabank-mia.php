@@ -329,7 +329,9 @@ function victoriabank_mia_init()
             return $validate_result;
         }
 
-        // https://developer.woocommerce.com/docs/extensions/settings-and-config/implementing-settings/
+        /**
+         * @link https://developer.woocommerce.com/docs/extensions/settings-and-config/implementing-settings/
+         */
         protected function get_settings_field_label($key)
         {
             $form_fields = $this->get_form_fields();
@@ -501,9 +503,9 @@ function victoriabank_mia_init()
         {
             $qr_data = array(
                 'header' => array(
-                    'qrType' => 'DYNM', // Type of QR code: DYNM - Dynamic QR, STAT - Static QR, HYBR - Hybrid QR
-                    'amountType' => 'Fixed', // Specifies the type of amount: Fixed - Dynamic QR, Controlled - Static QR, Free - Hybrid QR
-                    'pmtContext' => 'e', // Payment context: m - mobile payment, e - e-commerce payment, i - invoice payment, o - other
+                    'qrType' => 'DYNM',
+                    'amountType' => 'Fixed',
+                    'pmtContext' => 'e',
                 ),
                 'extension' => array(
                     'creditorAccount' => array(
@@ -517,8 +519,8 @@ function victoriabank_mia_init()
                     'remittanceInfo4Payer' => $order_name,
                     'creditorRef' => strval($order_id),
                     'ttl' => array(
-                        'length' => $validity_minutes, // The duration for which the QR code is valid.
-                        'units' => 'mm', // The unit of time for the TTL: ss - seconds, mm - minutes
+                        'length' => $validity_minutes,
+                        'units' => 'mm',
                     ),
                 ),
             );
