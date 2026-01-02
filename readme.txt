@@ -18,6 +18,7 @@ Accept MIA Instant Payments directly on your store with the Payment Gateway for 
 
 * Online payments with [MIA Instant Payments](https://mia.bnm.md/en)
 * Reverse transactions – complete refunds[^1]
+* Admin order actions – check order payment status
 * Supports WooCommerce [block-based checkout experience](https://woocommerce.com/checkout-blocks/)
 * Free to use – [Open-source GPL-3.0 license on GitHub](https://github.com/alexminza/payment-gateway-wc-victoriabank-mia)
 
@@ -68,6 +69,9 @@ You can also contribute to the plugin by translating it. Simply visit [translate
 
 See [payment-gateway-wc-victoriabank-mia project releases on GitHub](https://github.com/alexminza/payment-gateway-wc-victoriabank-mia/releases) for details.
 
+= 1.0.4 =
+Added manual check payment status order action.
+
 = 1.0.3 =
 Fixed vendor packages deployment.
 
@@ -81,6 +85,9 @@ Minor improvements.
 Initial version release.
 
 == Upgrade Notice ==
+
+= 1.0.4 =
+Added manual check payment status order action.
 
 = 1.0.3 =
 Fixed vendor packages deployment.
