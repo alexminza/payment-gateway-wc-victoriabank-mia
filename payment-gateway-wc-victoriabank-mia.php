@@ -756,51 +756,22 @@ function victoriabank_mia_init()
 
         public function check_payment(\WC_Order $order)
         {
+            $order_id = $order->get_id();
+            $qr_extension_status = null;
+
+            $qr_extension_id = strval($order->get_meta(self::MOD_QR_EXTENSION_ID, true));
+            if (empty($qr_extension_id)) {
+                /* translators: 1: Order ID, 2: Meta field key */
+                $message = esc_html(sprintf(__('Order #%1$s missing meta field %2$s.', 'payment-gateway-wc-victoriabank-mia'), $order_id, self::MOD_QR_EXTENSION_ID));
+                WC_Admin_Meta_Boxes::add_error($message);
+                return;
+            }
+
             try {
-                $order_id = $order->get_id();
-                $qr_extension_id = strval($order->get_meta(self::MOD_QR_EXTENSION_ID, true));
-
-                if (empty($qr_extension_id)) {
-                    /* translators: 1: Order ID, 2: Meta field key */
-                    $message = esc_html(sprintf(__('Order #%1$s missing meta %2$s', 'payment-gateway-wc-victoriabank-mia'), $order_id, self::MOD_QR_EXTENSION_ID));
-                    WC_Admin_Meta_Boxes::add_error($message);
-                    return;
-                }
-
                 $client = $this->init_victoriabank_mia_client();
                 $auth_token = $this->victoriabank_mia_generate_token($client);
 
                 $qr_extension_status = $client->getQrExtensionStatus($qr_extension_id, $auth_token);
-                if (!empty($qr_extension_status)) {
-                    $qr_extension_status = $qr_extension_status->toArray();
-                    $qr_extension_status_value = strval($qr_extension_status['status']);
-
-                    /* translators: 1: Order ID, 2: Payment method title, 3: Payment status */
-                    $message = esc_html(sprintf(__('Order #%1$s payment %2$s QR Extension status: %3$s', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->get_method_title(), $qr_extension_status_value));
-                    $message = $this->get_test_message($message);
-                    WC_Admin_Notices::add_custom_notice('check_payment', $message);
-
-                    $this->log(
-                        $message,
-                        WC_Log_Levels::INFO,
-                        array(
-                            'qrExtensionStatus' => $qr_extension_status,
-                        )
-                    );
-
-                    if (strtolower($qr_extension_status_value) === 'paid') {
-                        $qr_extension_status_payments = (array) $qr_extension_status['payments'];
-
-                        if (!empty($qr_extension_status_payments)) {
-                            $payment_data = (array) $qr_extension_status_payments[0];
-                            $confirm_payment_result = $this->confirm_payment($order, $payment_data, $qr_extension_status);
-
-                            if (is_wp_error($confirm_payment_result)) {
-                                WC_Admin_Meta_Boxes::add_error($confirm_payment_result->get_error_message());
-                            }
-                        }
-                    }
-                }
             } catch (Exception $ex) {
                 $this->log(
                     $ex->getMessage(),
@@ -812,8 +783,40 @@ function victoriabank_mia_init()
                         'backtrace' => true,
                     )
                 );
+            }
 
-                $message = sprintf('Order #%1$s check payment failed.', $order_id);
+            if (!empty($qr_extension_status)) {
+                $qr_extension_status = $qr_extension_status->toArray();
+                $qr_extension_status_value = strval($qr_extension_status['status']);
+
+                /* translators: 1: Order ID, 2: Payment method title, 3: Payment status */
+                $message = esc_html(sprintf(__('Order #%1$s %2$s payment status: %3$s', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->get_method_title(), $qr_extension_status_value));
+                $message = $this->get_test_message($message);
+                WC_Admin_Meta_Boxes::add_error($message);
+
+                $this->log(
+                    $message,
+                    WC_Log_Levels::INFO,
+                    array(
+                        'qr_extension_status' => $qr_extension_status,
+                    )
+                );
+
+                if (strtolower($qr_extension_status_value) === 'paid') {
+                    $qr_extension_status_payments = (array) $qr_extension_status['payments'];
+
+                    if (!empty($qr_extension_status_payments)) {
+                        $payment_data = (array) $qr_extension_status_payments[0];
+                        $confirm_payment_result = $this->confirm_payment($order, $payment_data, $qr_extension_status);
+
+                        if (is_wp_error($confirm_payment_result)) {
+                            WC_Admin_Meta_Boxes::add_error($confirm_payment_result->get_error_message());
+                        }
+                    }
+                }
+            } else {
+                /* translators: 1: Order ID */
+                $message = esc_html(sprintf(__('Order #%1$s payment check failed.', 'payment-gateway-wc-victoriabank-mia'), $order_id));
                 WC_Admin_Meta_Boxes::add_error($message);
             }
         }
