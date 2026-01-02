@@ -732,7 +732,13 @@ function victoriabank_mia_init()
             if (empty($order)) {
                 /* translators: 1: QR Extension ID, 2: Payment method title */
                 $message = sprintf(__('Order not found by QR Extension ID: %1$s received from %2$s.', 'payment-gateway-wc-victoriabank-mia'), $callback_qr_extension_id, $this->get_method_title());
-                $this->log($message, WC_Log_Levels::ERROR);
+                $this->log(
+                    $message,
+                    WC_Log_Levels::ERROR,
+                    array(
+                        'callback_data' => $callback_data,
+                    )
+                );
 
                 return self::return_response(WP_Http::UNPROCESSABLE_ENTITY, 'Order not found');
             }
