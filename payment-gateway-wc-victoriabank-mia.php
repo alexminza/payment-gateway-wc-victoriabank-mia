@@ -650,8 +650,8 @@ function victoriabank_mia_init()
             /* translators: 1: Order ID, 2: Payment method title */
             $message = esc_html(sprintf(__('Order #%1$s payment initiation failed via %2$s.', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->get_method_title()));
             $message = $this->get_test_message($message);
-            $order->add_order_note($message);
             $this->log($message, WC_Log_Levels::ERROR);
+            $order->add_order_note($message);
 
             // https://github.com/woocommerce/woocommerce/issues/48687#issuecomment-2186475264
             if (WC()->is_store_api_request()) {
