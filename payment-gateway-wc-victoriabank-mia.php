@@ -499,7 +499,7 @@ function victoriabank_mia_init()
          * @link https://github.com/alexminza/victoriabank-mia-sdk-php/blob/main/README.md#create-a-dynamic-order-payment-qr
          * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-post_api_v1_qr
          */
-        private function victoriabank_mia_pay(VictoriabankMiaClient $client, string $auth_token, string $order_id, string $order_name, float $total_amount, string $currency, string $creditor_account, string $company_name, int $validity_minutes)
+        private function victoriabank_mia_pay(VictoriabankMiaClient $client, string $auth_token, \WC_Order $order)
         {
             $qr_data = array(
                 'header' => array(
@@ -509,17 +509,17 @@ function victoriabank_mia_init()
                 ),
                 'extension' => array(
                     'creditorAccount' => array(
-                        'iban' => $creditor_account,
+                        'iban' => $this->victoriabank_mia_creditor_account,
                     ),
                     'amount' => array(
-                        'sum' => $total_amount,
-                        'currency' => $currency,
+                        'sum' => $order->get_total(),
+                        'currency' => $order->get_currency(),
                     ),
-                    'dba' => $company_name,
-                    'remittanceInfo4Payer' => $order_name,
-                    'creditorRef' => strval($order_id),
+                    'dba' => $this->victoriabank_mia_company_name,
+                    'remittanceInfo4Payer' => $this->get_order_description($order),
+                    'creditorRef' => strval($order->get_id()),
                     'ttl' => array(
-                        'length' => $validity_minutes,
+                        'length' => $this->transaction_validity,
                         'units' => 'mm',
                     ),
                 ),
@@ -596,17 +596,7 @@ function victoriabank_mia_init()
                 }
                 //endregion
 
-                $create_qr_response = $this->victoriabank_mia_pay(
-                    $client,
-                    $auth_token,
-                    $order_id,
-                    $this->get_order_description($order),
-                    $order->get_total(),
-                    $order->get_currency(),
-                    $this->victoriabank_mia_creditor_account,
-                    $this->victoriabank_mia_company_name,
-                    $this->transaction_validity
-                );
+                $create_qr_response = $this->victoriabank_mia_pay($client, $auth_token, $order);
 
                 if (!empty($create_qr_response)) {
                     // NOTE: remove redundant large image data
