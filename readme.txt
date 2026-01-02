@@ -3,7 +3,7 @@ Contributors: alexminza
 Tags: Moldova, Victoriabank, MIA, QR, payment gateway
 Requires at least: 4.8
 Tested up to: 6.9
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 Requires PHP: 7.2.5
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -18,6 +18,7 @@ Accept MIA Instant Payments directly on your store with the Payment Gateway for 
 
 * Online payments with [MIA Instant Payments](https://mia.bnm.md/en)
 * Reverse transactions – complete refunds[^1]
+* Admin order actions – check order payment status
 * Supports WooCommerce [block-based checkout experience](https://woocommerce.com/checkout-blocks/)
 * Free to use – [Open-source GPL-3.0 license on GitHub](https://github.com/alexminza/payment-gateway-wc-victoriabank-mia)
 
@@ -46,7 +47,7 @@ Use the *WooCommerce > Settings > Payments > Victoriabank MIA* screen to configu
 
 = Where can I get the Connection Settings? =
 
-The connection settings are provided by Victoriabank. This data is used by the plugin to connect to the Victoriabank MIA payment gateway and process the transactions. Please see [https://oferte.victoriabank.md/mia-business](https://oferte.victoriabank.md/mia-business) and contact [mia@vb.md](mailto:mia@vb.md) for details.
+The connection settings are provided by Victoriabank. This data is used by the plugin to connect to the Victoriabank MIA payment gateway and process the transactions. Please see [https://www.victoriabank.md/en/operatiuni-curente/mia-business](https://www.victoriabank.md/en/operatiuni-curente/mia-business) and contact [mia@vb.md](mailto:mia@vb.md) for details.
 
 = What store settings are supported? =
 
@@ -68,6 +69,9 @@ You can also contribute to the plugin by translating it. Simply visit [translate
 
 See [payment-gateway-wc-victoriabank-mia project releases on GitHub](https://github.com/alexminza/payment-gateway-wc-victoriabank-mia/releases) for details.
 
+= 1.0.4 =
+Added manual check payment status order action.
+
 = 1.0.3 =
 Fixed vendor packages deployment.
 
@@ -81,6 +85,9 @@ Minor improvements.
 Initial version release.
 
 == Upgrade Notice ==
+
+= 1.0.4 =
+Added manual check payment status order action.
 
 = 1.0.3 =
 Fixed vendor packages deployment.
