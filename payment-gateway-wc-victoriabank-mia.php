@@ -950,17 +950,22 @@ function victoriabank_mia_init()
         //endregion
 
         //region Utility
+        /**
+         * Lookup order by QR Extension ID meta field value.
+         * Victoriabank MIA API does not currently support passing Order ID for transactions.
+         *
+         * @link https://stackoverflow.com/questions/71438717/extend-wc-get-orders-with-a-custom-meta-key-and-meta-value
+         */
         protected function get_order_by_qr_extension_id(string $qr_extension_id)
         {
-            // NOTE: Victoriabank MIA API does not currently support passing Order ID for transactions
-            // https://stackoverflow.com/questions/71438717/extend-wc-get-orders-with-a-custom-meta-key-and-meta-value
             $args = array(
                 'meta_key'   => self::MOD_QR_EXTENSION_ID, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-                'meta_value' => $qr_extension_id, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+                'meta_value' => $qr_extension_id,          // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
             );
 
             $orders = wc_get_orders($args);
             $orders_count = count($orders);
+
             if (1 === $orders_count) {
                 return $orders[0];
             } elseif ($orders_count > 1) {
@@ -1005,7 +1010,7 @@ function victoriabank_mia_init()
         protected function get_redirect_url(\WC_Order $order)
         {
             $redirect_url = $this->get_return_url($order);
-            return apply_filters('victoriabank_mia_redirect_url', $redirect_url);
+            return apply_filters('victoriabank_mia_redirect_url', $redirect_url, $order);
         }
 
         protected function get_callback_url()
@@ -1039,7 +1044,7 @@ function victoriabank_mia_init()
             );
         }
 
-        protected function log(string $message, string $level = WC_Log_Levels::DEBUG, array $additional_context = null)
+        protected function log(string $message, string $level = WC_Log_Levels::DEBUG, ?array $additional_context = null)
         {
             // https://developer.woocommerce.com/docs/best-practices/data-management/logging/
             // https://stackoverflow.com/questions/1423157/print-php-call-stack
@@ -1065,7 +1070,7 @@ function victoriabank_mia_init()
             return null;
         }
 
-        protected static function return_response(int $status_code, string $response_text = null)
+        protected static function return_response(int $status_code, ?string $response_text = null)
         {
             if (empty($response_text)) {
                 $response_text = get_status_header_desc($status_code);
@@ -1078,7 +1083,7 @@ function victoriabank_mia_init()
         //endregion
 
         //region Init
-        public static function plugin_action_links($links)
+        public static function plugin_action_links(array $links)
         {
             $plugin_links = array(
                 sprintf(
@@ -1108,7 +1113,7 @@ function victoriabank_mia_init()
             $plugin->check_payment($order);
         }
 
-        public static function add_gateway($methods)
+        public static function add_gateway(array $methods)
         {
             $methods[] = self::class;
             return $methods;
