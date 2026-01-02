@@ -837,10 +837,10 @@ function victoriabank_mia_init()
 
             if ($order_price !== $payment_data_price) {
                 /* translators: 1: Payment data price, 2: Order total price */
-                $message = sprintf(__('Order amount mismatch: Payment: %1$s, Order: %2$s.', 'payment-gateway-wc-victoriabank-mia'), $payment_data_price, $order_price);
+                $message = sprintf(__('Order payment data mismatch: Payment: %1$s, Order: %2$s.', 'payment-gateway-wc-victoriabank-mia'), $payment_data_price, $order_price);
                 $this->log($message, WC_Log_Levels::ERROR);
 
-                return new WP_Error(WP_Http::UNPROCESSABLE_ENTITY, 'Order data mismatch');
+                return new WP_Error(WP_Http::UNPROCESSABLE_ENTITY, 'Order payment data mismatch');
             }
 
             if ($order->is_paid()) {
