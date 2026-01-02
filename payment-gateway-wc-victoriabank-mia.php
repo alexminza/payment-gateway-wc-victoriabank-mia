@@ -891,13 +891,10 @@ function victoriabank_mia_init()
             }
 
             $order = wc_get_order($order_id);
-            $payment_reference = strval($order->get_meta(self::MOD_PAYMENT_REFERENCE, true));
-            $transaction_id = VictoriabankMiaClient::getPaymentTransactionId($payment_reference);
-            $order_total = $order->get_total();
             $order_currency = $order->get_currency();
 
             //region Validate refund amount
-            if (isset($amount) && $amount !== $order_total) {
+            if (isset($amount) && $amount !== $order->get_total()) {
                 /* translators: 1: Payment method title */
                 $message = esc_html(sprintf(__('Partial refunds are not currently supported by %1$s.', 'payment-gateway-wc-victoriabank-mia'), $this->get_method_title()));
                 $this->log($message, WC_Log_Levels::ERROR);
@@ -906,25 +903,35 @@ function victoriabank_mia_init()
             }
             //endregion
 
+            $payment_reference = strval($order->get_meta(self::MOD_PAYMENT_REFERENCE, true));
+            if (empty($payment_reference)) {
+                /* translators: 1: Order ID, 2: Meta field key */
+                $message = esc_html(sprintf(__('Order #%1$s missing meta field %2$s.', 'payment-gateway-wc-victoriabank-mia'), $order_id, self::MOD_PAYMENT_REFERENCE));
+                return new WP_Error('order_payment_reference', $message);
+            }
+
             try {
                 $client = $this->init_victoriabank_mia_client();
                 $auth_token = $this->victoriabank_mia_generate_token($client);
 
+                $transaction_id = VictoriabankMiaClient::getPaymentTransactionId($payment_reference);
                 $client->reverseTransaction($transaction_id, $auth_token);
             } catch (Exception $ex) {
                 $this->log(
                     $ex->getMessage(),
                     WC_Log_Levels::ERROR,
                     array(
-                        'exception' => (string) $ex,
+                        'response' => self::get_guzzle_error_response_body($ex),
                         'order_id' => $order_id,
                         'amount' => $amount,
                         'reason' => $reason,
+                        'exception' => (string) $ex,
+                        'backtrace' => true,
                     )
                 );
 
                 /* translators: 1: Order ID, 2: Refund amount, 3: Payment method title, 4: Error message */
-                $message = esc_html(sprintf(__('Order #%1$s refund of %2$s via %3$s failed.', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->format_price($order_total, $order_currency), $this->get_method_title()));
+                $message = esc_html(sprintf(__('Order #%1$s refund of %2$s via %3$s failed.', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->format_price($amount, $order_currency), $this->get_method_title()));
                 $message = $this->get_test_message($message);
                 $this->log($message, WC_Log_Levels::ERROR);
 
@@ -933,7 +940,7 @@ function victoriabank_mia_init()
             }
 
             /* translators: 1: Order ID, 2: Refund amount, 3: Payment method title */
-            $message = esc_html(sprintf(__('Order #%1$s refund of %2$s via %3$s approved.', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->format_price($order_total, $order_currency), $this->get_method_title()));
+            $message = esc_html(sprintf(__('Order #%1$s refund of %2$s via %3$s approved.', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->format_price($amount, $order_currency), $this->get_method_title()));
             $message = $this->get_test_message($message);
             $this->log($message, WC_Log_Levels::INFO);
             $order->add_order_note($message);
