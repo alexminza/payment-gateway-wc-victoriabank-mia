@@ -57,6 +57,7 @@ function victoriabank_mia_plugins_loaded_init()
         const MOD_QR_ID             = self::MOD_PREFIX . 'qr_id';
         const MOD_QR_EXTENSION_ID   = self::MOD_PREFIX . 'qr_extension_id';
         const MOD_QR_URL            = self::MOD_PREFIX . 'qr_url';
+        const MOD_PAYMENT_CALLBACK  = self::MOD_PREFIX . 'payment_callback';
         const MOD_PAYMENT_RECEIPT   = self::MOD_PREFIX . 'payment_receipt';
         const MOD_PAYMENT_REFERENCE = self::MOD_PREFIX . 'payment_reference';
 
@@ -698,7 +699,7 @@ function victoriabank_mia_plugins_loaded_init()
 
                 $this->log(
                     sprintf(__('Payment notification callback', 'payment-gateway-wc-victoriabank-mia')),
-                    WC_Log_Levels::DEBUG,
+                    WC_Log_Levels::INFO,
                     array(
                         'callback_body' => $callback_body,
                         'callback_data' => $callback_data,
@@ -747,7 +748,7 @@ function victoriabank_mia_plugins_loaded_init()
             //endregion
 
             $callback_data_payment = (array) $callback_data['payment'];
-            $confirm_payment_result = $this->confirm_payment($order, $callback_data_payment, $callback_data);
+            $confirm_payment_result = $this->confirm_payment($order, $callback_data_payment, $callback_data, $callback_body);
 
             if (is_wp_error($confirm_payment_result)) {
                 return self::return_response($confirm_payment_result->get_error_code(), $confirm_payment_result->get_error_message());
@@ -823,7 +824,7 @@ function victoriabank_mia_plugins_loaded_init()
             }
         }
 
-        protected function confirm_payment(\WC_Order $order, array $payment_data, array $payment_receipt_data)
+        protected function confirm_payment(\WC_Order $order, array $payment_data, array $payment_receipt_data, ?string $callback_body = null)
         {
             //region Check order data
             $payment_data_amount = (array) $payment_data['amount'];
@@ -857,6 +858,10 @@ function victoriabank_mia_plugins_loaded_init()
             //region Complete order payment
             $payment_data_reference = strval($payment_data['reference']);
             $payment_data_transaction_id = VictoriabankMiaClient::getPaymentTransactionId($payment_data_reference);
+
+            if (!empty($callback_body)) {
+                $order->add_meta_data(self::MOD_PAYMENT_CALLBACK, $callback_body, true);
+            }
 
             $order->add_meta_data(self::MOD_PAYMENT_RECEIPT, wp_json_encode($payment_receipt_data), true);
             $order->add_meta_data(self::MOD_PAYMENT_REFERENCE, $payment_data_reference, true);
