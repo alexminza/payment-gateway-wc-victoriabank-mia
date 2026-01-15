@@ -408,8 +408,20 @@ function victoriabank_mia_plugins_loaded_init()
 
         protected function validate_certificate($value)
         {
-            return !empty($value)
-                && !empty(openssl_pkey_get_public($value));
+            $public_key_resource = openssl_pkey_get_public($value);
+
+            if (false === $public_key_resource) {
+                $this->log_openssl_errors(__FUNCTION__);
+
+                return false;
+            }
+
+            if (PHP_VERSION_ID < 80000) {
+                // phpcs:ignore Generic.PHP.DeprecatedFunctions.Deprecated -- PHP_VERSION_ID check performed before invocation.
+                openssl_free_key($public_key_resource);
+            }
+
+            return true;
         }
 
         protected function validate_iban($value)
@@ -1061,6 +1073,26 @@ function victoriabank_mia_plugins_loaded_init()
             }
 
             $this->logger->log($level, $message, $log_context);
+        }
+
+        protected function log_openssl_errors(string $message)
+        {
+            $openssl_errors = array();
+
+            // https://www.php.net/manual/en/function.openssl-error-string.php
+            // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition -- Common openssl_error_string code pattern.
+            while ($error = openssl_error_string()) {
+                $openssl_errors[] = $error;
+            }
+
+            $this->log(
+                $message,
+                WC_Log_Levels::ERROR,
+                array(
+                    'openssl_errors' => $openssl_errors,
+                    'backtrace' => true,
+                )
+            );
         }
 
         protected function log_request(string $source)
