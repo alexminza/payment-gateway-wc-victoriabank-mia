@@ -433,7 +433,7 @@ function victoriabank_mia_plugins_loaded_init()
 
         protected function logs_admin_website_notice()
         {
-            if (current_user_can('manage_woocommerce')) {
+            if (self::is_wc_admin()) {
                 $message = $this->get_logs_admin_message();
                 wc_add_notice($message, 'error');
             }
@@ -600,8 +600,8 @@ function victoriabank_mia_plugins_loaded_init()
                         $ex->getMessage(),
                         WC_Log_Levels::ERROR,
                         array(
-                            'response' => self::get_guzzle_error_response_body($ex),
                             'order_id' => $order_id,
+                            'response' => self::get_guzzle_error_response_body($ex),
                             'exception' => (string) $ex,
                             'backtrace' => true,
                         )
@@ -620,8 +620,8 @@ function victoriabank_mia_plugins_loaded_init()
                     $ex->getMessage(),
                     WC_Log_Levels::ERROR,
                     array(
-                        'response' => self::get_guzzle_error_response_body($ex),
                         'order_id' => $order_id,
+                        'response' => self::get_guzzle_error_response_body($ex),
                         'exception' => (string) $ex,
                         'backtrace' => true,
                     )
@@ -792,8 +792,8 @@ function victoriabank_mia_plugins_loaded_init()
                     $ex->getMessage(),
                     WC_Log_Levels::ERROR,
                     array(
-                        'response' => self::get_guzzle_error_response_body($ex),
                         'order_id' => $order_id,
+                        'response' => self::get_guzzle_error_response_body($ex),
                         'exception' => (string) $ex,
                         'backtrace' => true,
                     )
@@ -940,10 +940,10 @@ function victoriabank_mia_plugins_loaded_init()
                     $ex->getMessage(),
                     WC_Log_Levels::ERROR,
                     array(
-                        'response' => self::get_guzzle_error_response_body($ex),
                         'order_id' => $order_id,
                         'amount' => $amount,
                         'reason' => $reason,
+                        'response' => self::get_guzzle_error_response_body($ex),
                         'exception' => (string) $ex,
                         'backtrace' => true,
                     )
@@ -1133,6 +1133,12 @@ function victoriabank_mia_plugins_loaded_init()
             http_response_code($status_code);
             echo esc_html($response_text);
             exit;
+        }
+
+        protected static function is_wc_admin()
+        {
+            // https://developer.wordpress.org/reference/functions/current_user_can/
+            return current_user_can('manage_woocommerce');
         }
         //endregion
 
