@@ -55,15 +55,9 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         $this->init_form_fields();
         $this->init_settings();
 
-        $this->enabled     = $this->get_option('enabled', 'no');
-        $this->title       = $this->get_option('title', $this->get_method_title());
-        $this->description = $this->get_option('description');
-        $this->icon        = plugins_url('/assets/img/mia.svg', self::MOD_PLUGIN_FILE);
+        parent::__construct();
 
-        if ($this->testmode) {
-            $this->description = $this->get_test_message($this->description);
-        }
-
+        $this->icon = plugins_url('/assets/img/mia.svg', self::MOD_PLUGIN_FILE);
         $this->transaction_validity = intval($this->get_option('transaction_validity', self::DEFAULT_VALIDITY));
 
         // https://github.com/alexminza/victoriabank-mia-sdk-php/blob/main/src/VictoriabankMia/VictoriabankMiaClient.php
