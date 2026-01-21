@@ -225,14 +225,6 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         );
     }
 
-    public function admin_options()
-    {
-        $this->validate_settings();
-        $this->display_errors();
-
-        parent::admin_options();
-    }
-
     //region Settings validation
     protected function check_settings()
     {
