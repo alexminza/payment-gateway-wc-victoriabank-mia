@@ -33,8 +33,16 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
 
     const MOD_ACTION_CHECK_PAYMENT = self::MOD_PREFIX . 'check_payment';
 
-    const DEFAULT_TIMEOUT  = 30;   // seconds
-    const DEFAULT_VALIDITY = 360;  // minutes
+    /**
+     * Default API request timeout (seconds).
+     */
+    const DEFAULT_TIMEOUT = 30;
+
+    /**
+     * Default transaction validity (minutes).
+     */
+    const DEFAULT_VALIDITY = 360;
+
     const MIN_VALIDITY     = 1;    // minutes
     const MAX_VALIDITY     = 1440; // minutes
     //endregion
