@@ -58,7 +58,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         $this->enabled     = $this->get_option('enabled', 'no');
         $this->title       = $this->get_option('title', $this->get_method_title());
         $this->description = $this->get_option('description');
-        $this->icon        = plugins_url('/assets/img/mia.svg', __FILE__);
+        $this->icon        = plugins_url('/assets/img/mia.svg', self::MOD_PLUGIN_FILE);
 
         if ($this->testmode) {
             $this->description = $this->get_test_message($this->description);
