@@ -19,6 +19,8 @@
  * WC requires at least: 3.3
  * WC tested up to: 10.4.3
  * Requires Plugins: woocommerce
+ *
+ * @package payment-gateway-wc-victoriabank-mia
  */
 
 // Looking to contribute code to this plugin? Go ahead and fork the repository over at GitHub https://github.com/alexminza/payment-gateway-wc-victoriabank-mia
