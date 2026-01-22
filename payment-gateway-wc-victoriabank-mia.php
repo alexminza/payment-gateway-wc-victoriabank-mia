@@ -36,7 +36,7 @@ if (!defined('ABSPATH')) {
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-const WC_VICTORIABANK_MOD_PLUGIN_FILE = __FILE__;
+const VICTORIABANK_MIA_MOD_PLUGIN_FILE = __FILE__;
 
 add_action('plugins_loaded', __NAMESPACE__ . '\victoriabank_mia_plugins_loaded_init');
 
