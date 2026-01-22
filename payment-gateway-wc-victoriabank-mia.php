@@ -36,6 +36,8 @@ if (!defined('ABSPATH')) {
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+const WC_VICTORIABANK_MOD_PLUGIN_FILE = __FILE__;
+
 add_action('plugins_loaded', __NAMESPACE__ . '\victoriabank_mia_plugins_loaded_init');
 
 function victoriabank_mia_plugins_loaded_init()
@@ -48,8 +50,6 @@ function victoriabank_mia_plugins_loaded_init()
     require_once plugin_dir_path(__FILE__) . 'includes/class-wc-gateway-victoriabank-mia.php';
 
     //region Init payment gateway
-    WC_Gateway_Victoriabank_MIA::$mod_plugin_file = __FILE__;
-
     add_filter('woocommerce_payment_gateways', array(WC_Gateway_Victoriabank_MIA::class, 'add_gateway'));
 
     if (is_admin()) {

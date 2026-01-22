@@ -20,6 +20,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
     const MOD_PREFIX      = 'victoriabank_mia_';
     const MOD_TITLE       = 'Victoriabank MIA';
     const MOD_VERSION     = '1.0.5';
+    const MOD_PLUGIN_FILE = WC_VICTORIABANK_MOD_PLUGIN_FILE;
 
     const SUPPORTED_CURRENCIES = array('MDL');
 
@@ -64,7 +65,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
 
         parent::__construct();
 
-        $this->icon = plugins_url('/assets/img/mia.svg', self::$mod_plugin_file);
+        $this->icon = plugins_url('/assets/img/mia.svg', self::MOD_PLUGIN_FILE);
         $this->transaction_validity = intval($this->get_option('transaction_validity', self::DEFAULT_VALIDITY));
 
         // https://github.com/alexminza/victoriabank-mia-sdk-php/blob/main/src/VictoriabankMia/VictoriabankMiaClient.php
