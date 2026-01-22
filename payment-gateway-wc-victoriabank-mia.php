@@ -34,10 +34,6 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
-if (!defined('WC_VICTORIABANK_MIA_PLUGIN_FILE')) {
-    define('WC_VICTORIABANK_MIA_PLUGIN_FILE', __FILE__);
-}
-
 require_once __DIR__ . '/vendor/autoload.php';
 
 add_action('plugins_loaded', __NAMESPACE__ . '\victoriabank_mia_plugins_loaded_init');
@@ -49,13 +45,15 @@ function victoriabank_mia_plugins_loaded_init()
         return;
     }
 
-    require_once plugin_dir_path(WC_VICTORIABANK_MIA_PLUGIN_FILE) . 'includes/class-wc-gateway-victoriabank-mia.php';
+    require_once plugin_dir_path(__FILE__) . 'includes/class-wc-gateway-victoriabank-mia.php';
 
     //region Init payment gateway
+    WC_Gateway_Victoriabank_MIA::$mod_plugin_file = __FILE__;
+
     add_filter('woocommerce_payment_gateways', array(WC_Gateway_Victoriabank_MIA::class, 'add_gateway'));
 
     if (is_admin()) {
-        add_filter('plugin_action_links_' . plugin_basename(WC_VICTORIABANK_MIA_PLUGIN_FILE), array(WC_Gateway_Victoriabank_MIA::class, 'plugin_action_links'));
+        add_filter('plugin_action_links_' . plugin_basename(__FILE__), array(WC_Gateway_Victoriabank_MIA::class, 'plugin_action_links'));
 
         //Add WooCommerce order actions
         add_filter('woocommerce_order_actions', array(WC_Gateway_Victoriabank_MIA::class, 'order_actions'), 10, 2);
@@ -71,11 +69,11 @@ add_action(
         if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
             // WooCommerce HPOS compatibility
             // https://developer.woocommerce.com/docs/features/high-performance-order-storage/recipe-book/#declaring-extension-incompatibility
-            \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', WC_VICTORIABANK_MIA_PLUGIN_FILE, true);
+            \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
 
             // WooCommerce Cart Checkout Blocks compatibility
             // https://github.com/woocommerce/woocommerce/pull/36426
-            \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks', WC_VICTORIABANK_MIA_PLUGIN_FILE, true);
+            \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks', __FILE__, true);
         }
     }
 );
@@ -86,7 +84,7 @@ add_action(
     'woocommerce_blocks_loaded',
     function () {
         if (class_exists(\Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType::class)) {
-            require_once plugin_dir_path(WC_VICTORIABANK_MIA_PLUGIN_FILE) . 'includes/class-wc-gateway-victoriabank-mia-wbc.php';
+            require_once plugin_dir_path(__FILE__) . 'includes/class-wc-gateway-victoriabank-mia-wbc.php';
 
             add_action(
                 'woocommerce_blocks_payment_method_type_registration',
