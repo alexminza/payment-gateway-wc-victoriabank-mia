@@ -488,9 +488,9 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
 
             //region Update order payment transaction metadata
             // https://developer.woocommerce.com/docs/features/high-performance-order-storage/recipe-book/#apis-for-gettingsetting-posts-and-postmeta
-            $order->add_meta_data(self::MOD_QR_ID, $qr_id, true);
-            $order->add_meta_data(self::MOD_QR_EXTENSION_ID, $qr_extension_id, true);
-            $order->add_meta_data(self::MOD_QR_URL, $qr_url, true);
+            $order->update_meta_data(self::MOD_QR_ID, $qr_id);
+            $order->update_meta_data(self::MOD_QR_EXTENSION_ID, $qr_extension_id);
+            $order->update_meta_data(self::MOD_QR_URL, $qr_url);
             $order->save();
             //endregion
 
@@ -698,7 +698,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         $payment_data_amount_currency = strval($payment_data_amount['currency']);
 
         $order_id = $order->get_id();
-        $order_total = $order->get_total();
+        $order_total = floatval($order->get_total());
         $order_currency = $order->get_currency();
 
         $order_price = $this->format_price($order_total, $order_currency);
@@ -726,11 +726,11 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         $payment_data_transaction_id = VictoriabankMiaClient::getPaymentTransactionId($payment_data_reference);
 
         if (!empty($callback_body)) {
-            $order->add_meta_data(self::MOD_PAYMENT_CALLBACK, $callback_body, true);
+            $order->update_meta_data(self::MOD_PAYMENT_CALLBACK, $callback_body);
         }
 
-        $order->add_meta_data(self::MOD_PAYMENT_RECEIPT, wp_json_encode($payment_receipt_data), true);
-        $order->add_meta_data(self::MOD_PAYMENT_REFERENCE, $payment_data_reference, true);
+        $order->update_meta_data(self::MOD_PAYMENT_RECEIPT, wp_json_encode($payment_receipt_data));
+        $order->update_meta_data(self::MOD_PAYMENT_REFERENCE, $payment_data_reference);
         $order->save();
 
         $order->payment_complete($payment_data_transaction_id);
@@ -764,10 +764,12 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         }
 
         $order = wc_get_order($order_id);
+        $order_total = floatval($order->get_total());
         $order_currency = $order->get_currency();
+        $amount = floatval($amount);
 
         //region Validate refund amount
-        if (isset($amount) && $amount !== $order->get_total()) {
+        if (isset($amount) && $amount !== $order_total) {
             /* translators: 1: Payment method title */
             $message = esc_html(sprintf(__('Partial refunds are not currently supported by %1$s.', 'payment-gateway-wc-victoriabank-mia'), $this->get_method_title()));
             $this->log($message, \WC_Log_Levels::ERROR);
