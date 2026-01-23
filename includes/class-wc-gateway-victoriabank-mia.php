@@ -775,7 +775,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         $amount = floatval($amount);
 
         //region Validate refund amount
-        if (isset($amount) && $amount !== $order_total) {
+        if ($amount !== $order_total) {
             /* translators: 1: Payment method title */
             $message = esc_html(sprintf(__('Partial refunds are not currently supported by %1$s.', 'payment-gateway-wc-victoriabank-mia'), $this->get_method_title()));
             $this->log($message, \WC_Log_Levels::ERROR);
