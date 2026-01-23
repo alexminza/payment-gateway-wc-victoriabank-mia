@@ -625,6 +625,12 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
 
     public function check_payment(\WC_Order $order)
     {
+        if (!$this->check_settings()) {
+            $message = $this->get_settings_admin_message();
+            \WC_Admin_Meta_Boxes::add_error($message);
+            return;
+        }
+
         $order_id = $order->get_id();
         $qr_extension_status = null;
 
