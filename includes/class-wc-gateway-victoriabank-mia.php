@@ -772,7 +772,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         $order = wc_get_order($order_id);
         $order_total = floatval($order->get_total());
         $order_currency = $order->get_currency();
-        $amount = floatval($amount);
+        $amount = isset($amount) ? floatval($amount) : $order_total;
 
         //region Validate refund amount
         if ($amount !== $order_total) {
