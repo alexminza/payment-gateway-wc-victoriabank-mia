@@ -552,7 +552,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         $callback_data = null;
 
         try {
-            $callback_body = wc_clean(file_get_contents('php://input'));
+            $callback_body = file_get_contents('php://input');
             if (empty($callback_body)) {
                 throw new \Exception('Empty callback body');
             }
