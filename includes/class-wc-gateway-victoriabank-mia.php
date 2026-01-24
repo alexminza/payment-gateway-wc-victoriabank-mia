@@ -356,8 +356,12 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
     private function victoriabank_mia_generate_token(VictoriabankMiaClient $client)
     {
         $get_token_response = $client->getToken('password', $this->victoriabank_mia_username, $this->victoriabank_mia_password);
-        $access_token = strval($get_token_response['accessToken']);
 
+        if (empty($get_token_response) || !isset($get_token_response['accessToken'])) {
+            throw new \Exception('Failed to obtain Victoriabank MIA QR API access token');
+        }
+
+        $access_token = strval($get_token_response['accessToken']);
         return $access_token;
     }
 
