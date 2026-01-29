@@ -847,7 +847,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
     }
     //endregion
 
-    //region Init
+    //region Integration
     public static function order_actions(array $actions, \WC_Order $order)
     {
         if ($order->is_paid() || $order->get_payment_method() !== self::MOD_ID) {
