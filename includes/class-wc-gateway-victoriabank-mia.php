@@ -238,22 +238,6 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
             && $this->validate_iban($this->victoriabank_mia_creditor_account);
     }
 
-    protected function validate_settings()
-    {
-        if (!parent::validate_settings()) {
-            return false;
-        }
-
-        if (!$this->check_settings()) {
-            /* translators: 1: Plugin installation instructions URL */
-            $message_instructions = sprintf(__('See plugin documentation for <a href="%1$s" target="_blank">installation instructions</a>.', 'payment-gateway-wc-victoriabank-mia'), 'https://wordpress.org/plugins/payment-gateway-wc-victoriabank-mia/#installation');
-            $this->add_error(sprintf('<strong>%1$s</strong>: %2$s. %3$s', esc_html__('Connection Settings', 'payment-gateway-wc-victoriabank-mia'), esc_html__('Not configured', 'payment-gateway-wc-victoriabank-mia'), wp_kses_post($message_instructions)));
-            return false;
-        }
-
-        return true;
-    }
-
     public function validate_order_template_field($key, $value)
     {
         return $this->validate_required_field($key, $value);
