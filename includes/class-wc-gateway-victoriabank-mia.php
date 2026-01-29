@@ -845,19 +845,6 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
 
         return false;
     }
-
-    protected function get_redirect_url(\WC_Order $order)
-    {
-        $redirect_url = $this->get_return_url($order);
-        return (string) apply_filters('victoriabank_mia_redirect_url', $redirect_url, $order);
-    }
-
-    protected function get_callback_url()
-    {
-        // https://developer.woocommerce.com/docs/extensions/core-concepts/woocommerce-plugin-api-callback/
-        $callback_url = WC()->api_request_url("wc_{$this->id}");
-        return (string) apply_filters('victoriabank_mia_callback_url', $callback_url);
-    }
     //endregion
 
     //region Init
