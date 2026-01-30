@@ -178,7 +178,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
                 ),
             ),
             'victoriabank_mia_certificate' => array(
-                'title'       => __('Certificate', 'payment-gateway-wc-victoriabank-mia'),
+                'title'       => __('Bank certificate', 'payment-gateway-wc-victoriabank-mia'),
                 'type'        => 'textarea',
                 'description' => 'VBCA.crt',
                 'desc_tip'    => __('Victoriabank Public Key Certificate to validate the authenticity of the payment notifications.', 'payment-gateway-wc-victoriabank-mia'),
@@ -189,7 +189,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
                 ),
             ),
             'victoriabank_mia_company_name' => array(
-                'title'       => __('Company Name', 'payment-gateway-wc-victoriabank-mia'),
+                'title'       => __('Company name', 'payment-gateway-wc-victoriabank-mia'),
                 'type'        => 'text',
                 'description' => $blog_info_name,
                 'desc_tip'    => __('Commercial name that the customer will see in the app during payment.', 'payment-gateway-wc-victoriabank-mia'),
@@ -201,7 +201,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
                 ),
             ),
             'victoriabank_mia_creditor_account' => array(
-                'title'       => __('Creditor Account', 'payment-gateway-wc-victoriabank-mia'),
+                'title'       => __('Creditor account', 'payment-gateway-wc-victoriabank-mia'),
                 'type'        => 'text',
                 'description' => __('IBAN', 'payment-gateway-wc-victoriabank-mia'),
                 'desc_tip'    => __('IBAN account for receiving payments.', 'payment-gateway-wc-victoriabank-mia'),
