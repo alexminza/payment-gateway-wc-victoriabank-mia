@@ -65,7 +65,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
 
         parent::__construct();
 
-        $this->icon = plugins_url('/assets/img/mia.svg', self::MOD_PLUGIN_FILE);
+        $this->icon = plugins_url('assets/img/mia.svg', self::MOD_PLUGIN_FILE);
         $this->transaction_validity = intval($this->get_option('transaction_validity', self::DEFAULT_VALIDITY));
 
         // https://github.com/alexminza/victoriabank-mia-sdk-php/blob/main/src/VictoriabankMia/VictoriabankMiaClient.php
@@ -580,7 +580,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
 
         //region Validate order ID
         $callback_qr_extension_id = strval($callback_data['qrExtensionUUID']);
-        $order = $this->get_order_by_qr_extension_id($callback_qr_extension_id);
+        $order = $this->get_order_by_meta_field_value(self::MOD_QR_EXTENSION_ID, $callback_qr_extension_id);
 
         if (empty($order)) {
             /* translators: 1: QR Extension ID, 2: Payment method title */
@@ -811,39 +811,6 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         $order->add_order_note($message);
 
         return true;
-    }
-    //endregion
-
-    //region Utility
-    /**
-     * Lookup order by QR Extension ID meta field value.
-     * Victoriabank MIA API does not currently support passing Order ID for transactions.
-     *
-     * @link https://stackoverflow.com/questions/71438717/extend-wc-get-orders-with-a-custom-meta-key-and-meta-value
-     */
-    protected function get_order_by_qr_extension_id(string $qr_extension_id)
-    {
-        $args = array(
-            'meta_key'   => self::MOD_QR_EXTENSION_ID, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-            'meta_value' => $qr_extension_id,          // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
-        );
-
-        $orders = wc_get_orders($args);
-        $orders_count = count($orders);
-
-        if (1 === $orders_count) {
-            return $orders[0];
-        } elseif ($orders_count > 1) {
-            $this->log(
-                sprintf('Duplicate order meta %1$s: %2$s', self::MOD_QR_EXTENSION_ID, $qr_extension_id),
-                \WC_Log_Levels::ERROR,
-                array(
-                    'orders' => $orders,
-                )
-            );
-        }
-
-        return false;
     }
     //endregion
 
