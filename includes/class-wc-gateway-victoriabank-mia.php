@@ -306,6 +306,120 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
     }
     //endregion
 
+    //region QR
+    /**
+     * @param string $thank_you_title
+     * @param \WC_Order $order
+     */
+    public function thankyou_order_received_text($thank_you_title, $order)
+    {
+        // https://rudrastyh.com/woocommerce/thank-you-page.html
+        if (!empty($order)) {
+            if (!$order->is_paid() && $order->get_payment_method() === $this->id) {
+                $thank_you_title .= '<br />' . __('This order has a pending payment. Follow the instructions below.', 'payment-gateway-wc-victoriabank-mia');
+            }
+        }
+
+        return wp_kses_post($thank_you_title);
+    }
+
+    /**
+     * @param int $order_id
+     */
+    public function thankyou_page($order_id)
+    {
+        $qr_code_div_id = "{$this->id}-order-qrcode";
+        $qr_code_js_div_id = "{$qr_code_div_id}-js";
+
+        $order = wc_get_order($order_id);
+        if ($order->is_paid()) {
+            ?>
+            <fieldset id="<?php echo esc_attr($qr_code_div_id); ?>">
+                <legend><?php echo esc_html($this->title); ?></legend>
+                <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                    <p><?php esc_html_e('This order is fully paid.', 'payment-gateway-wc-victoriabank-mia'); ?></p>
+                </div>
+            </fieldset>
+            <?php
+            return;
+        }
+
+        $qr_url = $order->get_meta(self::MOD_QR_URL, true);
+        if (empty($qr_url)) {
+            /* translators: 1: Order ID, 2: Meta field name */
+            $message = sprintf(__('Order #%1$s missing meta field %2$s.', 'payment-gateway-wc-victoriabank-mia'), $order_id, self::MOD_QR_URL);
+            $this->log($message, \WC_Log_Levels::ERROR);
+            return;
+        }
+
+        $is_mobile = wp_is_mobile();
+        $qr_code_title = $is_mobile ? __('Select & Pay', 'payment-gateway-wc-victoriabank-mia') : __('Scan & Pay', 'payment-gateway-wc-victoriabank-mia');
+        $qr_code_text = $is_mobile ? __('Choose the financial app from the list by pressing the button below.', 'payment-gateway-wc-victoriabank-mia') : __('Scan this QR code with your phone camera or from your financial app and complete the payment.', 'payment-gateway-wc-victoriabank-mia');
+        $qr_code_url_text = __('Banks list', 'payment-gateway-wc-victoriabank-mia');
+
+        ?>
+        <fieldset id="<?php echo esc_attr($qr_code_div_id); ?>">
+            <legend><?php echo esc_html($this->title); ?></legend>
+            <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                <img src="<?php echo esc_url($this->icon); ?>" alt="<?php echo esc_attr($this->title); ?>" class="aligncenter" style="max-width: 200px; height: auto;">
+                <div id="<?php echo esc_attr($qr_code_js_div_id); ?>" class="aligncenter"></div>
+                <h2><?php echo esc_html($qr_code_title); ?></h2>
+                <p><?php echo esc_html($qr_code_text); ?></p>
+                <a href="<?php echo esc_url($qr_url); ?>" target="_blank" class="woocommerce-button button pay order-actions-button"><?php echo esc_html($qr_code_url_text); ?></a>
+            </div>
+        </fieldset>
+        <?php
+
+        if (!$is_mobile) {
+            // https://cdnjs.com/libraries/qrcodejs
+            // <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+            $js_div_id = wp_json_encode($qr_code_js_div_id);
+            $js_text = wp_json_encode($qr_url);
+
+            wp_enqueue_script('qrcodejs', plugins_url('/assets/js/qrcodejs/qrcode.min.js', __FILE__), array(), '1.0.0', true);
+            wp_add_inline_script(
+                'qrcodejs',
+                "var qrcode = new QRCode({$js_div_id}, {
+                    text: {$js_text},
+                    width: 200,
+                    height: 200
+                });"
+            );
+        }
+    }
+
+    public function ajax_check_order_status()
+    {
+        $order_id = isset($_POST['order_id']) ? intval(wp_unslash($_POST['order_id'])) : 0;
+        $nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
+
+        $expected_nonce = "{$this->id}-check-order-status-{$order_id}";
+        if (empty($order_id) || !wp_verify_nonce($nonce, $expected_nonce)) {
+            $response = array(
+                'success' => false,
+                'message' => __('Invalid request', 'payment-gateway-wc-victoriabank-mia'),
+            );
+            wp_send_json_error($response, \WP_Http::UNPROCESSABLE_ENTITY);
+        }
+
+        $order = wc_get_order($order_id);
+        if (empty($order)) {
+            $response = array(
+                'success' => false,
+                'message' => __('Order not found', 'payment-gateway-wc-victoriabank-mia'),
+            );
+            wp_send_json_error($response, \WP_Http::UNPROCESSABLE_ENTITY);
+        }
+
+        $response = array(
+            'success' => true,
+            'paid' => $order->is_paid(),
+        );
+        wp_send_json($response);
+    }
+    //endregion
+
     //region Victoriabank MIA
     /**
      * @link https://github.com/alexminza/victoriabank-mia-sdk-php/blob/main/README.md#getting-started
