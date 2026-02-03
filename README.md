@@ -15,6 +15,7 @@ WordPress plugin: https://wordpress.org/plugins/payment-gateway-wc-victoriabank-
 
 * Online payments with [MIA Instant Payments](https://mia.bnm.md/en)
 * Reverse transactions – complete refunds[^1]
+* Admin order actions – check order payment status
 * Supports WooCommerce [block-based checkout experience](https://woocommerce.com/checkout-blocks/)
 * Free to use – [Open-source GPL-3.0 license on GitHub](https://github.com/alexminza/payment-gateway-wc-victoriabank-mia)
 
@@ -22,6 +23,7 @@ WordPress plugin: https://wordpress.org/plugins/payment-gateway-wc-victoriabank-
 
 ## Getting Started
 
+* [Victoriabank MIA](https://www.victoriabank.md/en/operatiuni-curente/mia-business)
 * [Installation Instructions](https://wordpress.org/plugins/payment-gateway-wc-victoriabank-mia/installation/)
 * [Frequently Asked Questions](https://wordpress.org/plugins/payment-gateway-wc-victoriabank-mia/faq/)
 
@@ -38,3 +40,7 @@ WordPress plugin: https://wordpress.org/plugins/payment-gateway-wc-victoriabank-
 3\. Refunds
 
 ![Refunds](./.wordpress-org/screenshot-3.png)
+
+4\. Order actions
+
+![Order actions](./.wordpress-org/screenshot-4.png)

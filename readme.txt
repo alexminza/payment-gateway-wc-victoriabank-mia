@@ -18,6 +18,7 @@ Accept MIA Instant Payments directly on your store with the Payment Gateway for 
 
 * Online payments with [MIA Instant Payments](https://mia.bnm.md/en)
 * Reverse transactions – complete refunds[^1]
+* Admin order actions – check order payment status
 * Supports WooCommerce [block-based checkout experience](https://woocommerce.com/checkout-blocks/)
 * Free to use – [Open-source GPL-3.0 license on GitHub](https://github.com/alexminza/payment-gateway-wc-victoriabank-mia)
 
@@ -46,7 +47,7 @@ Use the *WooCommerce > Settings > Payments > Victoriabank MIA* screen to configu
 
 = Where can I get the Connection Settings? =
 
-The connection settings are provided by Victoriabank. This data is used by the plugin to connect to the Victoriabank MIA payment gateway and process the transactions. Please see [https://oferte.victoriabank.md/mia-business](https://oferte.victoriabank.md/mia-business) and contact [mia@vb.md](mailto:mia@vb.md) for details.
+The connection settings are provided by Victoriabank. This data is used by the plugin to connect to the Victoriabank MIA payment gateway and process the transactions. Please see [https://www.victoriabank.md/en/operatiuni-curente/mia-business](https://www.victoriabank.md/en/operatiuni-curente/mia-business) and contact [mia@vb.md](mailto:mia@vb.md) for details.
 
 = What store settings are supported? =
 
@@ -71,6 +72,13 @@ See [payment-gateway-wc-victoriabank-mia project releases on GitHub](https://git
 = 1.1.0 =
 Improved QR payment UI/UX.
 
+= 1.0.5 =
+* Improved [Composer packages versions compatibility](https://vanrossum.dev/37-wordpress-and-composer) by using [Jetpack Autoloader by Automattic](https://github.com/Automattic/jetpack-autoloader)
+* Code reorganization and refactoring for better maintainability
+
+= 1.0.4 =
+Added manual check payment status order action.
+
 = 1.0.3 =
 Fixed vendor packages deployment.
 
@@ -87,6 +95,12 @@ Initial version release.
 
 = 1.1.0 =
 Improved QR payment UI/UX.
+
+= 1.0.5 =
+Code reorganization and refactoring for better maintainability.
+
+= 1.0.4 =
+Added manual check payment status order action.
 
 = 1.0.3 =
 Fixed vendor packages deployment.
