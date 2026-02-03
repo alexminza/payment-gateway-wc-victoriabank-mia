@@ -19,7 +19,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
     const MOD_TEXT_DOMAIN = 'payment-gateway-wc-victoriabank-mia';
     const MOD_PREFIX      = 'victoriabank_mia_';
     const MOD_TITLE       = 'Victoriabank MIA';
-    const MOD_VERSION     = '1.0.5';
+    const MOD_VERSION     = '1.0.6';
     const MOD_PLUGIN_FILE = VICTORIABANK_MIA_MOD_PLUGIN_FILE;
 
     const SUPPORTED_CURRENCIES = array('MDL');
@@ -820,7 +820,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
     //region Integration
     public static function order_actions(array $actions, \WC_Order $order)
     {
-        if ($order->is_paid() || $order->get_payment_method() !== self::MOD_ID) {
+        if (!$order->needs_payment() || $order->get_payment_method() !== self::MOD_ID) {
             return $actions;
         }
 
