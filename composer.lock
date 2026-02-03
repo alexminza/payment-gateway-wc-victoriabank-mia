@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "alexminza/victoriabank-mia-sdk",
-            "version": "v1.0.3",
+            "version": "v1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/alexminza/victoriabank-mia-sdk-php.git",
-                "reference": "f046d1f287c415c216b862999eb6108ea90b2f93"
+                "reference": "14f4964908a0f3d7d0e9d526f47863f5762ac1e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alexminza/victoriabank-mia-sdk-php/zipball/f046d1f287c415c216b862999eb6108ea90b2f93",
-                "reference": "f046d1f287c415c216b862999eb6108ea90b2f93",
+                "url": "https://api.github.com/repos/alexminza/victoriabank-mia-sdk-php/zipball/14f4964908a0f3d7d0e9d526f47863f5762ac1e4",
+                "reference": "14f4964908a0f3d7d0e9d526f47863f5762ac1e4",
                 "shasum": ""
             },
             "require": {
@@ -27,8 +27,11 @@
                 "php": ">=7.2.5"
             },
             "require-dev": {
+                "dealerdirect/phpcodesniffer-composer-installer": "*",
                 "monolog/monolog": "*",
+                "phpcompatibility/php-compatibility": "*",
                 "phpunit/phpunit": "*",
+                "squizlabs/php_codesniffer": "*",
                 "vlucas/phpdotenv": "*"
             },
             "suggest": {
@@ -58,7 +61,6 @@
                 "api",
                 "mia",
                 "payments",
-                "php",
                 "qr",
                 "sdk",
                 "victoriabank"
@@ -68,7 +70,7 @@
                 "issues": "https://github.com/alexminza/victoriabank-mia-sdk-php/issues",
                 "source": "https://github.com/alexminza/victoriabank-mia-sdk-php"
             },
-            "time": "2026-01-02T14:10:03+00:00"
+            "time": "2026-02-02T15:04:41+00:00"
         },
         {
             "name": "alexminza/wc-payment-gateway-base",
