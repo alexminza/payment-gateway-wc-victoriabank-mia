@@ -3,7 +3,7 @@ Contributors: alexminza
 Tags: Moldova, Victoriabank, MIA, QR, payment gateway
 Requires at least: 4.8
 Tested up to: 6.9
-Stable tag: 1.0.4
+Stable tag: 1.0.5
 Requires PHP: 7.2.5
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -69,6 +69,10 @@ You can also contribute to the plugin by translating it. Simply visit [translate
 
 See [payment-gateway-wc-victoriabank-mia project releases on GitHub](https://github.com/alexminza/payment-gateway-wc-victoriabank-mia/releases) for details.
 
+= 1.0.5 =
+* Improved [Composer packages versions compatibility](https://vanrossum.dev/37-wordpress-and-composer) by using [Jetpack Autoloader by Automattic](https://github.com/Automattic/jetpack-autoloader)
+* Code reorganization and refactoring for better maintainability
+
 = 1.0.4 =
 Added manual check payment status order action.
 
@@ -85,6 +89,9 @@ Minor improvements.
 Initial version release.
 
 == Upgrade Notice ==
+
+= 1.0.5 =
+Code reorganization and refactoring for better maintainability.
 
 = 1.0.4 =
 Added manual check payment status order action.

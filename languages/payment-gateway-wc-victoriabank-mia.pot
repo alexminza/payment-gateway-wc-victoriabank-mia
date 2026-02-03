@@ -1,11 +1,10 @@
 # Copyright (C) 2026 Alexander Minza
 # This file is distributed under the GPLv3 or later.
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Payment Gateway for Victoriabank MIA for WooCommerce 1.0.4\n"
+"Project-Id-Version: Payment Gateway for Victoriabank MIA for WooCommerce 1.0.5\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payment-gateway-wc-victoriabank-mia\n"
-"POT-Creation-Date: 2026-01-02 14:58+0200\n"
+"POT-Creation-Date: 2026-02-02 15:02+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,300 +23,300 @@ msgstr ""
 msgid "Accept MIA Instant Payments directly on your store with the Payment Gateway for Victoriabank MIA for WooCommerce."
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:76
+#: includes/class-wc-gateway-victoriabank-mia.php:58
 msgid "Accept MIA Instant Payments through Victoriabank."
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:122
+#: includes/class-wc-gateway-victoriabank-mia.php:93
 msgid "Enable/Disable"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:124
+#: includes/class-wc-gateway-victoriabank-mia.php:95
 msgid "Enable this gateway"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:128
+#: includes/class-wc-gateway-victoriabank-mia.php:99
 msgid "Title"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:130
+#: includes/class-wc-gateway-victoriabank-mia.php:101
 msgid "Payment method title that the customer will see during checkout."
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:138
+#: includes/class-wc-gateway-victoriabank-mia.php:109
 msgid "Description"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:140
+#: includes/class-wc-gateway-victoriabank-mia.php:111
 msgid "Payment method description that the customer will see during checkout."
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:142
+#: includes/class-wc-gateway-victoriabank-mia.php:113
 msgid "Pay instantly by scanning the QR code using your bank's mobile application."
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:146
+#: includes/class-wc-gateway-victoriabank-mia.php:117
 msgid "Test mode"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:148
+#: includes/class-wc-gateway-victoriabank-mia.php:119
 msgid "Enabled"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:149
+#: includes/class-wc-gateway-victoriabank-mia.php:120
 msgid "Use Test or Live bank gateway to process the payments. Disable when ready to accept live payments."
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:154
+#: includes/class-wc-gateway-victoriabank-mia.php:125
 msgid "Debug mode"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:156
+#: includes/class-wc-gateway-victoriabank-mia.php:127
 msgid "Enable logging"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:157
+#: includes/class-wc-gateway-victoriabank-mia.php:128
 msgid "View logs"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:158
+#: includes/class-wc-gateway-victoriabank-mia.php:129
 msgid "Save debug messages to the WooCommerce System Status logs. Note: this may log personal information. Use this for debugging purposes only and delete the logs when finished."
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:163
+#: includes/class-wc-gateway-victoriabank-mia.php:134
 msgid "Order description"
 msgstr ""
 
 #. translators: 1: Example placeholder shown to user, represents Order ID
-#: payment-gateway-wc-victoriabank-mia.php:166
+#: includes/class-wc-gateway-victoriabank-mia.php:137
 #, php-format
 msgid "Format: <code>%1$s</code> - Order ID"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:167
+#: includes/class-wc-gateway-victoriabank-mia.php:138
 msgid "Order description that the customer will see in the app during payment."
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:176
+#: includes/class-wc-gateway-victoriabank-mia.php:147
 msgid "Transaction validity"
 msgstr ""
 
 #. translators: 1: Transaction validity in minutes
-#: payment-gateway-wc-victoriabank-mia.php:179
+#: includes/class-wc-gateway-victoriabank-mia.php:150
 #, php-format
 msgid "Default: %1$s minutes"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:180
+#: includes/class-wc-gateway-victoriabank-mia.php:151
 msgid "QR code validity time in minutes."
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:191
-#: payment-gateway-wc-victoriabank-mia.php:325
+#: includes/class-wc-gateway-victoriabank-mia.php:162
+#: vendor/alexminza/wc-payment-gateway-base/src/WC_Payment_Gateway/WC_Payment_Gateway_Base.php:103
 msgid "Connection Settings"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:192
+#: includes/class-wc-gateway-victoriabank-mia.php:163
 msgid "Payment gateway connection credentials are provided by the bank."
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:196
+#: includes/class-wc-gateway-victoriabank-mia.php:167
 msgid "Username"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:203
+#: includes/class-wc-gateway-victoriabank-mia.php:174
 msgid "Password"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:210
-msgid "Certificate"
+#: includes/class-wc-gateway-victoriabank-mia.php:181
+msgid "Bank certificate"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:213
+#: includes/class-wc-gateway-victoriabank-mia.php:184
 msgid "Victoriabank Public Key Certificate to validate the authenticity of the payment notifications."
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:221
-msgid "Company Name"
+#: includes/class-wc-gateway-victoriabank-mia.php:192
+msgid "Company name"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:224
+#: includes/class-wc-gateway-victoriabank-mia.php:195
 msgid "Commercial name that the customer will see in the app during payment."
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:233
-msgid "Creditor Account"
+#: includes/class-wc-gateway-victoriabank-mia.php:204
+msgid "Creditor account"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:235
+#: includes/class-wc-gateway-victoriabank-mia.php:206
 msgid "IBAN"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:236
+#: includes/class-wc-gateway-victoriabank-mia.php:207
 msgid "IBAN account for receiving payments."
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:247
+#: includes/class-wc-gateway-victoriabank-mia.php:218
 msgid "Payment Notification"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:251
+#: includes/class-wc-gateway-victoriabank-mia.php:222
 msgid "Provide this URL to the bank to enable online payment notifications."
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:252
+#: includes/class-wc-gateway-victoriabank-mia.php:223
 msgid "Callback URL"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:312
-msgid "Unsupported store currency"
-msgstr ""
-
-#: payment-gateway-wc-victoriabank-mia.php:314
-msgid "Supported currencies"
-msgstr ""
-
-#. translators: 1: Plugin installation instructions URL
-#: payment-gateway-wc-victoriabank-mia.php:324
-#, php-format
-msgid "See plugin documentation for <a href=\"%1$s\" target=\"_blank\">installation instructions</a>."
-msgstr ""
-
-#: payment-gateway-wc-victoriabank-mia.php:325
-msgid "Not configured"
-msgstr ""
-
-#. translators: 1: Field label
-#: payment-gateway-wc-victoriabank-mia.php:345
-#, php-format
-msgid "%1$s field must be set."
-msgstr ""
-
 #. translators: 1: Field label, 2: Min value, 3: Max value
-#: payment-gateway-wc-victoriabank-mia.php:360
+#: includes/class-wc-gateway-victoriabank-mia.php:250
 #, php-format
 msgid "%1$s field must be an integer between %2$d and %3$d."
 msgstr ""
 
 #. translators: 1: Field label
-#: payment-gateway-wc-victoriabank-mia.php:380
+#: includes/class-wc-gateway-victoriabank-mia.php:270
 #, php-format
 msgid "Invalid %1$s field."
 msgstr ""
 
 #. translators: 1: Field label
-#: payment-gateway-wc-victoriabank-mia.php:395
+#: includes/class-wc-gateway-victoriabank-mia.php:285
 #, php-format
 msgid "Invalid %1$s field. Must start with MD and have 24 characters."
 msgstr ""
 
-#. translators: 1: Payment method title, 2: Plugin settings URL
-#: payment-gateway-wc-victoriabank-mia.php:444
-#, php-format
-msgid "%1$s is not properly configured. Verify plugin <a href=\"%2$s\">Connection Settings</a>."
-msgstr ""
-
-#. translators: 1: Payment method title, 2: Plugin settings URL
-#: payment-gateway-wc-victoriabank-mia.php:451
-#, php-format
-msgid "See <a href=\"%2$s\">%1$s settings</a> page for log details and setup instructions."
-msgstr ""
-
 #. translators: 1: Order ID, 2: Payment method title, 3: API response details
-#: payment-gateway-wc-victoriabank-mia.php:632
+#: includes/class-wc-gateway-victoriabank-mia.php:486
 #, php-format
 msgid "Order #%1$s payment initiated via %2$s: %3$s"
 msgstr ""
 
 #. translators: 1: Order ID, 2: Payment method title
-#: payment-gateway-wc-victoriabank-mia.php:651
+#: includes/class-wc-gateway-victoriabank-mia.php:505
 #, php-format
 msgid "Order #%1$s payment initiation failed via %2$s."
 msgstr ""
 
 #. translators: 1: Payment method title
-#: payment-gateway-wc-victoriabank-mia.php:675
+#: includes/class-wc-gateway-victoriabank-mia.php:528
 #, php-format
 msgid "%1$s Callback URL"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:698
+#: includes/class-wc-gateway-victoriabank-mia.php:551
 msgid "Payment notification callback"
 msgstr ""
 
 #. translators: 1: QR Extension ID, 2: Payment method title
-#: payment-gateway-wc-victoriabank-mia.php:734
+#: includes/class-wc-gateway-victoriabank-mia.php:587
 #, php-format
 msgid "Order not found by QR Extension ID: %1$s received from %2$s."
 msgstr ""
 
 #. translators: 1: Order ID, 2: Meta field key
-#: payment-gateway-wc-victoriabank-mia.php:765
-#: payment-gateway-wc-victoriabank-mia.php:909
+#: includes/class-wc-gateway-victoriabank-mia.php:624
+#: includes/class-wc-gateway-victoriabank-mia.php:774
 #, php-format
 msgid "Order #%1$s missing meta field %2$s."
 msgstr ""
 
 #. translators: 1: Order ID, 2: Payment method title, 3: Payment status
-#: payment-gateway-wc-victoriabank-mia.php:793
+#: includes/class-wc-gateway-victoriabank-mia.php:652
 #, php-format
 msgid "Order #%1$s %2$s payment status: %3$s"
 msgstr ""
 
 #. translators: 1: Order ID
-#: payment-gateway-wc-victoriabank-mia.php:819
+#: includes/class-wc-gateway-victoriabank-mia.php:678
 #, php-format
 msgid "Order #%1$s payment check failed."
 msgstr ""
 
 #. translators: 1: Payment data price, 2: Order total price
-#: payment-gateway-wc-victoriabank-mia.php:840
+#: includes/class-wc-gateway-victoriabank-mia.php:699
 #, php-format
 msgid "Order payment data mismatch: Payment: %1$s, Order: %2$s."
 msgstr ""
 
 #. translators: 1: Order ID
-#: payment-gateway-wc-victoriabank-mia.php:848
+#: includes/class-wc-gateway-victoriabank-mia.php:707
 #, php-format
 msgid "Order #%1$s already fully paid."
 msgstr ""
 
 #. translators: 1: Order ID, 2: Payment method title, 3: Payment data
-#: payment-gateway-wc-victoriabank-mia.php:867
+#: includes/class-wc-gateway-victoriabank-mia.php:730
 #, php-format
 msgid "Order #%1$s payment completed via %2$s: %3$s"
 msgstr ""
 
 #. translators: 1: Payment method title
-#: payment-gateway-wc-victoriabank-mia.php:899
+#: includes/class-wc-gateway-victoriabank-mia.php:764
 #, php-format
 msgid "Partial refunds are not currently supported by %1$s."
 msgstr ""
 
 #. translators: 1: Order ID, 2: Refund amount, 3: Payment method title, 4: Error message
-#: payment-gateway-wc-victoriabank-mia.php:934
+#: includes/class-wc-gateway-victoriabank-mia.php:799
 #, php-format
 msgid "Order #%1$s refund of %2$s via %3$s failed."
 msgstr ""
 
 #. translators: 1: Order ID, 2: Refund amount, 3: Payment method title
-#: payment-gateway-wc-victoriabank-mia.php:943
+#: includes/class-wc-gateway-victoriabank-mia.php:808
 #, php-format
 msgid "Order #%1$s refund of %2$s via %3$s approved."
 msgstr ""
 
+#. translators: 1: Payment method title
+#: includes/class-wc-gateway-victoriabank-mia.php:825
+#, php-format
+msgid "Check %1$s order payment"
+msgstr ""
+
+#: vendor/alexminza/wc-payment-gateway-base/src/WC_Payment_Gateway/WC_Payment_Gateway_Base.php:90
+msgid "Unsupported store currency"
+msgstr ""
+
+#: vendor/alexminza/wc-payment-gateway-base/src/WC_Payment_Gateway/WC_Payment_Gateway_Base.php:92
+msgid "Supported currencies"
+msgstr ""
+
+#. translators: 1: Payment gateway ID
+#: vendor/alexminza/wc-payment-gateway-base/src/WC_Payment_Gateway/WC_Payment_Gateway_Base.php:102
+#, php-format
+msgid "See plugin documentation for <a href=\"https://wordpress.org/plugins/%1$s/#installation\" target=\"_blank\">installation instructions</a>."
+msgstr ""
+
+#: vendor/alexminza/wc-payment-gateway-base/src/WC_Payment_Gateway/WC_Payment_Gateway_Base.php:103
+msgid "Not configured"
+msgstr ""
+
+#. translators: 1: Field label
+#: vendor/alexminza/wc-payment-gateway-base/src/WC_Payment_Gateway/WC_Payment_Gateway_Base.php:123
+#, php-format
+msgid "%1$s field must be set."
+msgstr ""
+
+#. translators: 1: Payment method title, 2: Plugin settings URL
+#: vendor/alexminza/wc-payment-gateway-base/src/WC_Payment_Gateway/WC_Payment_Gateway_Base.php:222
+#, php-format
+msgid "%1$s is not properly configured. Verify plugin <a href=\"%2$s\">Connection Settings</a>."
+msgstr ""
+
+#. translators: 1: Payment method title, 2: Plugin settings URL
+#: vendor/alexminza/wc-payment-gateway-base/src/WC_Payment_Gateway/WC_Payment_Gateway_Base.php:229
+#, php-format
+msgid "See <a href=\"%2$s\">%1$s settings</a> page for log details and setup instructions."
+msgstr ""
+
 #. translators: 1: Original message
-#: payment-gateway-wc-victoriabank-mia.php:1004
+#: vendor/alexminza/wc-payment-gateway-base/src/WC_Payment_Gateway/WC_Payment_Gateway_Base.php:326
 #, php-format
 msgid "TEST: %1$s"
 msgstr ""
 
-#: payment-gateway-wc-victoriabank-mia.php:1092
+#: vendor/alexminza/wc-payment-gateway-base/src/WC_Payment_Gateway/WC_Payment_Gateway_Base.php:483
 msgid "Settings"
-msgstr ""
-
-#. translators: 1: Payment method title
-#: payment-gateway-wc-victoriabank-mia.php:1106
-#, php-format
-msgid "Check %1$s order payment"
 msgstr ""
