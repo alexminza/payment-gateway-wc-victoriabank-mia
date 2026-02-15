@@ -700,6 +700,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         if ($order_price !== $payment_data_price) {
             /* translators: 1: Payment data price, 2: Order total price */
             $message = sprintf(__('Order payment data mismatch: Payment: %1$s, Order: %2$s.', 'payment-gateway-wc-victoriabank-mia'), $payment_data_price, $order_price);
+            $message = $this->get_test_message($message);
             $this->log($message, \WC_Log_Levels::ERROR);
 
             return new \WP_Error(\WP_Http::UNPROCESSABLE_ENTITY, 'Order payment data mismatch');
@@ -708,6 +709,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         if ($order->is_paid()) {
             /* translators: 1: Order ID */
             $message = sprintf(__('Order #%1$s already fully paid.', 'payment-gateway-wc-victoriabank-mia'), $order_id);
+            $message = $this->get_test_message($message);
             $this->log($message, \WC_Log_Levels::WARNING);
 
             return new \WP_Error(\WP_Http::ACCEPTED, 'Order already fully paid');
