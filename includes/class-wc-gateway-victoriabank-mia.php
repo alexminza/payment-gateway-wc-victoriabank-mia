@@ -550,8 +550,10 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
                 throw new \Exception('Invalid callback data');
             }
 
+            $message = __('Payment notification callback', 'payment-gateway-wc-victoriabank-mia');
+            $message = $this->get_test_message($message);
             $this->log(
-                sprintf(__('Payment notification callback', 'payment-gateway-wc-victoriabank-mia')),
+                $message,
                 \WC_Log_Levels::INFO,
                 array(
                     'callback_body' => $callback_body,
