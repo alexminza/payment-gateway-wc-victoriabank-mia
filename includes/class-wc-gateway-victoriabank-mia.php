@@ -422,7 +422,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         wp_enqueue_script(
             $script_handle,
             plugins_url('/assets/js/thankyou.js', self::MOD_PLUGIN_FILE),
-            $is_mobile ? array() : array('qrcodejs'),
+            $is_mobile ? array('jquery') : array('jquery', 'qrcodejs'),
             self::MOD_VERSION,
             true
         );

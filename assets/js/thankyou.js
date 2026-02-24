@@ -1,5 +1,5 @@
 /* global victoriabank_mia_thankyou_page */
-( function () {
+( function ( $ ) {
 	'use strict';
 
 	var orderId      = victoriabank_mia_thankyou_page.order_id;
@@ -12,13 +12,13 @@
 	var pollTimer      = null;
 	var countdownTimer = null;
 
-	var container   = document.getElementById( 'victoriabank_mia-order-qrcode' );
-	var qrSection   = document.getElementById( 'victoriabank_mia-qr-section' );
-	var successMsg  = document.getElementById( 'victoriabank_mia-success-message' );
-	var expiredMsg  = document.getElementById( 'victoriabank_mia-expired-message' );
-	var countdownEl = document.getElementById( 'victoriabank_mia-countdown' );
+	var $container   = $( '#victoriabank_mia-order-qrcode' );
+	var $qrSection   = $( '#victoriabank_mia-qr-section' );
+	var $successMsg  = $( '#victoriabank_mia-success-message' );
+	var $expiredMsg  = $( '#victoriabank_mia-expired-message' );
+	var $countdownEl = $( '#victoriabank_mia-countdown' );
 
-	if ( ! container ) {
+	if ( ! $container.length ) {
 		return;
 	}
 
@@ -27,9 +27,9 @@
 	 */
 	function showSuccess() {
 		stopAll();
-		if ( qrSection )  { qrSection.style.display  = 'none'; }
-		if ( expiredMsg ) { expiredMsg.style.display  = 'none'; }
-		if ( successMsg ) { successMsg.style.display  = 'block'; }
+		$qrSection.hide();
+		$expiredMsg.hide();
+		$successMsg.show();
 	}
 
 	/**
@@ -37,9 +37,9 @@
 	 */
 	function showExpired() {
 		stopAll();
-		if ( qrSection )  { qrSection.style.display  = 'none'; }
-		if ( successMsg ) { successMsg.style.display  = 'none'; }
-		if ( expiredMsg ) { expiredMsg.style.display  = 'block'; }
+		$qrSection.hide();
+		$successMsg.hide();
+		$expiredMsg.show();
 	}
 
 	/**
@@ -74,40 +74,30 @@
 		var remaining = expiresAt - Math.floor( Date.now() / 1000 );
 
 		if ( remaining <= 0 ) {
-			if ( countdownEl ) { countdownEl.textContent = '00:00'; }
+			$countdownEl.text( '00:00' );
 			showExpired();
 			return;
 		}
 
-		if ( countdownEl ) { countdownEl.textContent = formatTime( remaining ); }
+		$countdownEl.text( formatTime( remaining ) );
 	}
 
 	/**
 	 * Poll the server to check whether the order has been paid.
 	 */
 	function pollOrderStatus() {
-		var xhr = new XMLHttpRequest();
-		xhr.open( 'POST', ajaxUrl, true );
-		xhr.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
-
-		xhr.onreadystatechange = function () {
-			if ( xhr.readyState !== 4 ) { return; }
-			if ( xhr.status !== 200 ) { return; }
-
-			try {
-				var data = JSON.parse( xhr.responseText );
+		$.post(
+			ajaxUrl,
+			{
+				action:   actionStatus,
+				order_id: orderId,
+				nonce:    nonce,
+			},
+			function ( data ) {
 				if ( data && data.success && data.data && data.data.paid ) {
 					showSuccess();
 				}
-			} catch ( e ) {
-				// Silently ignore JSON parse errors.
 			}
-		};
-
-		xhr.send(
-			'action=' + encodeURIComponent( actionStatus ) +
-			'&order_id=' + encodeURIComponent( orderId ) +
-			'&nonce=' + encodeURIComponent( nonce )
 		);
 	}
 
@@ -116,4 +106,4 @@
 	countdownTimer = setInterval( tickCountdown, 1000 );
 	pollOrderStatus();
 	pollTimer = setInterval( pollOrderStatus, pollInterval );
-}() );
+}( jQuery ) );
