@@ -352,85 +352,61 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
      */
     public function thankyou_page($order_id)
     {
-        $fieldset_id       = "{$this->id}-order-qrcode";
-        $qr_section_id     = "{$this->id}-qr-section";
-        $qr_code_js_div_id = "{$this->id}-order-qrcode-js";
-        $success_id        = "{$this->id}-success-message";
-        $expired_id        = "{$this->id}-expired-message";
-        $countdown_id      = "{$this->id}-countdown";
-        $deep_link_id      = "{$this->id}-deep-link";
+        $order     = wc_get_order($order_id);
+        $is_paid   = $order->is_paid();
+        $is_mobile = wp_is_mobile();
 
-        $order = wc_get_order($order_id);
-        if ($order->is_paid()) {
-            ?>
-            <fieldset id="<?php echo esc_attr($fieldset_id); ?>">
-                <legend><?php echo esc_html($this->title); ?></legend>
-                <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                    <p><?php esc_html_e('This order is fully paid.', 'payment-gateway-wc-victoriabank-mia'); ?></p>
-                </div>
-            </fieldset>
-            <?php
-            return;
+        $qr_url = '';
+        if (!$is_paid) {
+            $qr_url = $order->get_meta(self::MOD_QR_URL, true);
+            if (empty($qr_url)) {
+                /* translators: 1: Order ID, 2: Meta field name */
+                $message = sprintf(__('Order #%1$s missing meta field %2$s.', 'payment-gateway-wc-victoriabank-mia'), $order_id, self::MOD_QR_URL);
+                $this->log($message, \WC_Log_Levels::ERROR);
+                return;
+            }
         }
 
-        $qr_url = $order->get_meta(self::MOD_QR_URL, true);
-        if (empty($qr_url)) {
-            /* translators: 1: Order ID, 2: Meta field name */
-            $message = sprintf(__('Order #%1$s missing meta field %2$s.', 'payment-gateway-wc-victoriabank-mia'), $order_id, self::MOD_QR_URL);
-            $this->log($message, \WC_Log_Levels::ERROR);
+        wc_get_template(
+            'payment/victoriabank-mia-thankyou.php',
+            array(
+                'gateway_title'     => $this->title,
+                'gateway_icon'      => $this->icon,
+                'fieldset_id'       => "{$this->id}-order-qrcode",
+                'success_id'        => "{$this->id}-success-message",
+                'expired_id'        => "{$this->id}-expired-message",
+                'qr_section_id'     => "{$this->id}-qr-section",
+                'qr_code_js_div_id' => "{$this->id}-order-qrcode-js",
+                'countdown_id'      => "{$this->id}-countdown",
+                'deep_link_id'      => "{$this->id}-deep-link",
+                'is_paid'           => $is_paid,
+                'is_mobile'         => $is_mobile,
+                'qr_url'            => $qr_url,
+                'pay_url'           => $order->get_checkout_payment_url(true),
+                'qr_code_title'     => $is_mobile ? __('Select & Pay', 'payment-gateway-wc-victoriabank-mia') : __('Scan & Pay', 'payment-gateway-wc-victoriabank-mia'),
+                'qr_code_text'      => $is_mobile
+                    ? __('Choose the financial app from the list by pressing the button below.', 'payment-gateway-wc-victoriabank-mia')
+                    : __('Scan this QR code with your phone camera or from your financial app and complete the payment.', 'payment-gateway-wc-victoriabank-mia'),
+                'qr_code_url_text'  => __('Banks list', 'payment-gateway-wc-victoriabank-mia'),
+                'validity_text'     => __('QR code valid for', 'payment-gateway-wc-victoriabank-mia'),
+                'expired_text'      => __('The QR code has expired.', 'payment-gateway-wc-victoriabank-mia'),
+                'retry_text'        => __('Generate new QR code', 'payment-gateway-wc-victoriabank-mia'),
+                'success_text'      => __('Payment received. Thank you for your order!', 'payment-gateway-wc-victoriabank-mia'),
+                'paid_text'         => __('This order is fully paid.', 'payment-gateway-wc-victoriabank-mia'),
+            ),
+            '',
+            plugin_dir_path(self::MOD_PLUGIN_FILE) . 'templates/'
+        );
+
+        if ($is_paid) {
             return;
         }
 
         $expires_at = intval($order->get_meta(self::MOD_QR_EXPIRES_AT, true));
-        $is_mobile  = wp_is_mobile();
-
-        $qr_code_title    = $is_mobile ? __('Select & Pay', 'payment-gateway-wc-victoriabank-mia') : __('Scan & Pay', 'payment-gateway-wc-victoriabank-mia');
-        $qr_code_text     = $is_mobile
-            ? __('Choose the financial app from the list by pressing the button below.', 'payment-gateway-wc-victoriabank-mia')
-            : __('Scan this QR code with your phone camera or from your financial app and complete the payment.', 'payment-gateway-wc-victoriabank-mia');
-        $qr_code_url_text = __('Banks list', 'payment-gateway-wc-victoriabank-mia');
-        $validity_text    = __('QR code valid for', 'payment-gateway-wc-victoriabank-mia');
-        $expired_text     = __('The QR code has expired.', 'payment-gateway-wc-victoriabank-mia');
-        $retry_text       = __('Generate new QR code', 'payment-gateway-wc-victoriabank-mia');
-        $success_text     = __('Payment received. Thank you for your order!', 'payment-gateway-wc-victoriabank-mia');
-        $pay_url          = $order->get_checkout_payment_url(true);
-
-        ?>
-        <fieldset id="<?php echo esc_attr($fieldset_id); ?>">
-            <legend><?php echo esc_html($this->title); ?></legend>
-
-            <?php /* Success state – hidden until payment confirmed */ ?>
-            <div id="<?php echo esc_attr($success_id); ?>" style="display: none; flex-direction: column; align-items: center; text-align: center;">
-                <p class="woocommerce-message"><?php echo esc_html($success_text); ?></p>
-            </div>
-
-            <?php /* Expired state – hidden until QR expires */ ?>
-            <div id="<?php echo esc_attr($expired_id); ?>" style="display: none; flex-direction: column; align-items: center; text-align: center;">
-                <p><?php echo esc_html($expired_text); ?></p>
-                <a href="<?php echo esc_url($pay_url); ?>" class="woocommerce-button button pay"><?php echo esc_html($retry_text); ?></a>
-            </div>
-
-            <?php /* QR code section – visible initially */ ?>
-            <div id="<?php echo esc_attr($qr_section_id); ?>" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                <img src="<?php echo esc_url($this->icon); ?>" alt="<?php echo esc_attr($this->title); ?>" class="aligncenter" style="max-width: 200px; height: auto;">
-                <?php if (!$is_mobile) : ?>
-                <div id="<?php echo esc_attr($qr_code_js_div_id); ?>" class="aligncenter"></div>
-                <?php endif; ?>
-                <h2><?php echo esc_html($qr_code_title); ?></h2>
-                <p><?php echo esc_html($qr_code_text); ?></p>
-                <p>
-                    <?php echo esc_html($validity_text); ?>
-                    <strong id="<?php echo esc_attr($countdown_id); ?>">--:--</strong>
-                </p>
-                <a id="<?php echo esc_attr($deep_link_id); ?>" href="<?php echo esc_url($qr_url); ?>" target="_blank" class="woocommerce-button button pay order-actions-button"><?php echo esc_html($qr_code_url_text); ?></a>
-            </div>
-
-        </fieldset>
-        <?php
 
         if (!$is_mobile) {
             // https://cdnjs.com/libraries/qrcodejs
-            $js_div_id = wp_json_encode($qr_code_js_div_id);
+            $js_div_id = wp_json_encode("{$this->id}-order-qrcode-js");
             $js_text   = wp_json_encode($qr_url);
 
             wp_enqueue_script('qrcodejs', plugins_url('/assets/js/qrcodejs/qrcode.min.js', self::MOD_PLUGIN_FILE), array(), '1.0.0', true);
