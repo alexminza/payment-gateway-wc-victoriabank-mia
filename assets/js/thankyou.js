@@ -5,6 +5,9 @@
 	var pollInterval = 5000; // ms
 	var pollTimer = null;
 	var countdownTimer = null;
+	var isPolling = false;
+	var pollFailCount = 0;
+	var pollFailMax = 3;
 
 	var $container = $('#victoriabank_mia-order-qrcode');
 	var $qrSection = $('#victoriabank_mia-qr-section');
@@ -80,6 +83,9 @@
 	 * Poll the server to check whether the order has been paid.
 	 */
 	function pollOrderStatus() {
+		if (isPolling) { return; }
+		isPolling = true;
+
 		$.post(
 			victoriabank_mia_thankyou_page.ajax_url,
 			{
@@ -88,11 +94,19 @@
 				nonce: victoriabank_mia_thankyou_page.nonce,
 			},
 			function (data) {
+				pollFailCount = 0;
 				if (data && data.success && data.data && data.data.paid) {
 					showSuccess();
 				}
 			}
-		);
+		).fail(function () {
+			pollFailCount++;
+			if (pollFailCount >= pollFailMax) {
+				stopAll();
+			}
+		}).always(function () {
+			isPolling = false;
+		});
 	}
 
 	// Kick off countdown and polling immediately.
