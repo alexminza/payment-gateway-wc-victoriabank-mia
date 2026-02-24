@@ -72,6 +72,11 @@ See [payment-gateway-wc-victoriabank-mia project releases on GitHub](https://git
 = 1.1.0 =
 Improved QR payment UI/UX.
 
+= 1.0.6 =
+* Improved payment confirmation logging
+* Enhanced order actions logic
+* Added WooCommerce Product Object Caching compatibility
+
 = 1.0.5 =
 * Improved [Composer packages versions compatibility](https://vanrossum.dev/37-wordpress-and-composer) by using [Jetpack Autoloader by Automattic](https://github.com/Automattic/jetpack-autoloader)
 * Code reorganization and refactoring for better maintainability
@@ -95,6 +100,9 @@ Initial version release.
 
 = 1.1.0 =
 Improved QR payment UI/UX.
+
+= 1.0.6 =
+Improved payment confirmation logging and enhanced order actions logic.
 
 = 1.0.5 =
 Code reorganization and refactoring for better maintainability.
