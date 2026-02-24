@@ -1,14 +1,12 @@
-/* global victoriabank_mia_thankyou */
+/* global victoriabank_mia_thankyou_page */
 ( function () {
 	'use strict';
 
-	var config = victoriabank_mia_thankyou;
-
-	var orderId      = config.order_id;
-	var nonce        = config.nonce;      // check-order-status nonce
-	var expiresAt    = config.expires_at; // Unix timestamp (seconds)
-	var ajaxUrl      = config.ajax_url;
-	var actionStatus = config.action_status;
+	var orderId      = victoriabank_mia_thankyou_page.order_id;
+	var nonce        = victoriabank_mia_thankyou_page.nonce;      // check-order-status nonce
+	var expiresAt    = victoriabank_mia_thankyou_page.expires_at; // Unix timestamp (seconds)
+	var ajaxUrl      = victoriabank_mia_thankyou_page.ajax_url;
+	var actionStatus = victoriabank_mia_thankyou_page.action_status;
 
 	var pollInterval   = 5000; // ms
 	var pollTimer      = null;

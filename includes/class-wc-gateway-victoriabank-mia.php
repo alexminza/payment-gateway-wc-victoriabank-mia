@@ -418,8 +418,9 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
 
         $check_nonce = wp_create_nonce("{$this->id}-check-order-status-{$order_id}");
 
+        $script_handle = self::MOD_PREFIX . 'thankyou_page';
         wp_enqueue_script(
-            'victoriabank-mia-thankyou',
+            $script_handle,
             plugins_url('/assets/js/thankyou.js', self::MOD_PLUGIN_FILE),
             $is_mobile ? array() : array('qrcodejs'),
             self::MOD_VERSION,
@@ -427,8 +428,8 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         );
 
         wp_localize_script(
-            'victoriabank-mia-thankyou',
-            'victoriabank_mia_thankyou',
+            $script_handle,
+            $script_handle,
             array(
                 'order_id'      => $order_id,
                 'nonce'         => $check_nonce,
