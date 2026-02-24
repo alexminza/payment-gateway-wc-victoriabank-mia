@@ -26,7 +26,7 @@
 		stopAll();
 		$qrSection.hide();
 		$expiredMsg.hide();
-		$successMsg.show();
+		$successMsg.css('display', 'flex');
 	}
 
 	/**
@@ -36,7 +36,7 @@
 		stopAll();
 		$qrSection.hide();
 		$successMsg.hide();
-		$expiredMsg.show();
+		$expiredMsg.css('display', 'flex');
 	}
 
 	/**
