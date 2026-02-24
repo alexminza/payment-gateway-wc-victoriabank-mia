@@ -33,6 +33,8 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
 
     const MOD_ACTION_CHECK_PAYMENT = self::MOD_PREFIX . 'check_payment';
 
+    const MOD_QR_EXPIRES_AT = self::MOD_PREFIX . 'qr_expires_at';
+
     /**
      * Default API request timeout (seconds).
      */
@@ -45,9 +47,13 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
 
     const MIN_VALIDITY     = 1;    // minutes
     const MAX_VALIDITY     = 1440; // minutes
+
+    const REDIRECT_MODE_THANKYOU = 'thankyou';
+    const REDIRECT_MODE_QR_URL   = 'qr_url';
     //endregion
 
     protected $transaction_validity;
+    protected $redirect_mode;
     protected $victoriabank_mia_base_url, $victoriabank_mia_username, $victoriabank_mia_password, $victoriabank_mia_certificate;
     protected $victoriabank_mia_creditor_account, $victoriabank_mia_company_name;
 
@@ -67,6 +73,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
 
         $this->icon = plugins_url('assets/img/mia.svg', self::MOD_PLUGIN_FILE);
         $this->transaction_validity = intval($this->get_option('transaction_validity', self::DEFAULT_VALIDITY));
+        $this->redirect_mode        = $this->get_option('redirect_mode', self::REDIRECT_MODE_THANKYOU);
 
         // https://github.com/alexminza/victoriabank-mia-sdk-php/blob/main/src/VictoriabankMia/VictoriabankMiaClient.php
         $this->victoriabank_mia_base_url         = $this->testmode ? VictoriabankMiaClient::TEST_BASE_URL : VictoriabankMiaClient::DEFAULT_BASE_URL;
@@ -85,6 +92,12 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         //endregion
 
         add_action("woocommerce_api_wc_{$this->id}", array($this, 'check_response'));
+
+        add_action("woocommerce_thankyou_{$this->id}", array($this, 'thankyou_page'));
+        add_filter('woocommerce_thankyou_order_received_text', array($this, 'thankyou_order_received_text'), 10, 2);
+
+        add_action('wp_ajax_' . self::MOD_PREFIX . 'check_order_status', array($this, 'ajax_check_order_status'));
+        add_action('wp_ajax_nopriv_' . self::MOD_PREFIX . 'check_order_status', array($this, 'ajax_check_order_status'));
     }
 
     public function init_form_fields()
@@ -158,6 +171,17 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
                     'step'     => 1,
                     'max'      => self::MAX_VALIDITY,
                     'required' => 'required',
+                ),
+            ),
+            'redirect_mode' => array(
+                'title'       => __('After payment redirect', 'payment-gateway-wc-victoriabank-mia'),
+                'type'        => 'select',
+                'description' => __('Where to redirect the customer after the QR code is generated.', 'payment-gateway-wc-victoriabank-mia'),
+                'desc_tip'    => true,
+                'default'     => self::REDIRECT_MODE_THANKYOU,
+                'options'     => array(
+                    self::REDIRECT_MODE_THANKYOU => __('Order thank you page (with QR code and payment status polling)', 'payment-gateway-wc-victoriabank-mia'),
+                    self::REDIRECT_MODE_QR_URL   => __('QR code URL (direct deep-link to banking app)', 'payment-gateway-wc-victoriabank-mia'),
                 ),
             ),
 
@@ -328,13 +352,18 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
      */
     public function thankyou_page($order_id)
     {
-        $qr_code_div_id = "{$this->id}-order-qrcode";
-        $qr_code_js_div_id = "{$qr_code_div_id}-js";
+        $fieldset_id       = "{$this->id}-order-qrcode";
+        $qr_section_id     = "{$this->id}-qr-section";
+        $qr_code_js_div_id = "{$this->id}-order-qrcode-js";
+        $success_id        = "{$this->id}-success-message";
+        $expired_id        = "{$this->id}-expired-message";
+        $countdown_id      = "{$this->id}-countdown";
+        $deep_link_id      = "{$this->id}-deep-link";
 
         $order = wc_get_order($order_id);
         if ($order->is_paid()) {
             ?>
-            <fieldset id="<?php echo esc_attr($qr_code_div_id); ?>">
+            <fieldset id="<?php echo esc_attr($fieldset_id); ?>">
                 <legend><?php echo esc_html($this->title); ?></legend>
                 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
                     <p><?php esc_html_e('This order is fully paid.', 'payment-gateway-wc-victoriabank-mia'); ?></p>
@@ -352,71 +381,110 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
             return;
         }
 
-        $is_mobile = wp_is_mobile();
-        $qr_code_title = $is_mobile ? __('Select & Pay', 'payment-gateway-wc-victoriabank-mia') : __('Scan & Pay', 'payment-gateway-wc-victoriabank-mia');
-        $qr_code_text = $is_mobile ? __('Choose the financial app from the list by pressing the button below.', 'payment-gateway-wc-victoriabank-mia') : __('Scan this QR code with your phone camera or from your financial app and complete the payment.', 'payment-gateway-wc-victoriabank-mia');
+        $expires_at = intval($order->get_meta(self::MOD_QR_EXPIRES_AT, true));
+        $is_mobile  = wp_is_mobile();
+
+        $qr_code_title    = $is_mobile ? __('Select & Pay', 'payment-gateway-wc-victoriabank-mia') : __('Scan & Pay', 'payment-gateway-wc-victoriabank-mia');
+        $qr_code_text     = $is_mobile
+            ? __('Choose the financial app from the list by pressing the button below.', 'payment-gateway-wc-victoriabank-mia')
+            : __('Scan this QR code with your phone camera or from your financial app and complete the payment.', 'payment-gateway-wc-victoriabank-mia');
         $qr_code_url_text = __('Banks list', 'payment-gateway-wc-victoriabank-mia');
+        $validity_text    = __('QR code valid for', 'payment-gateway-wc-victoriabank-mia');
+        $expired_text     = __('The QR code has expired.', 'payment-gateway-wc-victoriabank-mia');
+        $retry_text       = __('Generate new QR code', 'payment-gateway-wc-victoriabank-mia');
+        $success_text     = __('Payment received. Thank you for your order!', 'payment-gateway-wc-victoriabank-mia');
+        $pay_url          = $order->get_checkout_payment_url(true);
 
         ?>
-        <fieldset id="<?php echo esc_attr($qr_code_div_id); ?>">
+        <fieldset id="<?php echo esc_attr($fieldset_id); ?>">
             <legend><?php echo esc_html($this->title); ?></legend>
-            <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+
+            <?php /* Success state – hidden until payment confirmed */ ?>
+            <div id="<?php echo esc_attr($success_id); ?>" style="display: none; flex-direction: column; align-items: center; text-align: center;">
+                <p class="woocommerce-message"><?php echo esc_html($success_text); ?></p>
+            </div>
+
+            <?php /* Expired state – hidden until QR expires */ ?>
+            <div id="<?php echo esc_attr($expired_id); ?>" style="display: none; flex-direction: column; align-items: center; text-align: center;">
+                <p><?php echo esc_html($expired_text); ?></p>
+                <a href="<?php echo esc_url($pay_url); ?>" class="woocommerce-button button pay"><?php echo esc_html($retry_text); ?></a>
+            </div>
+
+            <?php /* QR code section – visible initially */ ?>
+            <div id="<?php echo esc_attr($qr_section_id); ?>" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
                 <img src="<?php echo esc_url($this->icon); ?>" alt="<?php echo esc_attr($this->title); ?>" class="aligncenter" style="max-width: 200px; height: auto;">
+                <?php if (!$is_mobile) : ?>
                 <div id="<?php echo esc_attr($qr_code_js_div_id); ?>" class="aligncenter"></div>
+                <?php endif; ?>
                 <h2><?php echo esc_html($qr_code_title); ?></h2>
                 <p><?php echo esc_html($qr_code_text); ?></p>
-                <a href="<?php echo esc_url($qr_url); ?>" target="_blank" class="woocommerce-button button pay order-actions-button"><?php echo esc_html($qr_code_url_text); ?></a>
+                <p>
+                    <?php echo esc_html($validity_text); ?>
+                    <strong id="<?php echo esc_attr($countdown_id); ?>">--:--</strong>
+                </p>
+                <a id="<?php echo esc_attr($deep_link_id); ?>" href="<?php echo esc_url($qr_url); ?>" target="_blank" class="woocommerce-button button pay order-actions-button"><?php echo esc_html($qr_code_url_text); ?></a>
             </div>
+
         </fieldset>
         <?php
 
         if (!$is_mobile) {
             // https://cdnjs.com/libraries/qrcodejs
-            // <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
             $js_div_id = wp_json_encode($qr_code_js_div_id);
-            $js_text = wp_json_encode($qr_url);
+            $js_text   = wp_json_encode($qr_url);
 
-            wp_enqueue_script('qrcodejs', plugins_url('/assets/js/qrcodejs/qrcode.min.js', __FILE__), array(), '1.0.0', true);
+            wp_enqueue_script('qrcodejs', plugins_url('/assets/js/qrcodejs/qrcode.min.js', self::MOD_PLUGIN_FILE), array(), '1.0.0', true);
             wp_add_inline_script(
                 'qrcodejs',
-                "var qrcode = new QRCode({$js_div_id}, {
-                    text: {$js_text},
-                    width: 200,
-                    height: 200
-                });"
+                "new QRCode({$js_div_id}, { text: {$js_text}, width: 200, height: 200 });"
             );
         }
+
+        $check_nonce = wp_create_nonce("{$this->id}-check-order-status-{$order_id}");
+
+        wp_enqueue_script(
+            'victoriabank-mia-thankyou',
+            plugins_url('/assets/js/thankyou.js', self::MOD_PLUGIN_FILE),
+            $is_mobile ? array() : array('qrcodejs'),
+            self::MOD_VERSION,
+            true
+        );
+
+        wp_localize_script(
+            'victoriabank-mia-thankyou',
+            'victoriabank_mia_thankyou',
+            array(
+                'order_id'      => $order_id,
+                'nonce'         => $check_nonce,
+                'expires_at'    => $expires_at,
+                'ajax_url'      => admin_url('admin-ajax.php'),
+                'action_status' => self::MOD_PREFIX . 'check_order_status',
+            )
+        );
     }
 
     public function ajax_check_order_status()
     {
         $order_id = isset($_POST['order_id']) ? intval(wp_unslash($_POST['order_id'])) : 0;
-        $nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
+        $nonce    = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
 
         $expected_nonce = "{$this->id}-check-order-status-{$order_id}";
         if (empty($order_id) || !wp_verify_nonce($nonce, $expected_nonce)) {
-            $response = array(
-                'success' => false,
-                'message' => __('Invalid request', 'payment-gateway-wc-victoriabank-mia'),
+            wp_send_json_error(
+                array('message' => __('Invalid request', 'payment-gateway-wc-victoriabank-mia')),
+                \WP_Http::UNPROCESSABLE_ENTITY
             );
-            wp_send_json_error($response, \WP_Http::UNPROCESSABLE_ENTITY);
         }
 
         $order = wc_get_order($order_id);
         if (empty($order)) {
-            $response = array(
-                'success' => false,
-                'message' => __('Order not found', 'payment-gateway-wc-victoriabank-mia'),
+            wp_send_json_error(
+                array('message' => __('Order not found', 'payment-gateway-wc-victoriabank-mia')),
+                \WP_Http::UNPROCESSABLE_ENTITY
             );
-            wp_send_json_error($response, \WP_Http::UNPROCESSABLE_ENTITY);
         }
 
-        $response = array(
-            'success' => true,
-            'paid' => $order->is_paid(),
-        );
-        wp_send_json($response);
+        wp_send_json_success(array('paid' => $order->is_paid()));
     }
     //endregion
 
@@ -528,6 +596,15 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
     //endregion
 
     //region Payment
+    protected function get_payment_redirect_url(\WC_Order $order, string $qr_url)
+    {
+        if (self::REDIRECT_MODE_QR_URL === $this->redirect_mode) {
+            return $qr_url;
+        }
+
+        return $this->get_redirect_url($order);
+    }
+
     /**
      * @param int $order_id
      */
@@ -549,7 +626,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
                     if ($this->victoriabank_mia_qr_active($client, $auth_token, $qr_extension_id)) {
                         return array(
                             'result'   => 'success',
-                            'redirect' => $qr_url,
+                            'redirect' => $this->get_payment_redirect_url($order, $qr_url),
                         );
                     }
                 }
@@ -596,6 +673,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
             $order->update_meta_data(self::MOD_QR_ID, $qr_id);
             $order->update_meta_data(self::MOD_QR_EXTENSION_ID, $qr_extension_id);
             $order->update_meta_data(self::MOD_QR_URL, $qr_url);
+            $order->update_meta_data(self::MOD_QR_EXPIRES_AT, time() + ($this->transaction_validity * 60));
             $order->save();
             //endregion
 
@@ -614,7 +692,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
 
             return array(
                 'result'   => 'success',
-                'redirect' => $qr_url,
+                'redirect' => $this->get_payment_redirect_url($order, $qr_url),
             );
         }
 
