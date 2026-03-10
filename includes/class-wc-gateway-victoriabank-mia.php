@@ -416,7 +416,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
             );
         }
 
-        $check_nonce = wp_create_nonce("{$this->id}-check-order-status-{$order_id}");
+        $check_nonce = wp_create_nonce($this->get_check_order_status_nonce_action($order_id));
 
         $script_handle = self::MOD_PREFIX . 'thankyou_page';
         wp_enqueue_script(
@@ -432,6 +432,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
             $script_handle,
             array(
                 'order_id'      => $order_id,
+                'order_key'     => $order->get_order_key(),
                 'nonce'         => $check_nonce,
                 'expires_at'    => $expires_at,
                 'ajax_url'      => admin_url('admin-ajax.php'),
@@ -442,11 +443,12 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
 
     public function ajax_check_order_status()
     {
-        $order_id = isset($_POST['order_id']) ? intval(wp_unslash($_POST['order_id'])) : 0;
-        $nonce    = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
+        $order_id  = isset($_POST['order_id']) ? intval(wp_unslash($_POST['order_id'])) : 0;
+        $order_key = isset($_POST['order_key']) ? sanitize_text_field(wp_unslash($_POST['order_key'])) : '';
+        $nonce     = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
 
-        $expected_nonce = "{$this->id}-check-order-status-{$order_id}";
-        if (empty($order_id) || !wp_verify_nonce($nonce, $expected_nonce)) {
+        $expected_nonce = $this->get_check_order_status_nonce_action($order_id);
+        if (empty($order_id) || empty($order_key) || empty($nonce) || !wp_verify_nonce($nonce, $expected_nonce)) {
             wp_send_json_error(
                 array('message' => __('Invalid request', 'payment-gateway-wc-victoriabank-mia')),
                 \WP_Http::UNPROCESSABLE_ENTITY
@@ -454,14 +456,19 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         }
 
         $order = wc_get_order($order_id);
-        if (empty($order)) {
+        if (empty($order) || !hash_equals($order->get_order_key(), $order_key)) {
             wp_send_json_error(
-                array('message' => __('Order not found', 'payment-gateway-wc-victoriabank-mia')),
+                array('message' => __('Order ID or Order Key', 'payment-gateway-wc-victoriabank-mia')),
                 \WP_Http::UNPROCESSABLE_ENTITY
             );
         }
 
-        wp_send_json_success(array('paid' => $order->is_paid()));
+        wp_send_json_success(array('is_paid' => $order->is_paid()));
+    }
+
+    protected function get_check_order_status_nonce_action(int $order_id): string
+    {
+        return "{$this->id}-check-order-status-{$order_id}";
     }
     //endregion
 
