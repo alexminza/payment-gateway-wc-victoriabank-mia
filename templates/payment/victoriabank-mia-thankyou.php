@@ -15,6 +15,7 @@
  * @var string    $qr_section_id     ID attribute for the QR code section.
  * @var string    $qr_code_js_div_id ID attribute for the QRCode.js render target.
  * @var string    $countdown_id      ID attribute for the countdown element.
+ * @var string    $spinner_id        ID attribute for the loading spinner.
  * @var string    $deep_link_id      ID attribute for the deep-link anchor.
  * @var bool      $is_paid           Whether the order is already paid.
  * @var bool      $is_mobile         Whether the visitor is on a mobile device.
@@ -32,6 +33,23 @@
 
 defined('ABSPATH') || exit;
 ?>
+
+<style>
+.victoriabank-mia-spinner {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    vertical-align: middle;
+    margin-left: 0.4em;
+    animation: victoriabank-mia-spin 0.75s linear infinite;
+}
+@keyframes victoriabank-mia-spin {
+    to { transform: rotate(360deg); }
+}
+</style>
 
 <fieldset id="<?php echo esc_attr($fieldset_id); ?>">
     <legend><?php echo esc_html($gateway_title); ?></legend>
@@ -66,6 +84,7 @@ defined('ABSPATH') || exit;
             <p>
                 <?php echo esc_html($validity_text); ?>
                 <strong id="<?php echo esc_attr($countdown_id); ?>">--:--</strong>
+                <span id="<?php echo esc_attr($spinner_id); ?>" class="victoriabank-mia-spinner" aria-hidden="true"></span>
             </p>
             <a id="<?php echo esc_attr($deep_link_id); ?>" href="<?php echo esc_url($qr_url); ?>" target="_blank" class="woocommerce-button button pay order-actions-button"><?php echo esc_html($qr_code_url_text); ?></a>
         </div>

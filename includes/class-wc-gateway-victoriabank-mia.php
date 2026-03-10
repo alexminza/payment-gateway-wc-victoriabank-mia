@@ -378,6 +378,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
                 'qr_section_id'     => "{$this->id}-qr-section",
                 'qr_code_js_div_id' => "{$this->id}-order-qrcode-js",
                 'countdown_id'      => "{$this->id}-countdown",
+                'spinner_id'        => "{$this->id}-spinner",
                 'deep_link_id'      => "{$this->id}-deep-link",
                 'is_paid'           => $is_paid,
                 'is_mobile'         => $is_mobile,
@@ -437,6 +438,12 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
                 'expires_at'    => $expires_at,
                 'ajax_url'      => admin_url('admin-ajax.php'),
                 'action_status' => self::MOD_PREFIX . 'check_order_status',
+                'container_id'  => "{$this->id}-order-qrcode",
+                'qr_section_id' => "{$this->id}-qr-section",
+                'success_id'    => "{$this->id}-success-message",
+                'expired_id'    => "{$this->id}-expired-message",
+                'countdown_id'  => "{$this->id}-countdown",
+                'spinner_id'    => "{$this->id}-spinner",
             )
         );
     }

@@ -9,11 +9,12 @@
     var pollFailCount = 0;
     var pollFailMax = 3;
 
-    var $container = $('#victoriabank_mia-order-qrcode');
-    var $qrSection = $('#victoriabank_mia-qr-section');
-    var $successMsg = $('#victoriabank_mia-success-message');
-    var $expiredMsg = $('#victoriabank_mia-expired-message');
-    var $countdownEl = $('#victoriabank_mia-countdown');
+    var $container   = $('#' + victoriabank_mia_thankyou_page.container_id);
+    var $qrSection   = $('#' + victoriabank_mia_thankyou_page.qr_section_id);
+    var $successMsg  = $('#' + victoriabank_mia_thankyou_page.success_id);
+    var $expiredMsg  = $('#' + victoriabank_mia_thankyou_page.expired_id);
+    var $countdownEl = $('#' + victoriabank_mia_thankyou_page.countdown_id);
+    var $spinner     = $('#' + victoriabank_mia_thankyou_page.spinner_id);
 
     if (!$container.length) {
         return;
@@ -45,6 +46,7 @@
     function stopAll() {
         if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
         if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+        $spinner.hide();
     }
 
     /**
