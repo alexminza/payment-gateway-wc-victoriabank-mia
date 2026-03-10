@@ -465,7 +465,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         $order = wc_get_order($order_id);
         if (empty($order) || !hash_equals($order->get_order_key(), $order_key)) {
             wp_send_json_error(
-                array('message' => __('Order ID or Order Key', 'payment-gateway-wc-victoriabank-mia')),
+                array('message' => __('Invalid Order ID or Order Key', 'payment-gateway-wc-victoriabank-mia')),
                 \WP_Http::UNPROCESSABLE_ENTITY
             );
         }
