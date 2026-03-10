@@ -403,8 +403,6 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
             return;
         }
 
-        $expires_at = intval($order->get_meta(self::MOD_QR_EXPIRES_AT, true));
-
         if (!$is_mobile) {
             // https://cdnjs.com/libraries/qrcodejs
             $js_div_id = wp_json_encode("{$this->id}-order-qrcode-js");
@@ -417,8 +415,6 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
             );
         }
 
-        $check_nonce = wp_create_nonce($this->get_check_order_status_nonce_action($order_id));
-
         $script_handle = self::MOD_PREFIX . 'thankyou_page';
         wp_enqueue_script(
             $script_handle,
@@ -427,6 +423,9 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
             self::MOD_VERSION,
             true
         );
+
+        $check_nonce = wp_create_nonce($this->get_check_order_status_nonce_action($order_id));
+        $expires_at = intval($order->get_meta(self::MOD_QR_EXPIRES_AT, true));
 
         wp_localize_script(
             $script_handle,
@@ -658,13 +657,14 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
             $qr_id = strval($create_qr_response['qrHeaderUUID']);
             $qr_extension_id = strval($create_qr_response['qrExtensionUUID']);
             $qr_url = strval($create_qr_response['qrAsText']);
+            $qr_expires_at = time() + ($this->transaction_validity * 60);
 
             //region Update order payment transaction metadata
             // https://developer.woocommerce.com/docs/features/high-performance-order-storage/recipe-book/#apis-for-gettingsetting-posts-and-postmeta
             $order->update_meta_data(self::MOD_QR_ID, $qr_id);
             $order->update_meta_data(self::MOD_QR_EXTENSION_ID, $qr_extension_id);
             $order->update_meta_data(self::MOD_QR_URL, $qr_url);
-            $order->update_meta_data(self::MOD_QR_EXPIRES_AT, time() + ($this->transaction_validity * 60));
+            $order->update_meta_data(self::MOD_QR_EXPIRES_AT, $qr_expires_at);
             $order->save();
             //endregion
 
