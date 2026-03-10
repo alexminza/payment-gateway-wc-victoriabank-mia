@@ -105,7 +105,7 @@
         ).fail(function () {
             pollFailCount++;
             if (pollFailCount >= pollFailMax) {
-                stopAll();
+                showExpired();
             }
         }).always(function () {
             isPolling = false;

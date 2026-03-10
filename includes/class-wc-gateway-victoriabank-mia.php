@@ -383,7 +383,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
                 'is_paid'           => $is_paid,
                 'is_mobile'         => $is_mobile,
                 'qr_url'            => $qr_url,
-                'pay_url'           => $order->get_checkout_payment_url(true),
+                'pay_url'           => $order->get_checkout_payment_url(),
                 'qr_code_title'     => $is_mobile ? __('Select & Pay', 'payment-gateway-wc-victoriabank-mia') : __('Scan & Pay', 'payment-gateway-wc-victoriabank-mia'),
                 'qr_code_text'      => $is_mobile
                     ? __('Choose the financial app from the list by pressing the button below.', 'payment-gateway-wc-victoriabank-mia')
