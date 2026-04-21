@@ -75,7 +75,7 @@ defined('ABSPATH') || exit;
 
         <?php /* Success state – hidden until payment confirmed via polling */ ?>
         <div id="<?php echo esc_attr($success_id); ?>" style="display: none; flex-direction: column; align-items: center; text-align: center;">
-            <p class="woocommerce-message"><?php echo esc_html($success_text); ?></p>
+            <p><?php echo esc_html($success_text); ?></p>
         </div>
 
         <?php /* Expired state – hidden until countdown reaches zero */ ?>
