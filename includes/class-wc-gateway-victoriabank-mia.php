@@ -439,6 +439,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
                 'order_key'     => $order->get_order_key(),
                 'nonce'         => $check_nonce,
                 'expires_at'    => $expires_at,
+                'poll_interval' => 10000,
                 'ajax_url'      => admin_url('admin-ajax.php'),
                 'action_status' => self::MOD_PREFIX . 'check_order_status',
                 'container_id'  => "{$this->id}-order-qrcode",

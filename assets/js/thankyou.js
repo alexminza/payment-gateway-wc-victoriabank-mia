@@ -2,7 +2,7 @@
 (function ($) {
     'use strict';
 
-    var pollInterval = 5000; // ms
+    var pollInterval = parseInt(victoriabank_mia_thankyou_page.poll_interval, 10) || 10000; // ms
     var countdownIntervalVisible = 1000; // ms — smooth MM:SS tick when shown
     var countdownIntervalHidden = 15000; // ms — only needed to trigger expiry when hidden
     var reloadDelay = 2000; // ms — show success message briefly before reloading
