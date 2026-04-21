@@ -174,14 +174,14 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
                 ),
             ),
             'redirect_mode' => array(
-                'title'       => __('After payment redirect', 'payment-gateway-wc-victoriabank-mia'),
+                'title'       => __('Payment redirect', 'payment-gateway-wc-victoriabank-mia'),
                 'type'        => 'select',
                 'description' => __('Where to redirect the customer after the QR code is generated.', 'payment-gateway-wc-victoriabank-mia'),
                 'desc_tip'    => true,
                 'default'     => self::REDIRECT_MODE_THANKYOU,
                 'options'     => array(
-                    self::REDIRECT_MODE_THANKYOU => __('Order thank you page (with QR code and payment status polling)', 'payment-gateway-wc-victoriabank-mia'),
-                    self::REDIRECT_MODE_QR_URL   => __('QR code URL (direct deep-link to banking app)', 'payment-gateway-wc-victoriabank-mia'),
+                    self::REDIRECT_MODE_THANKYOU => __('Order thank you page', 'payment-gateway-wc-victoriabank-mia'),
+                    self::REDIRECT_MODE_QR_URL   => __('QR code URL', 'payment-gateway-wc-victoriabank-mia'),
                 ),
             ),
 
@@ -339,7 +339,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
     {
         // https://rudrastyh.com/woocommerce/thank-you-page.html
         if (!empty($order)) {
-            if (!$order->is_paid() && $order->get_payment_method() === $this->id) {
+            if (!$order->is_paid() && $order->needs_payment() && $order->get_payment_method() === $this->id) {
                 $thank_you_title .= '<br />' . __('This order has a pending payment. Follow the instructions below.', 'payment-gateway-wc-victoriabank-mia');
             }
         }
@@ -352,12 +352,13 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
      */
     public function thankyou_page($order_id)
     {
-        $order     = wc_get_order($order_id);
-        $is_paid   = $order->is_paid();
-        $is_mobile = wp_is_mobile();
+        $order          = wc_get_order($order_id);
+        $is_paid        = $order->is_paid();
+        $needs_payment  = $order->needs_payment();
+        $is_mobile      = wp_is_mobile();
 
         $qr_url = '';
-        if (!$is_paid) {
+        if (!$is_paid && $needs_payment) {
             $qr_url = $order->get_meta(self::MOD_QR_URL, true);
             if (empty($qr_url)) {
                 /* translators: 1: Order ID, 2: Meta field name */
@@ -381,7 +382,9 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
                 'spinner_id'        => "{$this->id}-spinner",
                 'deep_link_id'      => "{$this->id}-deep-link",
                 'is_paid'           => $is_paid,
+                'needs_payment'     => $needs_payment,
                 'is_mobile'         => $is_mobile,
+                'show_countdown'    => false,
                 'qr_url'            => $qr_url,
                 'pay_url'           => $order->get_checkout_payment_url(),
                 'qr_code_title'     => $is_mobile ? __('Select & Pay', 'payment-gateway-wc-victoriabank-mia') : __('Scan & Pay', 'payment-gateway-wc-victoriabank-mia'),
@@ -390,6 +393,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
                     : __('Scan this QR code with your phone camera or from your financial app and complete the payment.', 'payment-gateway-wc-victoriabank-mia'),
                 'qr_code_url_text'  => __('Banks list', 'payment-gateway-wc-victoriabank-mia'),
                 'validity_text'     => __('QR code valid for', 'payment-gateway-wc-victoriabank-mia'),
+                'checking_text'     => __('Checking order payment', 'payment-gateway-wc-victoriabank-mia'),
                 'expired_text'      => __('The QR code has expired.', 'payment-gateway-wc-victoriabank-mia'),
                 'retry_text'        => __('Generate new QR code', 'payment-gateway-wc-victoriabank-mia'),
                 'success_text'      => __('Payment received. Thank you for your order!', 'payment-gateway-wc-victoriabank-mia'),
@@ -399,7 +403,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
             plugin_dir_path(self::MOD_PLUGIN_FILE) . 'templates/'
         );
 
-        if ($is_paid) {
+        if ($is_paid || !$needs_payment) {
             return;
         }
 
@@ -469,7 +473,10 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
             );
         }
 
-        wp_send_json_success(array('is_paid' => $order->is_paid()));
+        wp_send_json_success(array(
+            'is_paid'       => $order->is_paid(),
+            'needs_payment' => $order->needs_payment(),
+        ));
     }
 
     protected function get_check_order_status_nonce_action(int $order_id): string

@@ -18,13 +18,16 @@
  * @var string    $spinner_id        ID attribute for the loading spinner.
  * @var string    $deep_link_id      ID attribute for the deep-link anchor.
  * @var bool      $is_paid           Whether the order is already paid.
+ * @var bool      $needs_payment     Whether the order still needs payment (false for cancelled/failed/refunded).
  * @var bool      $is_mobile         Whether the visitor is on a mobile device.
+ * @var bool      $show_countdown    Whether to render the countdown timer inline with the checking label.
  * @var string    $qr_url            MIA QR deep-link URL.
  * @var string    $pay_url           WooCommerce order-pay URL (for QR retry).
  * @var string    $qr_code_title     Section heading text.
  * @var string    $qr_code_text      Section description text.
  * @var string    $qr_code_url_text  Deep-link button label.
  * @var string    $validity_text     Countdown label prefix.
+ * @var string    $checking_text     Payment-status check label shown next to the spinner.
  * @var string    $expired_text      Expired state message.
  * @var string    $retry_text        Retry button label.
  * @var string    $success_text      Success state message.
@@ -60,6 +63,14 @@ defined('ABSPATH') || exit;
             <p><?php echo esc_html($paid_text); ?></p>
         </div>
 
+    <?php elseif (!$needs_payment) : ?>
+
+        <?php /* Terminal non-paid state (cancelled / failed / refunded) — show the expired panel. */ ?>
+        <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+            <p><?php echo esc_html($expired_text); ?></p>
+            <a href="<?php echo esc_url($pay_url); ?>" class="woocommerce-button button pay"><?php echo esc_html($retry_text); ?></a>
+        </div>
+
     <?php else : ?>
 
         <?php /* Success state – hidden until payment confirmed via polling */ ?>
@@ -82,9 +93,9 @@ defined('ABSPATH') || exit;
             <h2><?php echo esc_html($qr_code_title); ?></h2>
             <p><?php echo esc_html($qr_code_text); ?></p>
             <p>
-                <?php echo esc_html($validity_text); ?>
-                <strong id="<?php echo esc_attr($countdown_id); ?>">--:--</strong>
+                <?php echo esc_html($checking_text); ?>
                 <span id="<?php echo esc_attr($spinner_id); ?>" class="victoriabank-mia-spinner" aria-hidden="true"></span>
+                <strong id="<?php echo esc_attr($countdown_id); ?>"<?php echo $show_countdown ? '' : ' style="display: none;"'; ?>>--:--</strong>
             </p>
             <a id="<?php echo esc_attr($deep_link_id); ?>" href="<?php echo esc_url($qr_url); ?>" target="_blank" class="woocommerce-button button pay order-actions-button"><?php echo esc_html($qr_code_url_text); ?></a>
         </div>

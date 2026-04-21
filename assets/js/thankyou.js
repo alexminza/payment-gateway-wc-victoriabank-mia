@@ -3,6 +3,9 @@
     'use strict';
 
     var pollInterval = 5000; // ms
+    var countdownIntervalVisible = 1000; // ms — smooth MM:SS tick when shown
+    var countdownIntervalHidden = 15000; // ms — only needed to trigger expiry when hidden
+    var reloadDelay = 2000; // ms — show success message briefly before reloading
     var pollTimer = null;
     var countdownTimer = null;
     var isPolling = false;
@@ -28,6 +31,10 @@
         $qrSection.hide();
         $expiredMsg.hide();
         $successMsg.css('display', 'flex');
+        // Reload so WooCommerce re-renders the order-received page with the
+        // now-paid order state (clears the pending-payment title and the
+        // Pay/Cancel order actions).
+        setTimeout(function () { window.location.reload(); }, reloadDelay);
     }
 
     /**
@@ -67,18 +74,20 @@
     }
 
     /**
-     * Tick countdown — called every second.
+     * Tick countdown — called every countdownInterval. Updates the countdown
+     * element if present in the DOM (the element may be hidden in the template)
+     * and flips to the expired state once the TTL runs out.
      */
     function tickCountdown() {
         var remaining = victoriabank_mia_thankyou_page.expires_at - Math.floor(Date.now() / 1000);
 
         if (remaining <= 0) {
-            $countdownEl.text('00:00');
+            if ($countdownEl.length) { $countdownEl.text('00:00'); }
             showExpired();
             return;
         }
 
-        $countdownEl.text(formatTime(remaining));
+        if ($countdownEl.length) { $countdownEl.text(formatTime(remaining)); }
     }
 
     /**
@@ -98,8 +107,14 @@
             },
             function (data) {
                 pollFailCount = 0;
-                if (data && data.success && data.data && data.data.is_paid) {
-                    showSuccess();
+                if (data && data.success && data.data) {
+                    if (data.data.is_paid) {
+                        showSuccess();
+                    } else if (data.data.needs_payment === false) {
+                        // Terminal non-paid state (cancelled / failed / refunded) —
+                        // treat like expiry so the retry button is surfaced.
+                        showExpired();
+                    }
                 }
             }
         ).fail(function () {
@@ -112,9 +127,14 @@
         });
     }
 
-    // Kick off countdown and polling immediately.
+    // Kick off countdown and polling immediately. Use a faster tick when the
+    // countdown element is visible (so MM:SS updates smoothly), and a slower
+    // tick otherwise — expiry still flips the UI either way.
+    var countdownInterval = ($countdownEl.length && $countdownEl.is(':visible'))
+        ? countdownIntervalVisible
+        : countdownIntervalHidden;
     tickCountdown();
-    countdownTimer = setInterval(tickCountdown, 1000);
+    countdownTimer = setInterval(tickCountdown, countdownInterval);
     pollOrderStatus();
     pollTimer = setInterval(pollOrderStatus, pollInterval);
 }(jQuery));
