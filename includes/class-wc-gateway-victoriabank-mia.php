@@ -93,11 +93,13 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
 
         add_action("woocommerce_api_wc_{$this->id}", array($this, 'check_response'));
 
-        add_action("woocommerce_thankyou_{$this->id}", array($this, 'thankyou_page'));
-        add_filter('woocommerce_thankyou_order_received_text', array($this, 'thankyou_order_received_text'), 10, 2);
+        if (self::REDIRECT_MODE_THANKYOU === $this->redirect_mode) {
+            add_action("woocommerce_thankyou_{$this->id}", array($this, 'thankyou_page'));
+            add_filter('woocommerce_thankyou_order_received_text', array($this, 'thankyou_order_received_text'), 10, 2);
 
-        add_action('wp_ajax_' . self::MOD_PREFIX . 'check_order_status', array($this, 'ajax_check_order_status'));
-        add_action('wp_ajax_nopriv_' . self::MOD_PREFIX . 'check_order_status', array($this, 'ajax_check_order_status'));
+            add_action('wp_ajax_' . self::MOD_PREFIX . 'check_order_status', array($this, 'ajax_check_order_status'));
+            add_action('wp_ajax_nopriv_' . self::MOD_PREFIX . 'check_order_status', array($this, 'ajax_check_order_status'));
+        }
     }
 
     public function init_form_fields()
