@@ -479,10 +479,12 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
             );
         }
 
-        wp_send_json_success(array(
-            'is_paid'       => $order->is_paid(),
-            'needs_payment' => $order->needs_payment(),
-        ));
+        wp_send_json_success(
+            array(
+                'is_paid'       => $order->is_paid(),
+                'needs_payment' => $order->needs_payment(),
+            )
+        );
     }
 
     protected function get_check_order_status_nonce_action(int $order_id): string

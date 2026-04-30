@@ -31,11 +31,14 @@
     function renderQRCode() {
         $qrCode.empty();
 
-        new QRCode($qrCode.get(0), {
-            text: victoriabank_mia_thankyou_page.qr_text,
-            width: 200,
-            height: 200,
-        });
+        new QRCode(
+            $qrCode.get(0),
+            {
+                text: victoriabank_mia_thankyou_page.qr_text,
+                width: 200,
+                height: 200,
+            }
+        );
     }
 
     /**
@@ -49,7 +52,11 @@
         // Reload so WooCommerce re-renders the order-received page with the
         // now-paid order state (clears the pending-payment title and the
         // Pay/Cancel order actions).
-        setTimeout(() => { window.location.reload(); }, reloadDelay);
+        setTimeout(reloadPage, reloadDelay);
+    }
+
+    function reloadPage() {
+        window.location.reload();
     }
 
     /**
@@ -66,8 +73,16 @@
      * Stop all timers.
      */
     function stopAll() {
-        if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
-        if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+        if (pollTimer) {
+            clearInterval(pollTimer);
+            pollTimer = null;
+        }
+
+        if (countdownTimer) {
+            clearInterval(countdownTimer);
+            countdownTimer = null;
+        }
+
         $spinner.hide();
     }
 
@@ -78,7 +93,10 @@
      * @return {string}
      */
     function formatTime(totalSeconds) {
-        if (totalSeconds < 0) { totalSeconds = 0; }
+        if (totalSeconds < 0) {
+            totalSeconds = 0;
+        }
+
         const minutes = Math.floor(totalSeconds / 60);
         const seconds = Math.floor(totalSeconds % 60);
         const mm = String(minutes).padStart(2, '0');
@@ -95,12 +113,17 @@
         const remaining = victoriabank_mia_thankyou_page.expires_at - Math.floor(Date.now() / 1000);
 
         if (remaining <= 0) {
-            if ($countdownEl.length) { $countdownEl.text('00:00'); }
+            if ($countdownEl.length) {
+                $countdownEl.text('00:00');
+            }
+
             showExpired();
             return;
         }
 
-        if ($countdownEl.length) { $countdownEl.text(formatTime(remaining)); }
+        if ($countdownEl.length) {
+            $countdownEl.text(formatTime(remaining));
+        }
     }
 
     /**
@@ -110,15 +133,67 @@
      * the in-progress indicator instead of flipping to expired.
      */
     function stopPolling() {
-        if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+        if (pollTimer) {
+            clearInterval(pollTimer);
+            pollTimer = null;
+        }
+
         $spinner.hide();
+    }
+
+    /**
+     * Handle a successful order status poll.
+     *
+     * @param {Object} data
+     */
+    function handlePollSuccess(data) {
+        pollFailCount = 0;
+        if (data && data.success && data.data) {
+            if (data.data.is_paid) {
+                showSuccess();
+            } else if (data.data.needs_payment === false) {
+                // Terminal non-paid state (cancelled / failed / refunded) —
+                // treat like expiry so the retry button is surfaced.
+                showExpired();
+            }
+        }
+    }
+
+    /**
+     * Handle a failed order status poll.
+     *
+     * @param {Object} jqXHR
+     * @param {string} textStatus
+     * @param {string} errorThrown
+     */
+    function handlePollFailure(jqXHR, textStatus, errorThrown) {
+        pollFailCount++;
+        if (pollFailCount >= pollFailMax) {
+            if (window.console && console.error) {
+                console.error(
+                    `Order status polling disabled after ${pollFailMax} consecutive failures.`,
+                    { status: textStatus, error: errorThrown }
+                );
+            }
+            stopPolling();
+        }
+    }
+
+    /**
+     * Handle order status poll completion.
+     */
+    function handlePollComplete() {
+        isPolling = false;
     }
 
     /**
      * Poll the server to check whether the order has been paid.
      */
     function pollOrderStatus() {
-        if (isPolling) { return; }
+        if (isPolling) {
+            return;
+        }
+
         isPolling = true;
 
         $.post(
@@ -129,32 +204,8 @@
                 order_key: victoriabank_mia_thankyou_page.order_key,
                 nonce: victoriabank_mia_thankyou_page.nonce,
             },
-            (data) => {
-                pollFailCount = 0;
-                if (data && data.success && data.data) {
-                    if (data.data.is_paid) {
-                        showSuccess();
-                    } else if (data.data.needs_payment === false) {
-                        // Terminal non-paid state (cancelled / failed / refunded) —
-                        // treat like expiry so the retry button is surfaced.
-                        showExpired();
-                    }
-                }
-            }
-        ).fail((jqXHR, textStatus, errorThrown) => {
-            pollFailCount++;
-            if (pollFailCount >= pollFailMax) {
-                if (window.console && console.error) {
-                    console.error(
-                        `Order status polling disabled after ${pollFailMax} consecutive failures.`,
-                        { status: textStatus, error: errorThrown }
-                    );
-                }
-                stopPolling();
-            }
-        }).always(() => {
-            isPolling = false;
-        });
+            handlePollSuccess
+        ).fail(handlePollFailure).always(handlePollComplete);
     }
 
     // Kick off countdown and polling immediately. Use a faster tick when the
