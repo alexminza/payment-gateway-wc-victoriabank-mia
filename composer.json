@@ -27,7 +27,7 @@
         "source": "https://github.com/alexminza/payment-gateway-wc-victoriabank-mia"
     },
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=8.0",
         "alexminza/victoriabank-mia-sdk": "^1.0",
         "alexminza/wc-payment-gateway-base": "^1.0",
         "monolog/monolog": "^2.7",
@@ -35,7 +35,7 @@
     },
     "config": {
         "platform": {
-            "php": "7.2.5"
+            "php": "8.0"
         },
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
