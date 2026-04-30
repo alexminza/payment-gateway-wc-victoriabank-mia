@@ -51,8 +51,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
     const REDIRECT_MODE_QR_URL   = 'qr_url';
     //endregion
 
-    protected $transaction_validity;
-    protected $redirect_mode;
+    protected $transaction_validity, $redirect_mode;
     protected $victoriabank_mia_base_url, $victoriabank_mia_username, $victoriabank_mia_password, $victoriabank_mia_certificate;
     protected $victoriabank_mia_creditor_account, $victoriabank_mia_company_name;
 

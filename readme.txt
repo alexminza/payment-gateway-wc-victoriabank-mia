@@ -70,7 +70,9 @@ You can also contribute to the plugin by translating it. Simply visit [translate
 See [payment-gateway-wc-victoriabank-mia project releases on GitHub](https://github.com/alexminza/payment-gateway-wc-victoriabank-mia/releases) for details.
 
 = 1.1.0 =
-Improved QR payment UI/UX.
+* New order confirmation page with embedded QR code and automatic payment status polling
+* Mobile-friendly: customers on phones see a deep-link button to open their banking app directly
+* New "Payment redirect" setting — keep the new in-store flow (default) or restore the previous redirect to the MIA QR URL
 
 = 1.0.6 =
 * Improved payment confirmation logging
