@@ -3,8 +3,8 @@ Contributors: alexminza
 Tags: Moldova, Victoriabank, MIA, QR, payment gateway
 Requires at least: 4.8
 Tested up to: 6.9
-Stable tag: 1.0.6
-Requires PHP: 7.2.5
+Stable tag: 1.1.0
+Requires PHP: 8.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -69,6 +69,11 @@ You can also contribute to the plugin by translating it. Simply visit [translate
 
 See [payment-gateway-wc-victoriabank-mia project releases on GitHub](https://github.com/alexminza/payment-gateway-wc-victoriabank-mia/releases) for details.
 
+= 1.1.0 =
+* New order confirmation page with embedded QR code and automatic payment status polling
+* Mobile-friendly: customers on phones see a deep-link button to open their banking app directly
+* New "Payment redirect" setting — keep the new in-store flow (default) or restore the previous redirect to the MIA QR URL
+
 = 1.0.6 =
 * Improved payment confirmation logging
 * Enhanced order actions logic
@@ -94,6 +99,9 @@ Minor improvements.
 Initial version release.
 
 == Upgrade Notice ==
+
+= 1.1.0 =
+Improved QR payment UI/UX.
 
 = 1.0.6 =
 Improved payment confirmation logging and enhanced order actions logic.
