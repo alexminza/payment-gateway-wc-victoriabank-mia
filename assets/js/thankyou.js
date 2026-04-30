@@ -35,8 +35,8 @@
             $qrCode.get(0),
             {
                 text: victoriabank_mia_thankyou_page.qr_text,
-                width: 200,
-                height: 200,
+                width: victoriabank_mia_thankyou_page.qr_size,
+                height: victoriabank_mia_thankyou_page.qr_size,
             }
         );
     }

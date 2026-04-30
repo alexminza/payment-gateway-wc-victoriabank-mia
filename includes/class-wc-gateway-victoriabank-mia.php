@@ -449,6 +449,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
                 'qr_section_id' => "{$this->id}-qr-section",
                 'qr_code_id'    => "{$this->id}-order-qrcode-js",
                 'qr_text'       => $qr_url,
+                'qr_size'       => 200,
                 'success_id'    => "{$this->id}-success-message",
                 'expired_id'    => "{$this->id}-expired-message",
                 'countdown_id'  => "{$this->id}-countdown",
