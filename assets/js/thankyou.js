@@ -2,22 +2,23 @@
 (function ($) {
     'use strict';
 
-    var pollInterval = parseInt(victoriabank_mia_thankyou_page.poll_interval, 10) || 10000; // ms
-    var countdownIntervalVisible = 1000; // ms — smooth MM:SS tick when shown
-    var countdownIntervalHidden = 15000; // ms — only needed to trigger expiry when hidden
-    var reloadDelay = 2000; // ms — show success message briefly before reloading
-    var pollTimer = null;
-    var countdownTimer = null;
-    var isPolling = false;
-    var pollFailCount = 0;
-    var pollFailMax = 3;
+    const pollInterval = parseInt(victoriabank_mia_thankyou_page.poll_interval, 10) || 10000; // ms
+    const countdownIntervalVisible = 1000; // ms — smooth MM:SS tick when shown
+    const countdownIntervalHidden = 15000; // ms — only needed to trigger expiry when hidden
+    const reloadDelay = 2000; // ms — show success message briefly before reloading
+    const pollFailMax = 10;
 
-    var $container   = $('#' + victoriabank_mia_thankyou_page.container_id);
-    var $qrSection   = $('#' + victoriabank_mia_thankyou_page.qr_section_id);
-    var $successMsg  = $('#' + victoriabank_mia_thankyou_page.success_id);
-    var $expiredMsg  = $('#' + victoriabank_mia_thankyou_page.expired_id);
-    var $countdownEl = $('#' + victoriabank_mia_thankyou_page.countdown_id);
-    var $spinner     = $('#' + victoriabank_mia_thankyou_page.spinner_id);
+    let pollTimer = null;
+    let countdownTimer = null;
+    let isPolling = false;
+    let pollFailCount = 0;
+
+    const $container   = $(`#${victoriabank_mia_thankyou_page.container_id}`);
+    const $qrSection   = $(`#${victoriabank_mia_thankyou_page.qr_section_id}`);
+    const $successMsg  = $(`#${victoriabank_mia_thankyou_page.success_id}`);
+    const $expiredMsg  = $(`#${victoriabank_mia_thankyou_page.expired_id}`);
+    const $countdownEl = $(`#${victoriabank_mia_thankyou_page.countdown_id}`);
+    const $spinner     = $(`#${victoriabank_mia_thankyou_page.spinner_id}`);
 
     if (!$container.length) {
         return;
@@ -34,7 +35,7 @@
         // Reload so WooCommerce re-renders the order-received page with the
         // now-paid order state (clears the pending-payment title and the
         // Pay/Cancel order actions).
-        setTimeout(function () { window.location.reload(); }, reloadDelay);
+        setTimeout(() => { window.location.reload(); }, reloadDelay);
     }
 
     /**
@@ -64,13 +65,11 @@
      */
     function formatTime(totalSeconds) {
         if (totalSeconds < 0) { totalSeconds = 0; }
-        var minutes = Math.floor(totalSeconds / 60);
-        var seconds = Math.floor(totalSeconds % 60);
-        return (
-            (minutes < 10 ? '0' : '') + minutes +
-            ':' +
-            (seconds < 10 ? '0' : '') + seconds
-        );
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = Math.floor(totalSeconds % 60);
+        const mm = String(minutes).padStart(2, '0');
+        const ss = String(seconds).padStart(2, '0');
+        return `${mm}:${ss}`;
     }
 
     /**
@@ -79,7 +78,7 @@
      * and flips to the expired state once the TTL runs out.
      */
     function tickCountdown() {
-        var remaining = victoriabank_mia_thankyou_page.expires_at - Math.floor(Date.now() / 1000);
+        const remaining = victoriabank_mia_thankyou_page.expires_at - Math.floor(Date.now() / 1000);
 
         if (remaining <= 0) {
             if ($countdownEl.length) { $countdownEl.text('00:00'); }
@@ -88,6 +87,17 @@
         }
 
         if ($countdownEl.length) { $countdownEl.text(formatTime(remaining)); }
+    }
+
+    /**
+     * Stop polling without changing the visible payment state. Used when the
+     * AJAX endpoint becomes unreachable — the QR may still be valid and the
+     * payment notification callback is the source of truth, so we just hide
+     * the in-progress indicator instead of flipping to expired.
+     */
+    function stopPolling() {
+        if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+        $spinner.hide();
     }
 
     /**
@@ -105,7 +115,7 @@
                 order_key: victoriabank_mia_thankyou_page.order_key,
                 nonce: victoriabank_mia_thankyou_page.nonce,
             },
-            function (data) {
+            (data) => {
                 pollFailCount = 0;
                 if (data && data.success && data.data) {
                     if (data.data.is_paid) {
@@ -117,12 +127,18 @@
                     }
                 }
             }
-        ).fail(function () {
+        ).fail((jqXHR, textStatus, errorThrown) => {
             pollFailCount++;
             if (pollFailCount >= pollFailMax) {
-                showExpired();
+                if (window.console && console.error) {
+                    console.error(
+                        `Order status polling disabled after ${pollFailMax} consecutive failures.`,
+                        { status: textStatus, error: errorThrown }
+                    );
+                }
+                stopPolling();
             }
-        }).always(function () {
+        }).always(() => {
             isPolling = false;
         });
     }
@@ -130,7 +146,7 @@
     // Kick off countdown and polling immediately. Use a faster tick when the
     // countdown element is visible (so MM:SS updates smoothly), and a slower
     // tick otherwise — expiry still flips the UI either way.
-    var countdownInterval = ($countdownEl.length && $countdownEl.is(':visible'))
+    const countdownInterval = ($countdownEl.length && $countdownEl.is(':visible'))
         ? countdownIntervalVisible
         : countdownIntervalHidden;
     tickCountdown();

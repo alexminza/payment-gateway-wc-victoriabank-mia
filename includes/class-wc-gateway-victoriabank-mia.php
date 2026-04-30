@@ -27,13 +27,12 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
     const MOD_QR_ID             = self::MOD_PREFIX . 'qr_id';
     const MOD_QR_EXTENSION_ID   = self::MOD_PREFIX . 'qr_extension_id';
     const MOD_QR_URL            = self::MOD_PREFIX . 'qr_url';
+    const MOD_QR_EXPIRES_AT     = self::MOD_PREFIX . 'qr_expires_at';
     const MOD_PAYMENT_CALLBACK  = self::MOD_PREFIX . 'payment_callback';
     const MOD_PAYMENT_RECEIPT   = self::MOD_PREFIX . 'payment_receipt';
     const MOD_PAYMENT_REFERENCE = self::MOD_PREFIX . 'payment_reference';
 
     const MOD_ACTION_CHECK_PAYMENT = self::MOD_PREFIX . 'check_payment';
-
-    const MOD_QR_EXPIRES_AT = self::MOD_PREFIX . 'qr_expires_at';
 
     /**
      * Default API request timeout (seconds).
@@ -409,23 +408,33 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
             return;
         }
 
+        $qrcodejs_handle = self::MOD_PREFIX . 'qrcodejs';
+        $thankyou_handle = self::MOD_PREFIX . 'thankyou_page';
+
         if (!$is_mobile) {
-            // https://cdnjs.com/libraries/qrcodejs
             $js_div_id = wp_json_encode("{$this->id}-order-qrcode-js");
             $js_text   = wp_json_encode($qr_url);
 
-            wp_enqueue_script('qrcodejs', plugins_url('/assets/js/qrcodejs/qrcode.min.js', self::MOD_PLUGIN_FILE), array(), '1.0.0', true);
+            // https://github.com/davidshimjs/qrcodejs
+            // https://cdnjs.com/libraries/qrcodejs
+            wp_enqueue_script(
+                $qrcodejs_handle,
+                plugins_url('/assets/js/qrcodejs/qrcode.min.js', self::MOD_PLUGIN_FILE),
+                array(),
+                '1.0.0',
+                true
+            );
+
             wp_add_inline_script(
-                'qrcodejs',
+                $qrcodejs_handle,
                 "new QRCode({$js_div_id}, { text: {$js_text}, width: 200, height: 200 });"
             );
         }
 
-        $script_handle = self::MOD_PREFIX . 'thankyou_page';
         wp_enqueue_script(
-            $script_handle,
+            $thankyou_handle,
             plugins_url('/assets/js/thankyou.js', self::MOD_PLUGIN_FILE),
-            $is_mobile ? array('jquery') : array('jquery', 'qrcodejs'),
+            $is_mobile ? array('jquery') : array('jquery', $qrcodejs_handle),
             self::MOD_VERSION,
             true
         );
@@ -434,8 +443,8 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         $expires_at = intval($order->get_meta(self::MOD_QR_EXPIRES_AT, true));
 
         wp_localize_script(
-            $script_handle,
-            $script_handle,
+            $thankyou_handle,
+            $thankyou_handle,
             array(
                 'order_id'      => $order_id,
                 'order_key'     => $order->get_order_key(),
