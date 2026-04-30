@@ -411,9 +411,6 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         $thankyou_handle = self::MOD_PREFIX . 'thankyou_page';
 
         if (!$is_mobile) {
-            $js_div_id = wp_json_encode("{$this->id}-order-qrcode-js");
-            $js_text   = wp_json_encode($qr_url);
-
             // https://github.com/davidshimjs/qrcodejs
             // https://cdnjs.com/libraries/qrcodejs
             wp_enqueue_script(
@@ -422,11 +419,6 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
                 array(),
                 '1.0.0',
                 true
-            );
-
-            wp_add_inline_script(
-                $qrcodejs_handle,
-                "new QRCode({$js_div_id}, { text: {$js_text}, width: 200, height: 200 });"
             );
         }
 
@@ -452,8 +444,11 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
                 'poll_interval' => 10000,
                 'ajax_url'      => admin_url('admin-ajax.php'),
                 'action_status' => self::MOD_PREFIX . 'check_order_status',
+                'is_mobile'     => $is_mobile,
                 'container_id'  => "{$this->id}-order-qrcode",
                 'qr_section_id' => "{$this->id}-qr-section",
+                'qr_code_id'    => "{$this->id}-order-qrcode-js",
+                'qr_text'       => $qr_url,
                 'success_id'    => "{$this->id}-success-message",
                 'expired_id'    => "{$this->id}-expired-message",
                 'countdown_id'  => "{$this->id}-countdown",

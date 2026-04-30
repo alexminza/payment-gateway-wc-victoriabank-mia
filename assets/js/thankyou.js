@@ -1,4 +1,4 @@
-/* global victoriabank_mia_thankyou_page */
+/* global QRCode, victoriabank_mia_thankyou_page */
 (function ($) {
     'use strict';
 
@@ -15,6 +15,7 @@
 
     const $container   = $(`#${victoriabank_mia_thankyou_page.container_id}`);
     const $qrSection   = $(`#${victoriabank_mia_thankyou_page.qr_section_id}`);
+    const $qrCode      = $(`#${victoriabank_mia_thankyou_page.qr_code_id}`);
     const $successMsg  = $(`#${victoriabank_mia_thankyou_page.success_id}`);
     const $expiredMsg  = $(`#${victoriabank_mia_thankyou_page.expired_id}`);
     const $countdownEl = $(`#${victoriabank_mia_thankyou_page.countdown_id}`);
@@ -22,6 +23,19 @@
 
     if (!$container.length) {
         return;
+    }
+
+    /**
+     * Render the desktop QR code.
+     */
+    function renderQRCode() {
+        $qrCode.empty();
+
+        new QRCode($qrCode.get(0), {
+            text: victoriabank_mia_thankyou_page.qr_text,
+            width: 200,
+            height: 200,
+        });
     }
 
     /**
@@ -149,8 +163,14 @@
     const countdownInterval = ($countdownEl.length && $countdownEl.is(':visible'))
         ? countdownIntervalVisible
         : countdownIntervalHidden;
+
+    if (!Boolean(victoriabank_mia_thankyou_page.is_mobile)) {
+        renderQRCode();
+    }
+
     tickCountdown();
     countdownTimer = setInterval(tickCountdown, countdownInterval);
+
     pollOrderStatus();
     pollTimer = setInterval(pollOrderStatus, pollInterval);
 }(jQuery));
