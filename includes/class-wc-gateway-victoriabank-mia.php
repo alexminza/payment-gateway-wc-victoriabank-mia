@@ -19,7 +19,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
     const MOD_TEXT_DOMAIN = 'payment-gateway-wc-victoriabank-mia';
     const MOD_PREFIX      = 'victoriabank_mia_';
     const MOD_TITLE       = 'Victoriabank MIA';
-    const MOD_VERSION     = '1.1.0';
+    const MOD_VERSION     = '1.1.1';
     const MOD_PLUGIN_FILE = VICTORIABANK_MIA_MOD_PLUGIN_FILE;
 
     const SUPPORTED_CURRENCIES = array('MDL');
@@ -265,6 +265,19 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
             && $this->validate_iban($this->victoriabank_mia_creditor_account);
     }
 
+    protected function validate_settings()
+    {
+        $validate_result = parent::validate_settings();
+
+        $result = $this->validate_certificate($this->victoriabank_mia_certificate);
+        if (!empty($result)) {
+            $this->add_error(sprintf('<strong>%1$s</strong>: %2$s', $this->get_settings_field_label('victoriabank_mia_certificate'), esc_html($result)));
+            $validate_result = false;
+        }
+
+        return $validate_result;
+    }
+
     public function validate_order_template_field($key, $value)
     {
         return $this->validate_required_field($key, $value);
@@ -313,6 +326,48 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         }
 
         return $value;
+    }
+
+    protected function validate_certificate(string $cert_data)
+    {
+        try {
+            $cert = openssl_x509_read($cert_data);
+            if (false !== $cert) {
+                $cert_info = openssl_x509_parse($cert);
+                if (false !== $cert_info && isset($cert_info['validTo_time_t'])) {
+                    $expiry_date = new \WC_DateTime();
+                    $expiry_date->setTimestamp($cert_info['validTo_time_t']);
+                    $threshold_date = new \WC_DateTime('+30 days');
+
+                    $site_timezone = wp_timezone();
+                    $expiry_date->setTimezone($site_timezone);
+                    $threshold_date->setTimezone($site_timezone);
+
+                    if ($expiry_date <= $threshold_date) {
+                        // Certificate already expired or expires in the next 30 days
+                        /* translators: 1: Date string */
+                        return esc_html(sprintf(__('Certificate valid until %1$s', 'payment-gateway-wc-victoriabank-mia'), wc_format_datetime($expiry_date)));
+                    }
+
+                    return null;
+                }
+            }
+
+            $message = esc_html__('Invalid certificate', 'payment-gateway-wc-victoriabank-mia');
+            $this->log_openssl_errors($message);
+            return $message;
+        } catch (\Exception $ex) {
+            $this->log(
+                $ex->getMessage(),
+                \WC_Log_Levels::ERROR,
+                array(
+                    'exception' => (string) $ex,
+                    'backtrace' => true,
+                )
+            );
+
+            return esc_html__('Could not validate certificate', 'payment-gateway-wc-victoriabank-mia');
+        }
     }
 
     protected function validate_transaction_validity($value)
