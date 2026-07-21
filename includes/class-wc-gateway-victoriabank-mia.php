@@ -334,7 +334,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
             $cert = openssl_x509_read($cert_data);
             if (false !== $cert) {
                 $cert_info = openssl_x509_parse($cert);
-                if (false !== $cert_info && isset($cert_info['validTo_time_t'])) {
+                if (false !== $cert_info) {
                     $expiry_date = new \WC_DateTime();
                     $expiry_date->setTimestamp($cert_info['validTo_time_t']);
                     $threshold_date = new \WC_DateTime('+30 days');
