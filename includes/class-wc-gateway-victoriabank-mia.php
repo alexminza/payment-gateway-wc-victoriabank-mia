@@ -328,6 +328,20 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         return $value;
     }
 
+    protected function validate_transaction_validity($value)
+    {
+        $transaction_validity = intval($value);
+        return $transaction_validity >= self::MIN_VALIDITY
+            && $transaction_validity <= self::MAX_VALIDITY;
+    }
+
+    protected function validate_iban($value)
+    {
+        return !empty($value)
+            && strlen($value) === 24
+            && substr($value, 0, 2) === 'MD';
+    }
+
     protected function validate_certificate(string $cert_data)
     {
         try {
@@ -368,20 +382,6 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
 
             return esc_html__('Could not validate certificate', 'payment-gateway-wc-victoriabank-mia');
         }
-    }
-
-    protected function validate_transaction_validity($value)
-    {
-        $transaction_validity = intval($value);
-        return $transaction_validity >= self::MIN_VALIDITY
-            && $transaction_validity <= self::MAX_VALIDITY;
-    }
-
-    protected function validate_iban($value)
-    {
-        return !empty($value)
-            && strlen($value) === 24
-            && substr($value, 0, 2) === 'MD';
     }
     //endregion
 
