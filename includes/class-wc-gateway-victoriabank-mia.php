@@ -269,10 +269,12 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
     {
         $validate_result = parent::validate_settings();
 
-        $result = $this->validate_certificate($this->victoriabank_mia_certificate);
-        if (!empty($result)) {
-            $this->add_error(sprintf('<strong>%1$s</strong>: %2$s', $this->get_settings_field_label('victoriabank_mia_certificate'), esc_html($result)));
-            $validate_result = false;
+        if (!empty($this->victoriabank_mia_certificate)) {
+            $result = $this->validate_certificate($this->victoriabank_mia_certificate);
+            if (!empty($result)) {
+                $this->add_error(sprintf('<strong>%1$s</strong>: %2$s', $this->get_settings_field_label('victoriabank_mia_certificate'), esc_html($result)));
+                $validate_result = false;
+            }
         }
 
         return $validate_result;
