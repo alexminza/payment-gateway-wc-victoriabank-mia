@@ -19,7 +19,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
     const MOD_TEXT_DOMAIN = 'payment-gateway-wc-victoriabank-mia';
     const MOD_PREFIX      = 'victoriabank_mia_';
     const MOD_TITLE       = 'Victoriabank MIA';
-    const MOD_VERSION     = '1.1.0';
+    const MOD_VERSION     = '1.1.1';
     const MOD_PLUGIN_FILE = VICTORIABANK_MIA_MOD_PLUGIN_FILE;
 
     const SUPPORTED_CURRENCIES = array('MDL');
@@ -265,6 +265,21 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
             && $this->validate_iban($this->victoriabank_mia_creditor_account);
     }
 
+    protected function validate_settings()
+    {
+        $validate_result = parent::validate_settings();
+
+        if (!empty($this->victoriabank_mia_certificate)) {
+            $result = $this->validate_certificate($this->victoriabank_mia_certificate);
+            if (!empty($result)) {
+                $this->add_error(sprintf('<strong>%1$s</strong>: %2$s', $this->get_settings_field_label('victoriabank_mia_certificate'), esc_html($result)));
+                $validate_result = false;
+            }
+        }
+
+        return $validate_result;
+    }
+
     public function validate_order_template_field($key, $value)
     {
         return $this->validate_required_field($key, $value);
@@ -327,6 +342,48 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         return !empty($value)
             && strlen($value) === 24
             && substr($value, 0, 2) === 'MD';
+    }
+
+    protected function validate_certificate(string $cert_data)
+    {
+        try {
+            $cert = openssl_x509_read($cert_data);
+            if (false !== $cert) {
+                $cert_info = openssl_x509_parse($cert);
+                if (false !== $cert_info) {
+                    $expiry_date = new \WC_DateTime();
+                    $expiry_date->setTimestamp($cert_info['validTo_time_t']);
+                    $threshold_date = new \WC_DateTime('+30 days');
+
+                    $site_timezone = wp_timezone();
+                    $expiry_date->setTimezone($site_timezone);
+                    $threshold_date->setTimezone($site_timezone);
+
+                    if ($expiry_date <= $threshold_date) {
+                        // Certificate already expired or expires in the next 30 days
+                        /* translators: 1: Date string */
+                        return esc_html(sprintf(__('Certificate valid until %1$s', 'payment-gateway-wc-victoriabank-mia'), wc_format_datetime($expiry_date)));
+                    }
+
+                    return null;
+                }
+            }
+
+            $message = esc_html__('Invalid certificate', 'payment-gateway-wc-victoriabank-mia');
+            $this->log_openssl_errors($message);
+            return $message;
+        } catch (\Exception $ex) {
+            $this->log(
+                $ex->getMessage(),
+                \WC_Log_Levels::ERROR,
+                array(
+                    'exception' => (string) $ex,
+                    'backtrace' => true,
+                )
+            );
+
+            return esc_html__('Could not validate certificate', 'payment-gateway-wc-victoriabank-mia');
+        }
     }
     //endregion
 
@@ -576,28 +633,28 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
     /**
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-get_api_v1_qr_extensions__qrExtensionUUID__status
      */
-    private function victoriabank_mia_qr_active(VictoriabankMiaClient $client, string $auth_token, string $qr_extension_id)
+    private function victoriabank_mia_qr_status(VictoriabankMiaClient $client, string $auth_token, string $qr_extension_id)
     {
-        $qr_extension_status = $client->getQrExtensionStatus($qr_extension_id, $auth_token);
+        return $client->getQrExtensionStatus($qr_extension_id, $auth_token)->toArray();
+    }
 
-        if (!empty($qr_extension_status)) {
-            $qr_extension_status_value = strval($qr_extension_status['status']);
-
-            if (strtolower($qr_extension_status_value) === 'active') {
-                $qr_extension_status_ttl = (array) $qr_extension_status['ttl'];
-                $qr_extension_status_ttl_length = intval($qr_extension_status_ttl['length']);
-                $qr_extension_status_ttl_units = strval($qr_extension_status_ttl['units']);
-
-                $min_validity_seconds = $this->transaction_validity * 60 / 2;
-                $remaining_seconds = strtolower($qr_extension_status_ttl_units) === 'mm'
-                    ? $qr_extension_status_ttl_length * 60
-                    : $qr_extension_status_ttl_length;
-
-                return $remaining_seconds >= $min_validity_seconds;
-            }
+    private function victoriabank_mia_qr_active_ttl(array $qr_extension_status)
+    {
+        $qr_extension_status_value = strtolower(strval($qr_extension_status['status']));
+        if ('active' !== $qr_extension_status_value) {
+            return false;
         }
 
-        return false;
+        $qr_extension_status_ttl = (array) $qr_extension_status['ttl'];
+        $qr_extension_status_ttl_length = intval($qr_extension_status_ttl['length']);
+        $qr_extension_status_ttl_units = strval($qr_extension_status_ttl['units']);
+
+        $min_validity_seconds = $this->transaction_validity * 60 / 2;
+        $remaining_seconds = strtolower($qr_extension_status_ttl_units) === 'mm'
+            ? $qr_extension_status_ttl_length * 60
+            : $qr_extension_status_ttl_length;
+
+        return $remaining_seconds >= $min_validity_seconds;
     }
     //endregion
 
@@ -609,6 +666,25 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         }
 
         return $this->get_redirect_url($order);
+    }
+
+    private function payment_failure(\WC_Order $order)
+    {
+        /* translators: 1: Order ID, 2: Payment method title */
+        $message = esc_html(sprintf(__('Order #%1$s payment initiation failed via %2$s.', 'payment-gateway-wc-victoriabank-mia'), $order->get_id(), $this->get_method_title()));
+        $message = $this->get_test_message($message);
+        $this->log($message, \WC_Log_Levels::ERROR);
+        $order->add_order_note($message);
+
+        wc_add_notice($message, 'error');
+        $this->logs_admin_website_notice();
+
+        // https://github.com/woocommerce/woocommerce/issues/48687#issuecomment-2186475264
+        // https://github.com/woocommerce/woocommerce/pull/53671
+        return array(
+            'result'  => 'failure',
+            'message' => $message,
+        );
     }
 
     /**
@@ -624,29 +700,29 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
             $auth_token = $this->victoriabank_mia_generate_token($client);
 
             //region Existing QR
-            try {
-                $qr_extension_id = strval($order->get_meta(self::MOD_QR_EXTENSION_ID, true));
-                $qr_url = strval($order->get_meta(self::MOD_QR_URL, true));
+            $qr_extension_id = strval($order->get_meta(self::MOD_QR_EXTENSION_ID, true));
+            $qr_url = strval($order->get_meta(self::MOD_QR_URL, true));
 
-                if (!empty($qr_extension_id) && !empty($qr_url)) {
-                    if ($this->victoriabank_mia_qr_active($client, $auth_token, $qr_extension_id)) {
-                        return array(
-                            'result'   => 'success',
-                            'redirect' => $this->get_payment_redirect_url($order, $qr_url),
-                        );
+            if (!empty($qr_extension_id)) {
+                $qr_extension_status = $this->victoriabank_mia_qr_status($client, $auth_token, $qr_extension_id);
+                $qr_extension_status_value = strtolower(strval($qr_extension_status['status']));
+
+                if ('paid' === $qr_extension_status_value) {
+                    $confirm_payment_result = $this->confirm_qr_extension_payment($order, $qr_extension_status);
+                    if (is_wp_error($confirm_payment_result)) {
+                        return $this->payment_failure($order);
                     }
+
+                    return array(
+                        'result'   => 'success',
+                        'redirect' => $this->get_redirect_url($order),
+                    );
+                } elseif ('active' === $qr_extension_status_value && !empty($qr_url) && $this->victoriabank_mia_qr_active_ttl($qr_extension_status)) {
+                    return array(
+                        'result'   => 'success',
+                        'redirect' => $this->get_payment_redirect_url($order, $qr_url),
+                    );
                 }
-            } catch (\Exception $ex) {
-                $this->log(
-                    $ex->getMessage(),
-                    \WC_Log_Levels::ERROR,
-                    array(
-                        'order_id' => $order_id,
-                        'response' => self::get_guzzle_error_response_body($ex),
-                        'exception' => (string) $ex,
-                        'backtrace' => true,
-                    )
-                );
             }
             //endregion
 
@@ -703,21 +779,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
             );
         }
 
-        /* translators: 1: Order ID, 2: Payment method title */
-        $message = esc_html(sprintf(__('Order #%1$s payment initiation failed via %2$s.', 'payment-gateway-wc-victoriabank-mia'), $order_id, $this->get_method_title()));
-        $message = $this->get_test_message($message);
-        $this->log($message, \WC_Log_Levels::ERROR);
-        $order->add_order_note($message);
-
-        wc_add_notice($message, 'error');
-        $this->logs_admin_website_notice();
-
-        // https://github.com/woocommerce/woocommerce/issues/48687#issuecomment-2186475264
-        // https://github.com/woocommerce/woocommerce/pull/53671
-        return array(
-            'result'  => 'failure',
-            'message' => $message,
-        );
+        return $this->payment_failure($order);
     }
 
     public function check_response()
@@ -834,7 +896,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
             $client = $this->init_victoriabank_mia_client();
             $auth_token = $this->victoriabank_mia_generate_token($client);
 
-            $qr_extension_status = $client->getQrExtensionStatus($qr_extension_id, $auth_token);
+            $qr_extension_status = $this->victoriabank_mia_qr_status($client, $auth_token, $qr_extension_id);
         } catch (\Exception $ex) {
             $this->log(
                 $ex->getMessage(),
@@ -849,7 +911,6 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         }
 
         if (!empty($qr_extension_status)) {
-            $qr_extension_status = $qr_extension_status->toArray();
             $qr_extension_status_value = strval($qr_extension_status['status']);
 
             /* translators: 1: Order ID, 2: Payment method title, 3: Payment status */
@@ -866,15 +927,10 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
             );
 
             if (strtolower($qr_extension_status_value) === 'paid') {
-                $qr_extension_status_payments = (array) $qr_extension_status['payments'];
+                $confirm_payment_result = $this->confirm_qr_extension_payment($order, $qr_extension_status);
 
-                if (!empty($qr_extension_status_payments)) {
-                    $payment_data = (array) $qr_extension_status_payments[0];
-                    $confirm_payment_result = $this->confirm_payment($order, $payment_data, $qr_extension_status);
-
-                    if (is_wp_error($confirm_payment_result)) {
-                        \WC_Admin_Meta_Boxes::add_error($confirm_payment_result->get_error_message());
-                    }
+                if (is_wp_error($confirm_payment_result)) {
+                    \WC_Admin_Meta_Boxes::add_error($confirm_payment_result->get_error_message());
                 }
             }
         } else {
@@ -882,6 +938,13 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
             $message = esc_html(sprintf(__('Order #%1$s payment check failed.', 'payment-gateway-wc-victoriabank-mia'), $order_id));
             \WC_Admin_Meta_Boxes::add_error($message);
         }
+    }
+
+    private function confirm_qr_extension_payment(\WC_Order $order, array $qr_extension_status)
+    {
+        $qr_extension_status_payments = (array) $qr_extension_status['payments'];
+        $payment_data = (array) $qr_extension_status_payments[0];
+        return $this->confirm_payment($order, $payment_data, $qr_extension_status);
     }
 
     protected function confirm_payment(\WC_Order $order, array $payment_data, array $payment_receipt_data, ?string $callback_body = null)
