@@ -19,7 +19,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
     const MOD_TEXT_DOMAIN = 'payment-gateway-wc-victoriabank-mia';
     const MOD_PREFIX      = 'victoriabank_mia_';
     const MOD_TITLE       = 'Victoriabank MIA';
-    const MOD_VERSION     = '1.1.1';
+    const MOD_VERSION     = '1.2.0';
     const MOD_PLUGIN_FILE = VICTORIABANK_MIA_MOD_PLUGIN_FILE;
 
     const SUPPORTED_CURRENCIES = array('MDL');
