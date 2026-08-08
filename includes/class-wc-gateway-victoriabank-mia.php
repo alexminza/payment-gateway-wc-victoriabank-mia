@@ -729,13 +729,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
                 $qr_extension_status_value = strtolower(strval($qr_extension_status['status']));
 
                 if ('paid' === $qr_extension_status_value) {
-                    if (!$order->is_paid()) {
-                        $confirm_payment_result = $this->confirm_qr_extension_payment($order, $qr_extension_status);
-                        if (is_wp_error($confirm_payment_result)) {
-                            return $this->payment_failure($order);
-                        }
-                    }
-
+                    // Payment confirmation is handled by the Victoriabank MIA callback or the admin check.
                     return array(
                         'result'   => 'success',
                         'redirect' => $this->get_redirect_url($order),
