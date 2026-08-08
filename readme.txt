@@ -1,9 +1,9 @@
 === Payment Gateway for Victoriabank MIA for WooCommerce ===
 Contributors: alexminza
 Tags: Moldova, Victoriabank, MIA, QR, payment gateway
-Requires at least: 5.3
+Requires at least: 5.6
 Tested up to: 7.0
-Stable tag: 1.1.1
+Stable tag: 1.2.0
 Requires PHP: 8.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -70,6 +70,9 @@ You can also contribute to the plugin by translating it. Simply visit [translate
 
 See [payment-gateway-wc-victoriabank-mia project releases on GitHub](https://github.com/alexminza/payment-gateway-wc-victoriabank-mia/releases) for details.
 
+= 1.2.0 =
+* Improved payment retry handling for already-paid orders
+
 = 1.1.1 =
 * Improved payment retry handling
 * Added bank certificate validation
@@ -104,6 +107,9 @@ Minor improvements.
 Initial version release.
 
 == Upgrade Notice ==
+
+= 1.2.0 =
+Improved payment retry handling for already-paid orders.
 
 = 1.1.1 =
 Improved payment retry handling and bank certificate validation.

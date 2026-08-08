@@ -19,7 +19,7 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
     const MOD_TEXT_DOMAIN = 'payment-gateway-wc-victoriabank-mia';
     const MOD_PREFIX      = 'victoriabank_mia_';
     const MOD_TITLE       = 'Victoriabank MIA';
-    const MOD_VERSION     = '1.1.1';
+    const MOD_VERSION     = '1.2.0';
     const MOD_PLUGIN_FILE = VICTORIABANK_MIA_MOD_PLUGIN_FILE;
 
     const SUPPORTED_CURRENCIES = array('MDL');
@@ -553,6 +553,9 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
 
     //region Victoriabank MIA
     /**
+     * Initializes the Victoriabank MIA API client.
+     *
+     * @return VictoriabankMiaClient
      * @link https://github.com/alexminza/victoriabank-mia-sdk-php/blob/main/README.md#getting-started
      */
     protected function init_victoriabank_mia_client()
@@ -582,6 +585,11 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
     }
 
     /**
+     * Obtains an API access token.
+     *
+     * @param VictoriabankMiaClient $client API client.
+     * @return string Access token.
+     * @throws \Exception When the API response does not contain an access token.
      * @link https://github.com/alexminza/victoriabank-mia-sdk-php/blob/main/README.md#get-access-token-with-username-and-password
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Token-post_identity_token
      */
@@ -598,6 +606,12 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
     }
 
     /**
+     * Creates a dynamic payment QR for an order.
+     *
+     * @param VictoriabankMiaClient $client API client.
+     * @param string                $auth_token API access token.
+     * @param \WC_Order             $order WooCommerce order.
+     * @return \GuzzleHttp\Command\Result API response.
      * @link https://github.com/alexminza/victoriabank-mia-sdk-php/blob/main/README.md#create-a-dynamic-order-payment-qr
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-post_api_v1_qr
      */
@@ -631,6 +645,12 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
     }
 
     /**
+     * Retrieves QR extension status.
+     *
+     * @param VictoriabankMiaClient $client API client.
+     * @param string                $auth_token API access token.
+     * @param string                $qr_extension_id QR extension identifier.
+     * @return array QR extension status.
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-get_api_v1_qr_extensions__qrExtensionUUID__status
      */
     private function victoriabank_mia_qr_status(VictoriabankMiaClient $client, string $auth_token, string $qr_extension_id)
@@ -638,13 +658,14 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         return $client->getQrExtensionStatus($qr_extension_id, $auth_token)->toArray();
     }
 
-    private function victoriabank_mia_qr_active_ttl(array $qr_extension_status)
+    /**
+     * Checks whether a QR has sufficient remaining validity.
+     *
+     * @param array $qr_extension_status QR extension status.
+     * @return bool Whether the QR has sufficient remaining validity.
+     */
+    private function victoriabank_mia_qr_ttl_valid(array $qr_extension_status)
     {
-        $qr_extension_status_value = strtolower(strval($qr_extension_status['status']));
-        if ('active' !== $qr_extension_status_value) {
-            return false;
-        }
-
         $qr_extension_status_ttl = (array) $qr_extension_status['ttl'];
         $qr_extension_status_ttl_length = intval($qr_extension_status_ttl['length']);
         $qr_extension_status_ttl_units = strval($qr_extension_status_ttl['units']);
@@ -708,16 +729,12 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
                 $qr_extension_status_value = strtolower(strval($qr_extension_status['status']));
 
                 if ('paid' === $qr_extension_status_value) {
-                    $confirm_payment_result = $this->confirm_qr_extension_payment($order, $qr_extension_status);
-                    if (is_wp_error($confirm_payment_result)) {
-                        return $this->payment_failure($order);
-                    }
-
+                    // Payment confirmation is handled by the Victoriabank MIA callback or the admin check.
                     return array(
                         'result'   => 'success',
                         'redirect' => $this->get_redirect_url($order),
                     );
-                } elseif ('active' === $qr_extension_status_value && !empty($qr_url) && $this->victoriabank_mia_qr_active_ttl($qr_extension_status)) {
+                } elseif ('active' === $qr_extension_status_value && !empty($qr_url) && $this->victoriabank_mia_qr_ttl_valid($qr_extension_status)) {
                     return array(
                         'result'   => 'success',
                         'redirect' => $this->get_payment_redirect_url($order, $qr_url),

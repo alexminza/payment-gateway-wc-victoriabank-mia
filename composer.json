@@ -28,6 +28,7 @@
     },
     "require": {
         "php": ">=8.0",
+        "ext-openssl": "*",
         "alexminza/victoriabank-mia-sdk": "^1.0",
         "alexminza/wc-payment-gateway-base": "^1.0",
         "monolog/monolog": "^2.7",
@@ -46,6 +47,6 @@
     },
     "prefer-stable": true,
     "require-dev": {
-        "woocommerce/woocommerce-sniffs": "^1.0"
+        "woocommerce/woocommerce-sniffs": "*"
     }
 }
