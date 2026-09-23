@@ -1044,16 +1044,6 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         $order_currency = $order->get_currency();
         $amount = isset($amount) ? floatval($amount) : $order_total;
 
-        //region Validate refund amount
-        if ($amount !== $order_total) {
-            /* translators: 1: Payment method title */
-            $message = esc_html(sprintf(__('Partial refunds are not currently supported by %1$s.', 'payment-gateway-wc-victoriabank-mia'), $this->get_method_title()));
-            $this->log($message, \WC_Log_Levels::ERROR);
-
-            return new \WP_Error('partial_refund', $message);
-        }
-        //endregion
-
         $payment_reference = strval($order->get_meta(self::MOD_PAYMENT_REFERENCE, true));
         if (empty($payment_reference)) {
             /* translators: 1: Order ID, 2: Meta field key */
@@ -1066,7 +1056,18 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
             $auth_token = $this->victoriabank_mia_generate_token($client);
 
             $transaction_id = VictoriabankMiaClient::getPaymentTransactionId($payment_reference);
-            $client->reverseTransaction($transaction_id, $auth_token);
+
+            // Victoriabank MIA limitations:
+            // * full reversal and partial refund are separate operations
+            // * only a single partial refund per transaction is supported
+            // Multiple partial refunds are not available: repeated attempts are rejected by the bank and surface as API errors.
+            $order_price  = $this->format_price($order_total, $order_currency);
+            $refund_price = $this->format_price($amount, $order_currency);
+            if ($order_price === $refund_price) {
+                $client->reverseTransaction($transaction_id, $auth_token);
+            } else {
+                $client->partialRefundTransaction($transaction_id, $amount, $auth_token);
+            }
         } catch (\Exception $ex) {
             $this->log(
                 $ex->getMessage(),
