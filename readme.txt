@@ -2,7 +2,7 @@
 Contributors: alexminza
 Tags: Moldova, Victoriabank, MIA, QR, payment gateway
 Requires at least: 5.6
-Tested up to: 7.0
+Tested up to: 7.1
 Stable tag: 1.2.0
 Requires PHP: 8.0
 License: GPLv3 or later
@@ -109,7 +109,7 @@ Initial version release.
 == Upgrade Notice ==
 
 = 1.2.0 =
-Improved payment retry handling for already-paid orders.
+Added partial refunds and improved payment retry handling for already-paid orders.
 
 = 1.1.1 =
 Improved payment retry handling and bank certificate validation.
