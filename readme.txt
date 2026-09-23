@@ -1,9 +1,9 @@
 === Payment Gateway for Victoriabank MIA for WooCommerce ===
 Contributors: alexminza
 Tags: Moldova, Victoriabank, MIA, QR, payment gateway
-Requires at least: 5.3
-Tested up to: 7.0
-Stable tag: 1.1.1
+Requires at least: 5.6
+Tested up to: 7.1
+Stable tag: 1.2.0
 Requires PHP: 8.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -17,12 +17,12 @@ Accept MIA Instant Payments directly on your store with the Payment Gateway for 
 = Features =
 
 * Online payments with [MIA Instant Payments](https://mia.bnm.md/en)
-* Reverse transactions – complete refunds[^1]
+* Reverse transactions – partial or complete refunds[^1]
 * Admin order actions – check order payment status
 * Supports WooCommerce [block-based checkout experience](https://woocommerce.com/checkout-blocks/)
 * Free to use – [Open-source GPL-3.0 license on GitHub](https://github.com/alexminza/payment-gateway-wc-victoriabank-mia)
 
-[^1]: Partial refunds are not currently supported by Victoriabank MIA.
+[^1]: Victoriabank MIA supports a single partial refund per order; multiple partial refunds are not available.
 
 = Getting Started =
 
@@ -37,6 +37,7 @@ Accept MIA Instant Payments directly on your store with the Payment Gateway for 
 4. Perform the following test cases and provide the requested details to the bank:
     * **Test case #1**: Create a new order and pay
     * **Test case #2**: Create a new order and pay, afterwards perform a full order refund
+    * **Test case #3**: Create a new order and pay, afterwards perform a partial order refund
 5. Disable *Test* and *Debug* modes when ready to accept live payments
 
 == Frequently Asked Questions ==
@@ -69,6 +70,10 @@ You can also contribute to the plugin by translating it. Simply visit [translate
 == Changelog ==
 
 See [payment-gateway-wc-victoriabank-mia project releases on GitHub](https://github.com/alexminza/payment-gateway-wc-victoriabank-mia/releases) for details.
+
+= 1.2.0 =
+* Added partial refunds
+* Improved payment retry handling for already-paid orders
 
 = 1.1.1 =
 * Improved payment retry handling
@@ -104,6 +109,9 @@ Minor improvements.
 Initial version release.
 
 == Upgrade Notice ==
+
+= 1.2.0 =
+Added partial refunds and improved payment retry handling for already-paid orders.
 
 = 1.1.1 =
 Improved payment retry handling and bank certificate validation.
