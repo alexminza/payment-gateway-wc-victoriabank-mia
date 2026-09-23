@@ -17,10 +17,12 @@ Accept MIA Instant Payments directly on your store with the Payment Gateway for 
 = Features =
 
 * Online payments with [MIA Instant Payments](https://mia.bnm.md/en)
-* Reverse transactions – partial or complete refunds
+* Reverse transactions – partial or complete refunds[^1]
 * Admin order actions – check order payment status
 * Supports WooCommerce [block-based checkout experience](https://woocommerce.com/checkout-blocks/)
 * Free to use – [Open-source GPL-3.0 license on GitHub](https://github.com/alexminza/payment-gateway-wc-victoriabank-mia)
+
+[^1]: Victoriabank MIA supports a single partial refund per order; multiple partial refunds are not available.
 
 = Getting Started =
 
