@@ -721,25 +721,38 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
             $auth_token = $this->victoriabank_mia_generate_token($client);
 
             //region Existing QR
-            $qr_extension_id = strval($order->get_meta(self::MOD_QR_EXTENSION_ID, true));
-            $qr_url = strval($order->get_meta(self::MOD_QR_URL, true));
+            try {
+                $qr_extension_id = strval($order->get_meta(self::MOD_QR_EXTENSION_ID, true));
+                $qr_url = strval($order->get_meta(self::MOD_QR_URL, true));
 
-            if (!empty($qr_extension_id)) {
-                $qr_extension_status = $this->victoriabank_mia_qr_status($client, $auth_token, $qr_extension_id);
-                $qr_extension_status_value = strtolower(strval($qr_extension_status['status']));
+                if (!empty($qr_extension_id)) {
+                    $qr_extension_status = $this->victoriabank_mia_qr_status($client, $auth_token, $qr_extension_id);
+                    $qr_extension_status_value = strtolower(strval($qr_extension_status['status']));
 
-                if ('paid' === $qr_extension_status_value) {
-                    // Payment confirmation is handled by the Victoriabank MIA callback or the admin check.
-                    return array(
-                        'result'   => 'success',
-                        'redirect' => $this->get_redirect_url($order),
-                    );
-                } elseif ('active' === $qr_extension_status_value && !empty($qr_url) && $this->victoriabank_mia_qr_ttl_valid($qr_extension_status)) {
-                    return array(
-                        'result'   => 'success',
-                        'redirect' => $this->get_payment_redirect_url($order, $qr_url),
-                    );
+                    if ('paid' === $qr_extension_status_value) {
+                        // Payment confirmation is handled by the Victoriabank MIA callback or the admin check.
+                        return array(
+                            'result'   => 'success',
+                            'redirect' => $this->get_redirect_url($order),
+                        );
+                    } elseif ('active' === $qr_extension_status_value && !empty($qr_url) && $this->victoriabank_mia_qr_ttl_valid($qr_extension_status)) {
+                        return array(
+                            'result'   => 'success',
+                            'redirect' => $this->get_payment_redirect_url($order, $qr_url),
+                        );
+                    }
                 }
+            } catch (\Exception $ex) {
+                $this->log(
+                    $ex->getMessage(),
+                    \WC_Log_Levels::ERROR,
+                    array(
+                        'order_id' => $order_id,
+                        'response' => self::get_guzzle_error_response_body($ex),
+                        'exception' => (string) $ex,
+                        'backtrace' => true,
+                    )
+                );
             }
             //endregion
 
