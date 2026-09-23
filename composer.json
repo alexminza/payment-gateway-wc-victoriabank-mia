@@ -31,6 +31,8 @@
         "ext-openssl": "*",
         "alexminza/victoriabank-mia-sdk": "^1.0",
         "alexminza/wc-payment-gateway-base": "^1.0",
+        "guzzlehttp/guzzle": "^7.0",
+        "guzzlehttp/guzzle-services": "^1.0",
         "monolog/monolog": "^2.7",
         "automattic/jetpack-autoloader": "^5.0"
     },
