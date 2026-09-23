@@ -1044,6 +1044,19 @@ class WC_Gateway_Victoriabank_MIA extends WC_Payment_Gateway_Base
         $order_currency = $order->get_currency();
         $amount = isset($amount) ? floatval($amount) : $order_total;
 
+        //region Validate previous refunds
+        // WooCommerce flags refunds processed through the payment gateway; manual refunds are not counted.
+        foreach ($order->get_refunds() as $order_refund) {
+            if ($order_refund->get_refunded_payment()) {
+                /* translators: 1: Payment method title, 2: Order ID, 3: Refund amount */
+                $message = esc_html(sprintf(__('%1$s allows a single partial refund per order. Order #%2$s was already refunded %3$s, further refunds must be processed manually.', 'payment-gateway-wc-victoriabank-mia'), $this->get_method_title(), $order_id, $this->format_price(floatval($order_refund->get_amount()), $order_currency)));
+                $this->log($message, \WC_Log_Levels::ERROR);
+
+                return new \WP_Error('partial_refund', $message);
+            }
+        }
+        //endregion
+
         $payment_reference = strval($order->get_meta(self::MOD_PAYMENT_REFERENCE, true));
         if (empty($payment_reference)) {
             /* translators: 1: Order ID, 2: Meta field key */
